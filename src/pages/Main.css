@@ -1,0 +1,15 @@
+h1{
+    background-color: #ff0000;
+    color: #ffffff;
+}
+
+.main-page {
+    color: white;
+    background-image: url('/public/images/CarsForHire.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100vw;
+
+}
