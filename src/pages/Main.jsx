@@ -1,5 +1,6 @@
 import React, {useEffect ,useState} from 'react';
 import './Main.css';
+import {Link} from "react-router-dom";
 
 function Main(){
     const [message, setMessage] = useState("Booting up...");
@@ -16,6 +17,7 @@ function Main(){
         <div className="main-page">
             <h1>Welcome to the Car Hire System</h1>
             <p>{message}</p>
+            <Link to="/booking" className="link-button">Make Your Booking</Link>
         </div>
     );
 }
