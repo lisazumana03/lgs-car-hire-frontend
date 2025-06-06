@@ -11,6 +11,7 @@ function Booking() {
             <h1>Make your booking</h1>
             <form>
                 <label>Start Date(pick up date): </label>
+
                 <label>End date (return date): </label>
             </form>
         </div>
