@@ -13,3 +13,5 @@ function Location() {
         </div>
     );
 }
+
+export default Location;
