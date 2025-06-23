@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 function Main(){
     const [message, setMessage] = useState("Booting up...");
     useEffect(() => {
-        fetch('http://localhost:3045/lgs-car-hire/main')
+        fetch('http://localhost:3045/api/lgs-car-hire/main')
             .then(response => response.text())
             .then(data => setMessage(data.message))
             .catch(error => {
