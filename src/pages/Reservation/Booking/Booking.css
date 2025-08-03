@@ -1,7 +1,7 @@
 body {
     padding: 2rem;
     text-align: center;
-    background-image: url("public/images/CarsForHire.jpg");
+    background-image: url("/public/images/CarsForHire.jpg");
     background-repeat: no-repeat;
     background-size: cover;
 }

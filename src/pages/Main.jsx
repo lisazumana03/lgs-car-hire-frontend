@@ -14,17 +14,15 @@ function Main(){
             });
     }, []);
     return(
-        <body>
         <div className="main-page">
             <h1>Welcome to the Car Hire System</h1>
             <p>{message}</p>
-            <Link to="/booking" className="link-button">Make Your Booking</Link> | <Link to="/admin/booking" className="link-button">Admin</Link>
+            <Link to="/make-booking" className="link-button">Make Your Booking</Link> | <Link to="/admin/booking" className="link-button">Admin</Link>
             <Link to="/location" className="link-button">Register Car Rental Location</Link> |
             <Link to="/car" className="link-button">Look at our Cars</Link> |
             <Link to="/review" className="link-button">Submit A Review</Link> |
             <Link to="/login" className="link-button">Login</Link> |
         </div>
-        </body>
     );
 }
 
