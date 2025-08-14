@@ -2,7 +2,8 @@
 Lisakhanya Zumana (230864821)
 Date: 05/06/2025
  */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import {create, getAllBookings} from "../../../services/BookingService.js";
 import './Booking.css';
 
 function BookingForm() {
