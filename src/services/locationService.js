@@ -13,3 +13,11 @@ export const create = (location) => {
 export const getAllLocations = () => {
     return axios.get(API_URL);
 }
+
+export const updateLocation = (location) => {
+    return axios.put(`${API_URL}`, location);
+}
+
+export const deleteLocation = (locationId) => {
+    return axios.delete(`${API_URL}/${locationId}`);
+}
