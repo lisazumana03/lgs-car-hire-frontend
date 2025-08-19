@@ -1,4 +1,3 @@
-import './App.css'
 import Header from "./pages/Common/Header.jsx";
 import Footer from "./pages/Common/Footer.jsx";
 
