@@ -7,6 +7,9 @@ function App() {
   return (
       <>
       <Header/>
+          <main>
+              <p> Your go to destination for car rentals. </p>
+          </main>
       <Footer/>
       </>
   );
