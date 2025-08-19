@@ -9,6 +9,12 @@ function App() {
       <>
       <Header/>
           <Navigation/>
+          <main>
+                <div className="container">
+                    <h2>Welcome to LG's Car Hire</h2>
+                    <p>Your one-stop solution for all your car rental needs.</p>
+                </div>
+          </main>
       <Footer/>
       </>
   );

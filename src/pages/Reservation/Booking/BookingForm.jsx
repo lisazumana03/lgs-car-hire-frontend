@@ -2,12 +2,12 @@
 Lisakhanya Zumana (230864821)
 Date: 05/06/2025
  */
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {create} from "../../../services/bookingService.js";
 import './Booking.css';
 
 function BookingForm() {
-    const [booking, setBooking] = useState({})
+    const [step, setStep] = useState(1);
     const [form, setForm] = useState({
         car: '',
         bookingDate: '',
@@ -15,44 +15,34 @@ function BookingForm() {
         endDateTime: '',
         pickupLocation: '',
         dropOffLocation: '',
-        bookingStatus: 'confirmed'
+        payment:{
+            cardNumber: '',
+            expiryDate: '',
+            cvv: '',
+            cardHolderName: ''
+        },
+        bookingStatus: 'PENDING'
     });
 
-    useEffect(() => {
-        // This effect can be used to fetch initial data if needed
-        // For example, fetching available cars or locations
-    })
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if(['cardNumber', 'expiryDate', 'cvv', 'cardHolderName'].includes(name)) {
+            setForm({
+                ...form,
+                payment: {
+                    ...form.payment,
+                    [name]: value
+                }
+            });
+        } else {
+            setForm({
+                ...form,
+                [name]: value
+            });
+        }
+    };
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        const newBooking = {
-            car: form.car,
-            bookingDate: form.bookingDate,
-            startDateTime: form.startDateTime,
-            endDateTime: form.endDateTime,
-            pickupLocation: form.pickupLocation,
-            dropoffLocation: form.dropoffLocation,
-            bookingStatus: form.bookingStatus
-        };
-
-        create(newBooking)
-            .then(response => {
-                console.log("Booking created successfully:", response.data);
-                setBooking(response.data);
-                // Optionally reset the form or redirect
-                setForm({
-                    car: '',
-                    bookingDate: '',
-                    startDateTime: '',
-                    endDateTime: '',
-                    pickupLocation: '',
-                    dropOffLocation: '',
-                    bookingStatus: 'confirmed'
-                });
-            })
-            .catch(error => {
-                console.error("There was an error creating the booking!", error);
-            });
 
     }
 
