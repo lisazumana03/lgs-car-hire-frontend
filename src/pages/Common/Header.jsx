@@ -1,7 +1,7 @@
 function Header(){
         return(
-        <header className="text-4xl font-bold text-blue-600">
-            <h1>Welcome to LG's Car Hire</h1>
+        <header className="p-6 bg-primary-dark flex justify-between items-center">
+            <h1 className={"text-3xl font-brand"}>Welcome to LG's Car Hire</h1>
             <hr></hr>
         </header>
     );
