@@ -1,14 +1,13 @@
 import Header from "./pages/Common/Header.jsx";
 import Footer from "./pages/Common/Footer.jsx";
+import Home from "./Home.jsx";
 
 
 function App() {
   return (
       <>
       <Header/>
-          <main>
-              <p> Your go to destination for car rentals. </p>
-          </main>
+          <Home/>
       <Footer/>
       </>
   );
