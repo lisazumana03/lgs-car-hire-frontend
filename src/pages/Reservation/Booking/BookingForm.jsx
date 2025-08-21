@@ -4,10 +4,12 @@ Date: 05/06/2025
  */
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 
 
 function BookingForm() {
+    const navigate = useNavigate();
     const [form, setForm] = useState({
         cars: [""],
         bookingDateAndTime: "",
@@ -94,7 +96,7 @@ function BookingForm() {
                         dropOffLocation: "",
                         bookingStatus: "pending"
                     })}>Reset</button>
-                    <button type="return" className="bg-blue-100 text-white"> Back </button>
+                    <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/")}>Back</button>
                 </div>
             </form>
         </div>
