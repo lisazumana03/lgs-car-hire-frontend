@@ -9,7 +9,7 @@ import LocationPicker from "./pages/Reservation/Location/LocationPicker.jsx";
 
 function BookingHeader() {
     return (
-        <header className="bg-blue-900 text-white p-6 flex justify-center items-center">
+        <header className="bg-red-900 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">Make Your Booking</h1>
         </header>
     );
