@@ -5,7 +5,6 @@ import "./index.css";
 import Footer from "./pages/Common/Footer.jsx";
 import Header from "./pages/Common/Header.jsx";
 import BookingForm from "./pages/Reservation/Booking/BookingForm.jsx";
-import LocationPicker from "./pages/Reservation/Location/LocationPicker.jsx";
 
 function BookingHeader() {
     return (
@@ -34,7 +33,7 @@ function AppContent() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/make-booking" element={<BookingForm />} />
-                    <Route path="/available-locations" element={<LocationPicker />} />
+                    <Route path="/available-locations" element={<LocationList />} />
                 </Routes>
             </main>
             <Footer />
