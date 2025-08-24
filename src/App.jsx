@@ -23,6 +23,7 @@ function AppContent() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/make-booking" element={<BookingForm />} />
+                    <Route path="/locations"/>
                 </Routes>
             </main>
             <Footer />
