@@ -1,12 +1,32 @@
-# React + Vite
+# Guidelines to implement the frontend with Vite and React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the frontend implementation of our car hire application!
 
-Currently, two official plugins are available:
+This guide will explain how to set up and run the frontend using Vite and React.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+You will need to implement the Spring Boot backend separately, as this guide focuses solely on the frontend aspect.
 
-## Expanding the ESLint configuration
+## Prerequisites
+React and Vite are required to run the frontend. Make sure you have Node.js 18.20.3 and npm installed on your machine.
+The CSS used for the project is Tailwind CSS.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Steps to start the project
+1. Clone the repository to your local machine.
+2. Navigate to the project directory.
+3. Install the dependencies by running:
+   ```bash
+   npm install
+   ```
+4. Start the development server with:
+   ```bash
+   npm run dev
+   ```
+5. Open your browser and go to `http://localhost:3046` to view the application.
+6. To build the project for production, run:
+   ```bash
+   npm run build
+   ```
+7. To preview the production build, run:
+   ```bash
+   npm run preview
+   ```
