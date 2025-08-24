@@ -1,4 +1,3 @@
-
 import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import Home from "./Home.jsx";
 import "./index.css";
@@ -14,17 +13,8 @@ function BookingHeader() {
     );
 }
 
-function LocationHeader() {
-    return (
-        <header className="bg-blue-900 text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">View Locations</h1>
-        </header>
-    );
-}
-
 function AppContent() {
     const location = useLocation();
-    // Show a different header for the booking page
     const isBookingPage = location.pathname === "/make-booking";
     return (
         <>
@@ -33,14 +23,12 @@ function AppContent() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/make-booking" element={<BookingForm />} />
-                    <Route path="/available-locations" element={<LocationList />} />
                 </Routes>
             </main>
             <Footer />
         </>
     );
 }
-
 
 function App() {
     return (
