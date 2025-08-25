@@ -13,7 +13,7 @@ function LocationForm(){
         locationName: "",
         streetName: "",
         cityOrTown: "",
-        provinceOrState: "", // Make sure this matches your Java class!
+        provinceOrState: "", 
         country: "",
         postalCode: "",
     });
