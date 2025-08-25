@@ -71,6 +71,14 @@ function LocationForm(){
                     <input type="text" name="postalCode" value={form.postalCode} onChange={handleChange} placeholder="Enter postal code" required className="w-full px-3 py-2 border rounded"/>
                 </div>
                 <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Submit</button>
+                <button type="reset" className="bg-orange-600 text-white px-4 py-2 rounded" onClick{() => setForm({
+                    locationName: "",
+                    streetName: "",
+                    cityOrTown: "",
+                    provinceOrState: "",
+                    country: "",
+                    postalCode: "",
+                })}>Reset</button>
                 <button type="button" className="ml-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => navigate("/")}>Back</button>
             </form>
         </div>
