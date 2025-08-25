@@ -3,9 +3,10 @@ Lisakhanya Zumana (230864821)
 Date: 05/06/2025
  */
 
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
-import { create } from "../../../services/bookingService";
+import { create } from "../../../services/bookingService.js";
+import { getAllLocations } from "../../../services/locationService.js";
 
 
 function BookingForm() {
@@ -19,7 +20,14 @@ function BookingForm() {
         dropOffLocation: "",
         bookingStatus: "pending"
     });
+    const [locations, setLocations] = useState([]);
     const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        getAllLocations()
+            .then(result => setLocations(result.data))
+            .catch(() => setLocations([]))
+    })
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -32,6 +40,15 @@ function BookingForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const pickupObj = locations.find(loc => loc.locationName === form.pickupLocation);
+        const dropOffObj = locations.find(loc => loc.locationName === form.dropOffLocation);
+
+        if (!pickupObj || !dropOffObj) {
+            setMessage("Please select valid locations from the list.");
+            return
+        }
+
         try {
             await create(form);
             setMessage("Booking created successfully!");
@@ -50,7 +67,7 @@ function BookingForm() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-white-50">
             {message && <p className="mb-4 text-green-700 font-semibold">{message}</p>}
             <form onSubmit={handleSubmit} className="bg-red-100 p-8 rounded shadow-md w-full max-w-md">
                 <div className="mb-4">
@@ -86,7 +103,7 @@ function BookingForm() {
                     </select>
                 </div>
                 <div className="flex gap-4">
-                    <button type="submit" className="bg-green-800 text-white px-4 py-2 rounded hover:bg-red-700">Submit</button>
+                    <button type="submit" className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-700">Submit</button>
                     <button type="reset" className="bg-orange-300 text-white px-4 py-2 rounded hover:bg-gray-400" onClick={() => setForm({
                         cars: [""],
                         bookingDateAndTime: "",

@@ -7,7 +7,7 @@ import axios from "axios";
 const API_URL = "http://localhost:3045/location";
 
 export const create = (location) => {
-    return axios.post(API_URL, location);
+    return axios.post(`${API_URL}/create`, location);
 }
 
 export const getAllLocations = () => {
@@ -15,9 +15,9 @@ export const getAllLocations = () => {
 }
 
 export const updateLocation = (location) => {
-    return axios.put(`${API_URL}`, location);
+    return axios.put(`${API_URL}/update`, location);
 }
 
 export const deleteLocation = (locationId) => {
-    return axios.delete(`${API_URL}/${locationId}`);
+    return axios.delete(`${API_URL}/delete/${locationId}`);
 }

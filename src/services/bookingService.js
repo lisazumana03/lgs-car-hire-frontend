@@ -8,7 +8,7 @@ import axios from "axios";
 const API_URL = "http://localhost:3045/booking";
 
 export const create = (booking) => {
-    return axios.post(API_URL, booking);
+    return axios.post(`${API_URL}/create`, booking);
 }
 
 export const getAllBookings = () => {
