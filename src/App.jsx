@@ -10,6 +10,7 @@ import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
 import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
 import CarForm from "./pages/Reservation/Vehicle/CarForm.jsx";
 import CarList from "./pages/Reservation/Vehicle/CarList.jsx";
+import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
 
 function AdminHeader(){
     return (
@@ -118,6 +119,7 @@ function AppContent() {
                     <Route path="/register-location" element={<LocationForm/>} />
                     <Route path="/register-car" element={<CarForm />} />
                     <Route path="/cars" element={<CarList />} />
+                    <Route path="/admin" element={<AdminDashboard/>} />
                 </Routes>
             </main>
             <Footer />
