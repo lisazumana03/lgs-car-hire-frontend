@@ -11,6 +11,14 @@ import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
 import CarForm from "./pages/Reservation/Vehicle/CarForm.jsx";
 import CarList from "./pages/Reservation/Vehicle/CarList.jsx";
 
+function AdminHeader(){
+    return (
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">ADMIN DASHBOARD</h1>
+        </header>
+    );
+}
+
 function BookingHeader() {
     return (
         <header className="bg-red-600 text-white p-6 flex justify-center items-center">
@@ -69,6 +77,7 @@ function CarListHeader() {
 
 function AppContent() {
     const location = useLocation();
+    const isAdminMainPage = location.pathname === "/admin";
     const isBookingPage = location.pathname === "/make-booking";
     const isLocationListPage = location.pathname === "/locations";
     const isHomePage = location.pathname === "/";
@@ -82,6 +91,8 @@ function AppContent() {
         <>
             {isBookingPage ? (
                 <BookingHeader />
+            ) : isAdminMainPage ? (
+                <AdminHeader />
             ) : isLocationListPage ? (
                 <LocationViewHeader />
             ) : isBookingListPage ? (
