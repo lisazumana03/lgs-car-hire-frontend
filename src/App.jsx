@@ -7,7 +7,9 @@ import BookingForm from "./pages/Reservation/Booking/BookingForm.jsx";
 import LocationList from "./pages/Reservation/Location/LocationList.jsx";
 import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
 import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
-import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx"
+import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
+import CarForm from "./pages/Reservation/Vehicle/CarForm.jsx";
+import CarList from "./pages/Reservation/Vehicle/CarList.jsx";
 
 function BookingHeader() {
     return (
@@ -46,7 +48,23 @@ function BookingListHeader() {
         <header className="bg-red-600 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKINGS</h1>
         </header>
-    )
+    );
+}
+
+function CarHeader() {
+    return (
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">REGISTER A NEW CAR</h1>
+        </header>
+    );
+}
+
+function CarListHeader() {
+    return (
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">VIEW AVAILABLE CARS</h1>
+        </header>
+    );
 }
 
 function AppContent() {
@@ -57,6 +75,8 @@ function AppContent() {
     const isBookingListPage = location.pathname === "/bookings";
     const isBookingHistoryPage = location.pathname === "/booking-history";
     const isLocationPage = location.pathname === "/register-location";
+    const isCarPage = location.pathname === "/register-car";
+    const isCarListPage = location.pathname === "/cars";
 
     return (
         <>
@@ -70,6 +90,10 @@ function AppContent() {
                 <LocationHeader />
             ) : isBookingHistoryPage ? (
                 <BookingHistoryHeader />
+            ) : isCarPage ? (
+                <CarHeader />
+            ) : isCarListPage ? (
+                <CarListHeader />
             ) : (
                 <Header showNavigation={isHomePage} />
             )}
@@ -81,7 +105,8 @@ function AppContent() {
                     <Route path="/booking-history" element={<BookingHistory />} />
                     <Route path="/locations" element={<LocationList />} />
                     <Route path="/register-location" element={<LocationForm/>} />
-                    <Route path="/cars"/>
+                    <Route path="/register-car" element={<CarForm />} />
+                    <Route path="/cars" element={<CarList />} />
                 </Routes>
             </main>
             <Footer />
