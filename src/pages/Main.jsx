@@ -22,6 +22,7 @@ function Main(){
             <Link to="/car" className="link-button">Look at our Cars</Link> |
             <Link to="/review" className="link-button">Submit A Review</Link> |
             <Link to="/login" className="link-button">Login</Link> |
+            <Link to="/register" className="link-button">Sign Up</Link> |
         </div>
     );
 }
