@@ -10,7 +10,6 @@ import Dashboard from "./pages/Users/Dashboard.jsx";
 import UserProfile from "./pages/Users/UserProfile.jsx";
 import { getUserProfile } from "./scripts/index.js";
 
-
 function App() {
     
   const [isAuthenticated, setIsAuthenticated] = useState(false);
