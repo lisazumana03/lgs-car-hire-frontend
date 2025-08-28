@@ -1,0 +1,12 @@
+/** @type {import('tailwindcss').Config} */
+// eslint-disable-next-line no-undef
+module.exports = {
+    content: [
+        "./public/index.html", // Make Tailwind scan your HTML files
+        "./src/**/*.{js,jsx,ts,tsx}", // Make Tailwind scan all your files
+    ],
+    theme: {
+        extend: {},
+    },
+    plugins: [],
+}

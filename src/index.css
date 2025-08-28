@@ -5,6 +5,7 @@
   box-sizing: border-box;
 }
 
+<<<<<<< HEAD
 body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -18,3 +19,5 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+=======
+>>>>>>> 13520e9f161f68dd47065625bc3d5d7444c80860
