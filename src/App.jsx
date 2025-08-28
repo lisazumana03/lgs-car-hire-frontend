@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
-import Main from './pages/Main';
 import './App.css'
-import BookingForm from "./pages/Reservation/Booking/Booking.jsx";
-import LocationForm from "./pages/Reservation/Location/Location.jsx";
 import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
 import LoginForm from "./pages/Users/LoginForm.jsx";
 import Dashboard from "./pages/Users/Dashboard.jsx";
