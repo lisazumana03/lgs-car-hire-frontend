@@ -6,10 +6,8 @@ import Header from "./pages/Common/Header.jsx";
 import BookingForm from "./pages/Reservation/Booking/BookingForm.jsx";
 import LocationList from "./pages/Reservation/Location/LocationList.jsx";
 import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
-import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
 import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
-import CarForm from "./pages/Reservation/Vehicle/CarForm.jsx";
-import CarList from "./pages/Reservation/Vehicle/CarList.jsx";
+import CarList from "./pages/Reservation/Vehicle/carList.jsx";
 
 function BookingHeader() {
     return (
@@ -23,14 +21,6 @@ function BookingHistoryHeader() {
     return (
         <header className="bg-red-600 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKING HISTORY</h1>
-        </header>
-    );
-}
-
-function LocationHeader() {
-    return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">REGISTER A NEW RENTING LOCATION</h1>
         </header>
     );
 }
@@ -51,14 +41,6 @@ function BookingListHeader() {
     );
 }
 
-function CarHeader() {
-    return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">REGISTER A NEW CAR</h1>
-        </header>
-    );
-}
-
 function CarListHeader() {
     return (
         <header className="bg-red-600 text-white p-6 flex justify-center items-center">
@@ -74,8 +56,6 @@ function AppContent() {
     const isHomePage = location.pathname === "/";
     const isBookingListPage = location.pathname === "/bookings";
     const isBookingHistoryPage = location.pathname === "/booking-history";
-    const isLocationPage = location.pathname === "/register-location";
-    const isCarPage = location.pathname === "/register-car";
     const isCarListPage = location.pathname === "/cars";
 
     return (
@@ -86,12 +66,8 @@ function AppContent() {
                 <LocationViewHeader />
             ) : isBookingListPage ? (
                 <BookingListHeader />
-            ) : isLocationPage ? (
-                <LocationHeader />
             ) : isBookingHistoryPage ? (
                 <BookingHistoryHeader />
-            ) : isCarPage ? (
-                <CarHeader />
             ) : isCarListPage ? (
                 <CarListHeader />
             ) : (
@@ -104,8 +80,6 @@ function AppContent() {
                     <Route path="/bookings" element={<BookingList />} />
                     <Route path="/booking-history" element={<BookingHistory />} />
                     <Route path="/locations" element={<LocationList />} />
-                    <Route path="/register-location" element={<LocationForm/>} />
-                    <Route path="/register-car" element={<CarForm />} />
                     <Route path="/cars" element={<CarList />} />
                 </Routes>
             </main>

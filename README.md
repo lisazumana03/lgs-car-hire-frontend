@@ -30,3 +30,53 @@ The CSS used for the project is Tailwind CSS.
    ```bash
    npm run preview
    ```
+
+
+
+
+```
+LGS-CAR-HIRE-FRONTEND/
+├── nbproject/
+      | 
+      |-- project.properties
+      |-- projec.xml      
+├── package.json            
+├── index.html                   
+├── .gitignore              
+├── README.md
+├── eslint.config.js              
+├── postcss.config.js
+├── eslint.config.js              
+├── vite.config.js                
+│
+└── public/                
+    │
+    ├── images/            # Images and assets
+    │   ├── CarForHire.png
+    │   └── CarsForHire.png 
+└── src/                
+    │
+    ├── pages/            # Images and assets
+    │   ├── Common/
+    │   └── Reservation/
+    │          └── Booking/
+    │          └── Location/
+    │          └── Vehicle/
+    │            └── carForm.jsx
+    │            └── carList/.jsx                                    
+    |
+    ├── services/            # Images and assets
+    │   ├── bookingService.js
+    │   └── LocationService.js
+    │   └── carService.js
+    |
+    ├── utils/            # Images and assets
+    │   ├── Booking.js
+    |
+    ├── assets/            # Images and assets
+    │   ├── react.svg
+    ├── App.jsx              
+    ├── Home.jsx
+    ├── index.css            
+    ├── main.jsx      
+```
