@@ -50,7 +50,7 @@ function BookingForm() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-black">
             {message && <p className="mb-4 text-green-700 font-semibold">{message}</p>}
             <form onSubmit={handleSubmit} className="bg-red-100 p-8 rounded shadow-md w-full max-w-md">
                 <div className="mb-4">
