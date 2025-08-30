@@ -5,11 +5,7 @@ function AdminDashboard(){
         <div className="min-h-screen flex flex-col items-center justify-center bg-black-100 p-4">
             <p> Welcome to the admin dashboard. </p>
             <p> Here you can manage users, view reports, and configure system settings. </p>
-            <div className="flex flex-wrap justify-center gap-4">
-                <Link to="/register-location" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> Register a Location </Link>
-                <Link to="/register-car" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> Register a Car </Link>
-                <Link to="/queries" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> Manage Bookings </Link>
-            </div>
+
         </div>
     )
 }
