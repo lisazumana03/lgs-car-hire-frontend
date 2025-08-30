@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     port: 3046,
     host: true,
-    strictPort: false,
+    strictPort: true,
     historyApiFallback: true,
   },
 });
