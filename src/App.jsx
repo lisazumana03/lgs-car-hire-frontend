@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import './App.css'
@@ -157,28 +156,6 @@ function Sidebar({ onLogout }) {
       </ul>
     </div>
   );
-=======
-import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
-import Home from "./Home.jsx";
-import "./index.css";
-import Footer from "./pages/Common/Footer.jsx";
-import Header from "./pages/Common/Header.jsx";
-import BookingForm from "./pages/Reservation/Booking/BookingForm.jsx";
-import LocationList from "./pages/Reservation/Location/LocationList.jsx";
-import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
-import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
-import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
-import CarForm from "./pages/Reservation/Vehicle/CarForm.jsx";
-import CarList from "./pages/Reservation/Vehicle/CarList.jsx";
-import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
-
-function AdminHeader(){
-    return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">ADMIN DASHBOARD</h1>
-        </header>
-    );
->>>>>>> 13520e9f161f68dd47065625bc3d5d7444c80860
 }
 
 function BookingHeader() {
@@ -288,12 +265,12 @@ function AppContent() {
     );
 }
 
-function App() {
-    return (
-        <Router>
-            <AppContent />
-        </Router>
-    );
-}
+// function App() {
+//     return (
+//         <Router>
+//             <AppContent />
+//         </Router>
+//     );
+// }
 
 export default App;
