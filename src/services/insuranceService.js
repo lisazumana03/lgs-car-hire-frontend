@@ -27,3 +27,7 @@ export const deleteInsurance = (id) => {
 export const cancelInsurance = (id) => {
     return axios.delete(`${API_URL}/cancel/${id}`);
 }
+
+export const getAllInsurance = () => {
+    return axios.get(`${API_URL}/all`);
+};
