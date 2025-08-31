@@ -6,6 +6,9 @@ import LoginForm from "./pages/Users/LoginForm.jsx";
 import Dashboard from "./pages/Users/Dashboard.jsx";
 import UserProfile from "./pages/Users/UserProfile.jsx";
 import { getUserProfile } from "./scripts";
+import NotificationsPage from "./pages/Users/NotificationsPage.jsx";
+import { getUserProfile } from "./scripts/index.js";
+import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import Home from "./Home.jsx";
 import "./index.css";
 import Footer from "./pages/Common/Footer.jsx";
@@ -72,7 +75,7 @@ function App() {
                 <Route path="/profile" element={<UserProfile user={currentUser} />} />
                   <Route path="/bookings" element={<BookingComponent/>} />
                 <Route path="/cars" element={<div>Cars Page</div>} />
-                <Route path="/notifications" element={<div>Notifications Page</div>} />
+                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/history" element={<div>History Page</div>} />
                   <Route path="/payment" element={<PaymentForm />} />
                   <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
@@ -99,6 +102,87 @@ function App() {
 
 // Sidebar component with proper React Router navigation
 function Sidebar({ onLogout }) {
+  const location = useLocation();
+
+  return (
+    <div className="sidebar">
+      <h2>LG'S CAR HIRE</h2>
+      <ul className="sidebar-menu">
+        <li>
+          <Link
+            to="/dashboard"
+            className={`sidebar-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
+          >
+            <span className="icon">🏠</span>
+            <span className="title">Dashboard</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/bookings"
+            className={`sidebar-link ${location.pathname === '/bookings' ? 'active' : ''}`}
+          >
+            <span className="icon">🎒</span>
+            <span className="title">Bookings</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/cars"
+            className={`sidebar-link ${location.pathname === '/cars' ? 'active' : ''}`}
+          >
+            <span className="icon">🚗</span>
+            <span className="title">Cars</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/notifications"
+            className={`sidebar-link ${location.pathname === '/notifications' ? 'active' : ''}`}
+          >
+            <span className="icon">🔔</span>
+            <span className="title">Notifications</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/profile"
+            className={`sidebar-link ${location.pathname === '/profile' ? 'active' : ''}`}
+          >
+            <span className="icon">👤</span>
+            <span className="title">Profile</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/history"
+            className={`sidebar-link ${location.pathname === '/history' ? 'active' : ''}`}
+          >
+            <span className="icon">📜</span>
+            <span className="title">History</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/payments"
+            className={`sidebar-link ${location.pathname === '/payments' ? 'active' : ''}`}
+          >
+            <span className="icon">💳</span>
+            <span className="title">Payments</span>
+          </Link>
+        </li>
+        <li className="logout-item">
+          <button onClick={onLogout} className="logout-btn">
+            <span className="icon">🚪</span>
+            <span className="title">Logout</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+export default App
     const location = useLocation();
 
     return (
