@@ -2,17 +2,7 @@
 Lisakhanya Zumana (230864821)
 Date: 31/08/2025
  */
-import { Link, Route, Routes } from "react-router-dom";
-import BookingForm from "./BookingForm";
-import BookingHistory from "./BookingHistory";
-
-function bookingCreation(){
-    return(
-        <div>
-            <p> Where we create a new form. </p>
-        </div>
-    )
-}
+import { Link } from "react-router-dom";
 
 export default function BookingComponent(){
     return (
@@ -32,12 +22,6 @@ export default function BookingComponent(){
                     View Booking History
                 </Link>
             </div>
-
-            <Routes>
-                <Route path="/make-booking" element={<BookingForm />} />
-                <Route path="/booking-history" element={<BookingHistory />} />
-                <Route path="/" element={<div>Select an option above to manage bookings.</div>} />
-            </Routes>
         </div>
     );
 }
