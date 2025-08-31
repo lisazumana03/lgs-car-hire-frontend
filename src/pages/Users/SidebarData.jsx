@@ -45,7 +45,7 @@ const SidebarData = [
     icon: PaymentIcon,
   },
   {
-    title: "Invoices",
+    title: "Invoices", //to view invoice page
     path: "/invoices",
     icon: ReceiptIcon,
   }

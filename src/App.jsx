@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
 import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
 import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
 import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
+import InvoiceList from "./pages/Reservation/Invoice/InvoiceList.jsx";
 
 
 function App() {
@@ -76,7 +77,8 @@ function App() {
                   <Route path="/payment" element={<PaymentForm />} />
                   <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
                   <Route path="/invoice/:id" element={<InvoiceView />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/invoices" element={<InvoiceList />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </main>
           </>
@@ -164,6 +166,15 @@ function Sidebar({ onLogout }) {
                     >
                         <span className="icon">💳</span>
                         <span className="title">Payments</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/invoices"
+                        className={`sidebar-link ${location.pathname === '/invoices' ? 'active' : ''}`}
+                    >
+                        <span className="icon">📄</span>
+                        <span className="title">Invoices</span>
                     </Link>
                 </li>
                 <li className="logout-item">
@@ -270,6 +281,7 @@ function AppContent() {
     const isCarListPage = location.pathname === "/cars";
     const isPaymentPage = location.pathname === "/payment";
     const isInvoicePage = location.pathname.startsWith("/invoice/");
+    const isInvoicesPage = location.pathname === "/invoices";
 
     return (
         <>
@@ -293,6 +305,8 @@ function AppContent() {
                 <PaymentHeader />
             ) : isInvoicePage ? (
                 <InvoiceHeader />
+            ) : isInvoicesPage ? (
+                <InvoiceHeader />
             ) : (
                 <Header showNavigation={isHomePage} />
             )}
@@ -311,6 +325,7 @@ function AppContent() {
                     <Route path="/payment" element={<PaymentForm />} />
                     <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
                     <Route path="/invoice/:id" element={<InvoiceView />} />
+                    <Route path="/invoices" element={<InvoiceList />} />
                 </Routes>
             </main>
             <Footer />
