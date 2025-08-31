@@ -19,20 +19,23 @@ import BookingComponent from "./pages/Reservation/Booking/BookingComponent.jsx";
 import CarForm from "./pages/Vehicle/CarForm.jsx";
 import CarList from "./pages/Vehicle/CarList.jsx";
 import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
+import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
+import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
+import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
 
 
 function App() {
-    
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
   const handleLogin = async (userData) => {
     console.log('🔐 Login received userData:', userData);
     console.log('🆔 User ID in login response:', userData.id);
-    
+
     setIsAuthenticated(true);
     setCurrentUser(userData);
-    
+
     // Fetch complete profile data using the user ID
     if (userData.id) {
       console.log('📡 Fetching complete profile...');
@@ -70,7 +73,9 @@ function App() {
                 <Route path="/cars" element={<div>Cars Page</div>} />
                 <Route path="/notifications" element={<div>Notifications Page</div>} />
                 <Route path="/history" element={<div>History Page</div>} />
-                <Route path="/payments" element={<div>Payments Page</div>} />
+                  <Route path="/payment" element={<PaymentForm />} />
+                  <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
+                  <Route path="/invoice/:id" element={<InvoiceView />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </main>
@@ -92,85 +97,85 @@ function App() {
 
 // Sidebar component with proper React Router navigation
 function Sidebar({ onLogout }) {
-  const location = useLocation();
+    const location = useLocation();
 
-  return (
-    <div className="sidebar">
-      <h2>LG'S CAR HIRE</h2>
-      <ul className="sidebar-menu">
-        <li>
-          <Link
-            to="/dashboard"
-            className={`sidebar-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
-          >
-            <span className="icon">🏠</span>
-            <span className="title">Dashboard</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/bookings"
-            className={`sidebar-link ${location.pathname === '/bookings' ? 'active' : ''}`}
-          >
-            <span className="icon">🎒</span>
-            <span className="title">Bookings</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/cars"
-            className={`sidebar-link ${location.pathname === '/cars' ? 'active' : ''}`}
-          >
-            <span className="icon">🚗</span>
-            <span className="title">Cars</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/notifications"
-            className={`sidebar-link ${location.pathname === '/notifications' ? 'active' : ''}`}
-          >
-            <span className="icon">🔔</span>
-            <span className="title">Notifications</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/profile"
-            className={`sidebar-link ${location.pathname === '/profile' ? 'active' : ''}`}
-          >
-            <span className="icon">👤</span>
-            <span className="title">Profile</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/history"
-            className={`sidebar-link ${location.pathname === '/history' ? 'active' : ''}`}
-          >
-            <span className="icon">📜</span>
-            <span className="title">History</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/payments"
-            className={`sidebar-link ${location.pathname === '/payments' ? 'active' : ''}`}
-          >
-            <span className="icon">💳</span>
-            <span className="title">Payments</span>
-          </Link>
-        </li>
-        <li className="logout-item">
-          <button onClick={onLogout} className="logout-btn">
-            <span className="icon">🚪</span>
-            <span className="title">Logout</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-  );
-
+    return (
+        <div className="sidebar">
+            <h2>LG'S CAR HIRE</h2>
+            <ul className="sidebar-menu">
+                <li>
+                    <Link
+                        to="/dashboard"
+                        className={`sidebar-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
+                    >
+                        <span className="icon">🏠</span>
+                        <span className="title">Dashboard</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/bookings"
+                        className={`sidebar-link ${location.pathname === '/bookings' ? 'active' : ''}`}
+                    >
+                        <span className="icon">🎒</span>
+                        <span className="title">Bookings</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/cars"
+                        className={`sidebar-link ${location.pathname === '/cars' ? 'active' : ''}`}
+                    >
+                        <span className="icon">🚗</span>
+                        <span className="title">Cars</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/notifications"
+                        className={`sidebar-link ${location.pathname === '/notifications' ? 'active' : ''}`}
+                    >
+                        <span className="icon">🔔</span>
+                        <span className="title">Notifications</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/profile"
+                        className={`sidebar-link ${location.pathname === '/profile' ? 'active' : ''}`}
+                    >
+                        <span className="icon">👤</span>
+                        <span className="title">Profile</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/history"
+                        className={`sidebar-link ${location.pathname === '/history' ? 'active' : ''}`}
+                    >
+                        <span className="icon">📜</span>
+                        <span className="title">History</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/payment"
+                        className={`sidebar-link ${location.pathname === '/payment' ? 'active' : ''}`}
+                    >
+                        <span className="icon">💳</span>
+                        <span className="title">Payments</span>
+                    </Link>
+                </li>
+                <li className="logout-item">
+                    <button onClick={onLogout} className="logout-btn">
+                        <span className="icon">🚪</span>
+                        <span className="title">Logout</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    );
+}
 function AdminHeader(){
     return (
         <header className="bg-red-600 text-white p-6 flex justify-center items-center">
@@ -235,6 +240,23 @@ function CarListHeader() {
     );
 }
 
+function PaymentHeader() {
+    return (
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">PAYMENT</h1>
+        </header>
+    );
+}
+
+function InvoiceHeader() {
+    return (
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">INVOICE</h1>
+        </header>
+    );
+}
+
+
 function AppContent() {
     const location = useLocation();
     const isAdminMainPage = location.pathname === "/admin";
@@ -246,6 +268,8 @@ function AppContent() {
     const isLocationPage = location.pathname === "/register-location";
     const isCarPage = location.pathname === "/register-car";
     const isCarListPage = location.pathname === "/cars";
+    const isPaymentPage = location.pathname === "/payment";
+    const isInvoicePage = location.pathname.startsWith("/invoice/");
 
     return (
         <>
@@ -265,9 +289,14 @@ function AppContent() {
                 <CarHeader />
             ) : isCarListPage ? (
                 <CarListHeader />
+            ) : isPaymentPage ? (
+                <PaymentHeader />
+            ) : isInvoicePage ? (
+                <InvoiceHeader />
             ) : (
                 <Header showNavigation={isHomePage} />
             )}
+
             <main>
                 <Routes>
                     <Route path="/" element={<Home />} />
@@ -279,16 +308,15 @@ function AppContent() {
                     <Route path="/register-car" element={<CarForm />} />
                     <Route path="/cars" element={<CarList />} />
                     <Route path="/admin" element={<AdminDashboard/>} />
+                    <Route path="/payment" element={<PaymentForm />} />
+                    <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
+                    <Route path="/invoice/:id" element={<InvoiceView />} />
                 </Routes>
             </main>
             <Footer />
         </>
     );
 }
-
-}
-
-
 function Routers() {
      return (
          <Router>

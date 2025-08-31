@@ -40,7 +40,7 @@ const SidebarData = [
   },
   {
     title: "Payments",
-    path: "/payments",
+    path: "/payment",
     icon: PaymentIcon,
   },
 ];
