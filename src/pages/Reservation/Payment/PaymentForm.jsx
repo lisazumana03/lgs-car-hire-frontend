@@ -1,6 +1,6 @@
 /**
  * Sanele Zondi (221602011)
- * invoiceService.js
+ * PaymentForm.jsx (file)
  */
 
 import React, { useState, useEffect } from 'react';

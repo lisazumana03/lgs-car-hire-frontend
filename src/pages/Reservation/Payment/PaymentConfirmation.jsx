@@ -1,6 +1,6 @@
 /**
  * Sanele Zondi (221602011)
- * invoiceService.js
+ * PaymentConfirmation.jsx (file)
  */
 
 import React from 'react';
