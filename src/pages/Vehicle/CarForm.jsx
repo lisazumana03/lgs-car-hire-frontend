@@ -5,8 +5,8 @@ Imtiyaaz Waggie 219374759
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { create } from "../../../services/carService";
-import { createCarType } from "../../../services/carTypeService";
+import { create } from "../../services/carService.js";
+import { createCarType } from "../../services/carTypeService.js";
 
 function CarForm() {
     const navigate = useNavigate();
