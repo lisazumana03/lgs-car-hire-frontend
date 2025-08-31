@@ -1,7 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllCars, getAvailableCars } from "../../../services/carService.js";
+
+/*
+Imtiyaaz Waggie 219374759
+ */
 
 function CarView() {
     const [cars, setCars] = useState([]);
@@ -37,7 +40,7 @@ function CarView() {
     };
 
     const brands = [...new Set(cars.map(car => car.brand))];
-    const types = [...new Set(cars.map(car => car.carType?.type).filter(Boolean))];
+    const types = [...new Set(cars.map(car => car.carTypeName).filter(Boolean))];
 
     let filteredCars = cars.filter(car => {
         const matchesSearch =
@@ -46,7 +49,7 @@ function CarView() {
             `${car.brand} ${car.model}`.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesBrand = selectedBrand === "all" || car.brand === selectedBrand;
-        const matchesType = selectedType === "all" || car.carType?.type === selectedType;
+        const matchesType = selectedType === "all" || car.carTypeName === selectedType;
 
         return matchesSearch && matchesBrand && matchesType;
     });
@@ -77,78 +80,89 @@ function CarView() {
                     </div>
                 )}
 
-    {/* Search and Filter Section */}
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Search Bar */}
-            <div className="lg:col-span-2">
-                <input
-                    type="text"
-                    placeholder="Search by brand or model..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg text-black placeholder:text-gray-500 focus:outline-none focus:border-red-500"
-                />
-            </div>
+                {/* Back Button and Search/Filter Section */}
+                <div className="flex gap-4 mb-8">
+                    {/* Back Button */}
+                    <button
+                        onClick={() => navigate("/")}
+                        className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition h-fit"
+                    >
+                        Back to Home
+                    </button>
 
-            {/* Brand Filter */}
-            <div>
-                <select
-                    value={selectedBrand}
-                    onChange={(e) => setSelectedBrand(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-red-500"
-                >
-                    <option value="all">All Brands</option>
-                    {brands.map(brand => (
-                        <option key={brand} value={brand}>{brand}</option>
-                    ))}
-                </select>
-            </div>
+                    {/* Search and Filter Section */}
+                    <div className="bg-white rounded-lg shadow-md p-6 flex-1">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {/* Search Bar */}
+                        <div className="lg:col-span-2">
+                            <input
+                                type="text"
+                                placeholder="Search by brand or model..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg text-black placeholder:text-gray-500 focus:outline-none focus:border-red-500"
+                            />
+                        </div>
 
-            {/* Type Filter */}
-            <div>
-                <select
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-red-500"
-                >
-                    <option value="all">All Types</option>
-                    {types.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                    ))}
-                </select>
-            </div>
+                        {/* Brand Filter */}
+                        <div>
+                            <select
+                                value={selectedBrand}
+                                onChange={(e) => setSelectedBrand(e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-red-500"
+                            >
+                                <option value="all">All Brands</option>
+                                {brands.map(brand => (
+                                    <option key={brand} value={brand}>{brand}</option>
+                                ))}
+                            </select>
+                        </div>
 
-            {/* Price Sort */}
-            <div>
-                <select
-                    value={priceSort}
-                    onChange={(e) => setPriceSort(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-red-500"
-                >
-                    <option value="none">Sort by Price</option>
-                    <option value="low-high">Price: Low to High</option>
-                    <option value="high-low">Price: High to Low</option>
-                </select>
-            </div>
-        </div>
+                        {/* Type Filter */}
+                        <div>
+                            <select
+                                value={selectedType}
+                                onChange={(e) => setSelectedType(e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-red-500"
+                            >
+                                <option value="all">All Types</option>
+                                {types.map(type => (
+                                    <option key={type} value={type}>{type}</option>
+                                ))}
+                            </select>
+                        </div>
 
-        {/* Available Only Toggle */}
-        <div className="mt-4 flex items-center">
-            <label className="flex items-center cursor-pointer">
-                <input
-                    type="checkbox"
-                    checked={showOnlyAvailable}
-                    onChange={(e) => setShowOnlyAvailable(e.target.checked)}
-                    className="mr-2 h-4 w-4 text-red-600"
-                />
-                <span className="text-black">Show available cars only</span>
-            </label>
-            <span className="ml-auto text-black">
-                {filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'} found
-            </span>
-        </div>
-    </div>
+                        {/* Price Sort */}
+                        <div>
+                            <select
+                                value={priceSort}
+                                onChange={(e) => setPriceSort(e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-red-500"
+                            >
+                                <option value="none">Sort by Price</option>
+                                <option value="low-high">Price: Low to High</option>
+                                <option value="high-low">Price: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Available Only Toggle */}
+                    <div className="mt-4 flex items-center">
+                        <label className="flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={showOnlyAvailable}
+                                onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                                className="mr-2 h-4 w-4 text-red-600"
+                            />
+                            <span className="text-black">Show available cars only</span>
+                        </label>
+                        <span className="ml-auto text-black">
+                            {filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'} found
+                        </span>
+                    </div>
+                </div>
+            </div>
 
                 {/* Cars Grid */}
                 {filteredCars.length === 0 ? (
@@ -187,25 +201,25 @@ function CarView() {
                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
-                                            {car.carType?.type || 'Standard'}
+                                            {car.carTypeName || 'Standard'}
                                         </div>
                                         <div className="flex items-center text-sm text-gray-600">
                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                                             </svg>
-                                            {car.carType?.fuelType || 'Petrol'}
+                                            {car.carTypeFuelType || 'Petrol'}
                                         </div>
                                         <div className="flex items-center text-sm text-gray-600">
                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
-                                            {car.carType?.numberOfSeats || '5'} Seats
+                                            {car.carTypeNumberOfSeats || '5'} Seats
                                         </div>
                                     </div>
 
                                     {/* Badges */}
                                     <div className="flex gap-2 mb-4">
-                                        {car.insurance && (
+                                        {car.insuranceID && (
                                             <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                                                 Insurance Included
                                             </span>
@@ -246,16 +260,6 @@ function CarView() {
                         ))}
                     </div>
                 )}
-
-                {/* Back Button */}
-                <div className="mt-8 text-center">
-                    <button
-                        onClick={() => navigate("/")}
-                        className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
-                    >
-                        Back to Home
-                    </button>
-                </div>
             </div>
         </div>
     );

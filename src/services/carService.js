@@ -1,7 +1,6 @@
 /*
-Car Service for API calls
-Matches the backend CarController endpoints
-*/
+Imtiyaaz Waggie 219374759
+ */
 
 import axios from "axios";
 
