@@ -4,7 +4,7 @@ Date: 05/06/2025
  */
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 
 function BookingForm() {
@@ -100,6 +100,23 @@ function BookingForm() {
                         <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/dashboard")}>Back</button>
                     </div>
                 </form>
+            </div>
+            <div className="w-full max-w-lg bg-white/90 rounded-xl shadow-lg p-8 mt-8">
+                <h2 className="text-center text-xl font-semibold mb-4">Booking Options</h2>
+                <div className="booking-links flex gap-4 mb-4">
+                    <Link
+                        to="/make-booking"
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-800"
+                    >
+                        Make Booking
+                    </Link>
+                    <Link
+                        to="/booking-history"
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-800"
+                    >
+                        View Booking History
+                    </Link>
+                </div>
             </div>
         </div>
     );
