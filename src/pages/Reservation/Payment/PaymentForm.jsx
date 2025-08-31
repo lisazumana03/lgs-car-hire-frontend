@@ -7,7 +7,86 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import paymentService from '../../../services/paymentService';
 import { getAllBookings } from '../../../services/bookingService'; // Import booking service
-
+const mockBookings = [
+    {
+        id: "BOOK001",
+        bookingID: "BOOK001",
+        userId: "user123",
+        userName: "John Doe",
+        userEmail: "user@example.com",
+        cars: [
+            {
+                id: "CAR001",
+                model: "Toyota Corolla",
+                make: "Toyota",
+                year: 2023,
+                licensePlate: "CA 123-456",
+                dailyRate: 350
+            }
+        ],
+        startDate: "2024-01-15T08:00:00",
+        endDate: "2024-01-20T17:00:00",
+        bookingDateAndTime: "2024-01-10T14:30:00",
+        pickupLocation: "Cape Town International Airport",
+        dropOffLocation: "Cape Town City Center",
+        bookingStatus: "confirmed",
+        totalAmount: 2100,
+        duration: 6,
+        paymentStatus: "pending"
+    },
+    {
+        id: "BOOK002",
+        bookingID: "BOOK002",
+        userId: "USER456",
+        userName: "Sarah Smith",
+        userEmail: "sarah.smith@email.com",
+        cars: [
+            {
+                id: "CAR002",
+                model: "BMW 3 Series",
+                make: "BMW",
+                year: 2024,
+                licensePlate: "CA 789-012",
+                dailyRate: 850
+            }
+        ],
+        startDate: "2024-01-18T10:00:00",
+        endDate: "2024-01-22T15:00:00",
+        bookingDateAndTime: "2024-01-12T09:15:00",
+        pickupLocation: "Cape Town City Center",
+        dropOffLocation: "Cape Town International Airport",
+        bookingStatus: "confirmed",
+        totalAmount: 3400,
+        duration: 4,
+        paymentStatus: "paid"
+    },
+    {
+        id: "BOOK003",
+        bookingID: "BOOK003",
+        userId: "USER789",
+        userName: "Mike Johnson",
+        userEmail: "mike.johnson@email.com",
+        cars: [
+            {
+                id: "CAR003",
+                model: "VW Polo",
+                make: "Volkswagen",
+                year: 2023,
+                licensePlate: "CA 345-678",
+                dailyRate: 280
+            }
+        ],
+        startDate: "2024-01-25T09:00:00",
+        endDate: "2024-01-28T18:00:00",
+        bookingDateAndTime: "2024-01-20T16:45:00",
+        pickupLocation: "Stellenbosch",
+        dropOffLocation: "Stellenbosch",
+        bookingStatus: "pending",
+        totalAmount: 1120,
+        duration: 4,
+        paymentStatus: "pending"
+    }
+];
 const PaymentForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -36,10 +115,12 @@ const PaymentForm = () => {
     const fetchBookings = async () => {
         try {
             const response = await getAllBookings();
-            setBookings(response.data || []);
+            setBookings(response.data || mockBookings);
         } catch (error) {
             console.error('Failed to fetch bookings:', error);
             setMessage('Failed to load bookings');
+
+            setBookings(mockBookings);
         } finally {
             setLoading(false);
         }

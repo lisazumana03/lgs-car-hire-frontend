@@ -5,6 +5,7 @@ import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
 import LoginForm from "./pages/Users/LoginForm.jsx";
 import Dashboard from "./pages/Users/Dashboard.jsx";
 import UserProfile from "./pages/Users/UserProfile.jsx";
+import { getUserProfile } from "./scripts";
 import NotificationsPage from "./pages/Users/NotificationsPage.jsx";
 import { getUserProfile } from "./scripts/index.js";
 import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
@@ -24,6 +25,7 @@ import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
 import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
 import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
 import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
+import InvoiceList from "./pages/Reservation/Invoice/InvoiceList.jsx";
 
 
 function App() {
@@ -78,7 +80,8 @@ function App() {
                   <Route path="/payment" element={<PaymentForm />} />
                   <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
                   <Route path="/invoice/:id" element={<InvoiceView />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/invoices" element={<InvoiceList />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </main>
           </>
@@ -249,6 +252,15 @@ export default App
                         <span className="title">Payments</span>
                     </Link>
                 </li>
+                <li>
+                    <Link
+                        to="/invoices"
+                        className={`sidebar-link ${location.pathname === '/invoices' ? 'active' : ''}`}
+                    >
+                        <span className="icon">📄</span>
+                        <span className="title">Invoices</span>
+                    </Link>
+                </li>
                 <li className="logout-item">
                     <button onClick={onLogout} className="logout-btn">
                         <span className="icon">🚪</span>
@@ -266,7 +278,6 @@ function AdminHeader(){
         </header>
     );
 }
-import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx"
 
 function BookingHeader() {
     return (
@@ -278,7 +289,7 @@ function BookingHeader() {
 
 function BookingHistoryHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKING HISTORY</h1>
         </header>
     );
@@ -286,7 +297,7 @@ function BookingHistoryHeader() {
 
 function LocationHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">REGISTER A NEW RENTING LOCATION</h1>
         </header>
     );
@@ -294,7 +305,7 @@ function LocationHeader() {
 
 function LocationViewHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW AVAILABLE RENTING LOCATIONS</h1>
         </header>
     );
@@ -302,10 +313,26 @@ function LocationViewHeader() {
 
 function BookingListHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKINGS</h1>
         </header>
-    )
+    );
+}
+
+function CarHeader() {
+    return (
+        <header className=" text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">REGISTER A NEW CAR</h1>
+        </header>
+    );
+}
+
+function CarListHeader() {
+    return (
+        <header className=" text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">VIEW AVAILABLE CARS</h1>
+        </header>
+    );
 }
 
 function PaymentHeader() {
@@ -327,6 +354,7 @@ function InvoiceHeader() {
 
 function AppContent() {
     const location = useLocation();
+    const isAdminMainPage = location.pathname === "/admin";
     const isBookingPage = location.pathname === "/make-booking";
     const isLocationListPage = location.pathname === "/locations";
     const isHomePage = location.pathname === "/";
@@ -337,11 +365,14 @@ function AppContent() {
     const isCarListPage = location.pathname === "/cars";
     const isPaymentPage = location.pathname === "/payment";
     const isInvoicePage = location.pathname.startsWith("/invoice/");
+    const isInvoicesPage = location.pathname === "/invoices";
 
     return (
         <>
             {isBookingPage ? (
                 <BookingHeader />
+            ) : isAdminMainPage ? (
+                <AdminHeader />
             ) : isLocationListPage ? (
                 <LocationViewHeader />
             ) : isBookingListPage ? (
@@ -357,6 +388,8 @@ function AppContent() {
             ) : isPaymentPage ? (
                 <PaymentHeader />
             ) : isInvoicePage ? (
+                <InvoiceHeader />
+            ) : isInvoicesPage ? (
                 <InvoiceHeader />
             ) : (
                 <Header showNavigation={isHomePage} />
@@ -376,25 +409,18 @@ function AppContent() {
                     <Route path="/payment" element={<PaymentForm />} />
                     <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
                     <Route path="/invoice/:id" element={<InvoiceView />} />
-                    <Route path="/cars"/>
+                    <Route path="/invoices" element={<InvoiceList />} />
                 </Routes>
             </main>
             <Footer />
         </>
     );
 }
-
 function Routers() {
      return (
          <Router>
              <AppContent/>
          </Router>
-
-function App() {
-    return (
-        <Router>
-            <AppContent />
-        </Router>
     );
 }
 

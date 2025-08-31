@@ -88,6 +88,13 @@ const PaymentConfirmation = () => {
                 >
                     Back to Dashboard
                 </button>
+                <button
+                    className="submit-btn"
+                    onClick={() => navigate('/invoices')}
+                    style={{ backgroundColor: '#28a745' }}
+                >
+                    View All Invoices
+                </button>
             </div>
         </div>
     );
