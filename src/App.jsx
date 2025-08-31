@@ -65,7 +65,7 @@ function App() {
               <Routes>
                 <Route path="/dashboard" element={<Dashboard user={currentUser} />} />
                 <Route path="/profile" element={<UserProfile user={currentUser} />} />
-                <Route path="/bookings" element={<div>Bookings Page</div>} />
+                  <Route path="/bookings" element={<div> Bookings Section </div>} />
                 <Route path="/cars" element={<div>Cars Page</div>} />
                 <Route path="/notifications" element={<div>Notifications Page</div>} />
                 <Route path="/history" element={<div>History Page</div>} />
@@ -92,14 +92,14 @@ function App() {
 // Sidebar component with proper React Router navigation
 function Sidebar({ onLogout }) {
   const location = useLocation();
-  
+
   return (
     <div className="sidebar">
       <h2>LG'S CAR HIRE</h2>
       <ul className="sidebar-menu">
         <li>
-          <Link 
-            to="/dashboard" 
+          <Link
+            to="/dashboard"
             className={`sidebar-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
           >
             <span className="icon">🏠</span>
@@ -107,8 +107,8 @@ function Sidebar({ onLogout }) {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/bookings" 
+          <Link
+            to="/bookings"
             className={`sidebar-link ${location.pathname === '/bookings' ? 'active' : ''}`}
           >
             <span className="icon">🎒</span>
@@ -116,8 +116,8 @@ function Sidebar({ onLogout }) {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/cars" 
+          <Link
+            to="/cars"
             className={`sidebar-link ${location.pathname === '/cars' ? 'active' : ''}`}
           >
             <span className="icon">🚗</span>
@@ -125,8 +125,8 @@ function Sidebar({ onLogout }) {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/notifications" 
+          <Link
+            to="/notifications"
             className={`sidebar-link ${location.pathname === '/notifications' ? 'active' : ''}`}
           >
             <span className="icon">🔔</span>
@@ -134,8 +134,8 @@ function Sidebar({ onLogout }) {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/profile" 
+          <Link
+            to="/profile"
             className={`sidebar-link ${location.pathname === '/profile' ? 'active' : ''}`}
           >
             <span className="icon">👤</span>
@@ -143,8 +143,8 @@ function Sidebar({ onLogout }) {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/history" 
+          <Link
+            to="/history"
             className={`sidebar-link ${location.pathname === '/history' ? 'active' : ''}`}
           >
             <span className="icon">📜</span>
@@ -152,8 +152,8 @@ function Sidebar({ onLogout }) {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/payments" 
+          <Link
+            to="/payments"
             className={`sidebar-link ${location.pathname === '/payments' ? 'active' : ''}`}
           >
             <span className="icon">💳</span>
@@ -188,7 +188,7 @@ function BookingHeader() {
 
 function BookingHistoryHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKING HISTORY</h1>
         </header>
     );
@@ -196,7 +196,7 @@ function BookingHistoryHeader() {
 
 function LocationHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">REGISTER A NEW RENTING LOCATION</h1>
         </header>
     );
@@ -204,7 +204,7 @@ function LocationHeader() {
 
 function LocationViewHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW AVAILABLE RENTING LOCATIONS</h1>
         </header>
     );
@@ -212,7 +212,7 @@ function LocationViewHeader() {
 
 function BookingListHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKINGS</h1>
         </header>
     );
@@ -220,7 +220,7 @@ function BookingListHeader() {
 
 function CarHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">REGISTER A NEW CAR</h1>
         </header>
     );
@@ -228,7 +228,7 @@ function CarHeader() {
 
 function CarListHeader() {
     return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+        <header className=" text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW AVAILABLE CARS</h1>
         </header>
     );
