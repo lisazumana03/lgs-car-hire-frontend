@@ -15,6 +15,7 @@ import LocationList from "./pages/Reservation/Location/LocationList.jsx";
 import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
 import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
 import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
+import BookingComponent from "./pages/Reservation/Booking/BookingComponent.jsx";
 import CarForm from "./pages/Vehicle/CarForm.jsx";
 import CarList from "./pages/Vehicle/CarList.jsx";
 import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
@@ -65,7 +66,7 @@ function App() {
               <Routes>
                 <Route path="/dashboard" element={<Dashboard user={currentUser} />} />
                 <Route path="/profile" element={<UserProfile user={currentUser} />} />
-                  <Route path="/bookings" element={<div> Bookings Section </div>} />
+                  <Route path="/bookings" element={<BookingComponent/>} />
                 <Route path="/cars" element={<div>Cars Page</div>} />
                 <Route path="/notifications" element={<div>Notifications Page</div>} />
                 <Route path="/history" element={<div>History Page</div>} />

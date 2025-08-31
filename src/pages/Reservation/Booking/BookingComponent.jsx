@@ -21,7 +21,7 @@ export default function BookingComponent(){
             <div className="booking-links flex gap-4 mb-4">
                 <Link
                     to="create"
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-800"
+                    className="px-4 py-2 bg-blue-200 text-white rounded hover:bg-blue-800"
                 >
                     Create Booking
                 </Link>
@@ -34,8 +34,8 @@ export default function BookingComponent(){
             </div>
 
             <Routes>
-                <Route path="create" element={<BookingForm />} />
-                <Route path="history" element={<BookingHistory />} />
+                <Route path="/make-booking" element={<BookingForm />} />
+                <Route path="/booking-history" element={<BookingHistory />} />
                 <Route path="/" element={<div>Select an option above to manage bookings.</div>} />
             </Routes>
         </div>
