@@ -17,7 +17,7 @@ function BookingCreation(){
 export default function BookingComponent(){
     return (
         <div>
-            <h2 className="text-center">Booking Options</h2>
+            <h1 className="text-center text-white p-6 flex justify-center items-center">Booking Options</h1>
             <div className="booking-links flex gap-4 mb-4">
                 <Link
                     to="/make-booking"
