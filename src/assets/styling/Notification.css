@@ -1,0 +1,274 @@
+/* ===== Notifications Page Styling ===== */
+
+/* Notifications Container */
+.notifications-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.notifications-container h1 {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Notifications List */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Notification Card */
+.notification-card {
+  background-color: #3a3a3a;
+  border-radius: 12px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.notification-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Notification Icon */
+.notification-icon {
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  background-color: #555;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #ccc;
+}
+
+/* Notification Content */
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.notification-message {
+  color: #ccc;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.notification-meta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.notification-time {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+/* Notification Status */
+.notification-status {
+  flex-shrink: 0;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Status Colors */
+.status-pending {
+  background-color: #fbbf24; /* Yellow */
+}
+
+.status-completed {
+  background-color: #4ade80; /* Green */
+}
+
+.status-cancelled {
+  background-color: #ef4444; /* Red */
+}
+
+.status-unknown {
+  background-color: #6b7280; /* Gray */
+}
+
+/* No Notifications State */
+.no-notifications {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #3a3a3a;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Removed emoji icon */
+
+.no-notifications h3 {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.no-notifications p {
+  color: #ccc;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Loading and Error States */
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-container h2,
+.error-container h2 {
+  color: white;
+  margin-bottom: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #3a3a3a;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error-container p {
+  color: #ffa500;
+  margin-bottom: 20px;
+}
+
+.retry-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.retry-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Message Styling */
+.message {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.message.success {
+  background-color: #1e4d2b;
+  color: #4ade80;
+  border: 1px solid #22c55e;
+}
+
+.message.error {
+  background-color: #3a3a3a;
+  color: #ffa500;
+  border: 1px solid #ffa500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .notifications-container {
+    padding: 15px;
+  }
+
+  .notifications-container h1 {
+    font-size: 2rem;
+  }
+
+  .notification-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .notification-content {
+    order: 2;
+  }
+
+  .notification-status {
+    order: 3;
+  }
+
+  .notification-icon {
+    order: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .notifications-container {
+    padding: 10px;
+  }
+
+  .notification-card {
+    padding: 20px;
+  }
+
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  .notification-title {
+    font-size: 1.1rem;
+  }
+
+  .notification-message {
+    font-size: 0.9rem;
+  }
+}
