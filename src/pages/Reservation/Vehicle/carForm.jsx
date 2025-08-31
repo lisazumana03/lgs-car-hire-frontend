@@ -1,6 +1,6 @@
 /*
-Car Registration Form
-*/
+Imtiyaaz Waggie 219374759
+ */
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

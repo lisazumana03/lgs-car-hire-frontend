@@ -1,31 +1,51 @@
 /*
-Car Service for API calls
-Matches the backend CarController endpoints
-*/
+Imtiyaaz Waggie 219374759
+ */
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3045/car";
+const API_URL = "http://localhost:3045/api/car";
 
 export const create = (car) => {
     return axios.post(`${API_URL}/create`, car);
 }
 
-export const getAllCars = () => {
-    // Note: You'll need to add a getAll endpoint to your backend
-    return axios.get(`${API_URL}/getAll`);
+export const getCarById = (carId) => {
+    return axios.get(`${API_URL}/read/${carId}`);
 }
 
 export const updateCar = (car) => {
-    // Using POST as per your backend controller
-    return axios.post(`${API_URL}/update`, car);
+    return axios.put(`${API_URL}/update`, car);
 }
 
 export const deleteCar = (carId) => {
-    // Using GET as per your backend controller
-    return axios.get(`${API_URL}/delete/${carId}`);
+    return axios.delete(`${API_URL}/delete/${carId}`);
 }
 
-export const getCarById = (carId) => {
-    return axios.get(`${API_URL}/read/${carId}`);
+export const getAllCars = () => {
+    return axios.get(`${API_URL}/all`);
+}
+
+export const getCarsByBrand = (brand) => {
+    return axios.get(`${API_URL}/brand/${brand}`);
+}
+
+export const getAvailableCars = () => {
+    return axios.get(`${API_URL}/available`);
+}
+
+export const getCarsByYear = (year) => {
+    return axios.get(`${API_URL}/year/${year}`);
+}
+
+export const getCarsByPriceRange = (minPrice, maxPrice) => {
+    return axios.get(`${API_URL}/price-range`, {
+        params: { minPrice, maxPrice }
+    });
+}
+
+export const updateCarAvailability = (carId, available) => {
+    return axios.put(`${API_URL}/availability/${carId}`, null, {
+        params: { available }
+    });
 }
