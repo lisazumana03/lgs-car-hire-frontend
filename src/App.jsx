@@ -15,8 +15,8 @@ import LocationList from "./pages/Reservation/Location/LocationList.jsx";
 import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
 import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
 import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
-import CarForm from "./pages/Reservation/Vehicle/CarForm.jsx";
-import CarList from "./pages/Reservation/Vehicle/CarList.jsx";
+import CarForm from "./pages/Vehicle/CarForm.jsx";
+import CarList from "./pages/Vehicle/CarList.jsx";
 import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
 
 
