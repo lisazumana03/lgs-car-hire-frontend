@@ -1,11 +1,4 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
-import './App.css'
-import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
-import LoginForm from "./pages/Users/LoginForm.jsx";
-import Dashboard from "./pages/Users/Dashboard.jsx";
-import UserProfile from "./pages/Users/UserProfile.jsx";
-import { getUserProfile } from "./scripts";
+import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import Home from "./Home.jsx";
 import "./index.css";
 import Footer from "./pages/Common/Footer.jsx";
@@ -183,6 +176,7 @@ function AdminHeader(){
         </header>
     );
 }
+import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx"
 
 function BookingHeader() {
     return (
@@ -194,7 +188,7 @@ function BookingHeader() {
 
 function BookingHistoryHeader() {
     return (
-        <header className=" text-white p-6 flex justify-center items-center">
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKING HISTORY</h1>
         </header>
     );
@@ -202,7 +196,7 @@ function BookingHistoryHeader() {
 
 function LocationHeader() {
     return (
-        <header className=" text-white p-6 flex justify-center items-center">
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">REGISTER A NEW RENTING LOCATION</h1>
         </header>
     );
@@ -210,7 +204,7 @@ function LocationHeader() {
 
 function LocationViewHeader() {
     return (
-        <header className=" text-white p-6 flex justify-center items-center">
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW AVAILABLE RENTING LOCATIONS</h1>
         </header>
     );
@@ -218,26 +212,10 @@ function LocationViewHeader() {
 
 function BookingListHeader() {
     return (
-        <header className=" text-white p-6 flex justify-center items-center">
+        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">VIEW YOUR BOOKINGS</h1>
         </header>
-    );
-}
-
-function CarHeader() {
-    return (
-        <header className=" text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">REGISTER A NEW CAR</h1>
-        </header>
-    );
-}
-
-function CarListHeader() {
-    return (
-        <header className=" text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">VIEW AVAILABLE CARS</h1>
-        </header>
-    );
+    )
 }
 
 function PaymentHeader() {
@@ -259,7 +237,6 @@ function InvoiceHeader() {
 
 function AppContent() {
     const location = useLocation();
-    const isAdminMainPage = location.pathname === "/admin";
     const isBookingPage = location.pathname === "/make-booking";
     const isLocationListPage = location.pathname === "/locations";
     const isHomePage = location.pathname === "/";
@@ -275,8 +252,6 @@ function AppContent() {
         <>
             {isBookingPage ? (
                 <BookingHeader />
-            ) : isAdminMainPage ? (
-                <AdminHeader />
             ) : isLocationListPage ? (
                 <LocationViewHeader />
             ) : isBookingListPage ? (
@@ -311,17 +286,25 @@ function AppContent() {
                     <Route path="/payment" element={<PaymentForm />} />
                     <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
                     <Route path="/invoice/:id" element={<InvoiceView />} />
+                    <Route path="/cars"/>
                 </Routes>
             </main>
             <Footer />
         </>
     );
 }
+
 function Routers() {
      return (
          <Router>
              <AppContent/>
          </Router>
+
+function App() {
+    return (
+        <Router>
+            <AppContent />
+        </Router>
     );
 }
 
