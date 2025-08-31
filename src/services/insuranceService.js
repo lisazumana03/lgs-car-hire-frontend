@@ -20,10 +20,10 @@ export const updateInsurance = (insurance) => {
     return axios.put(`${API_URL}/update`, insurance);
 }
 
-export const deleteInsurance = (insuranceId) => {
-    return axios.delete(`${API_URL}/delete/${insuranceId}`);
+export const deleteInsurance = (id) => {
+    return axios.delete(`${API_URL}/delete/${id}`);
 }
 
-export const cancelInsurance = (insuranceId) => {
-    return axios.delete(`${API_URL}/cancel/${insuranceId}`);
+export const cancelInsurance = (id) => {
+    return axios.delete(`${API_URL}/cancel/${id}`);
 }
