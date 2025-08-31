@@ -1,10 +1,12 @@
 /*
-Car Registration Form
-*/
+Imtiyaaz Waggie 219374759
+ */
+
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { create } from "../../../services/carService";
+import { create } from "../../services/carService.js";
+import { createCarType } from "../../services/carTypeService.js";
 
 function CarForm() {
     const navigate = useNavigate();
@@ -15,7 +17,7 @@ function CarForm() {
         availability: true,
         rentalPrice: "",
         insurance: false,
-        // Car Type fields
+        imageUrl: "",
         carType: {
             type: "",
             fuelType: "",
@@ -24,35 +26,62 @@ function CarForm() {
         }
     });
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         
-        // Handle nested carType fields
         if (name.startsWith("carType.")) {
             const field = name.split(".")[1];
             setForm(prev => ({
                 ...prev,
                 carType: {
                     ...prev.carType,
-                    [field]: type === "checkbox" ? checked : value
+                    [field]: type === "checkbox" ? checked : 
+                            field === "numberOfWheels" || field === "numberOfSeats" ? 
+                            parseInt(value) || 0 : value
                 }
             }));
         } else {
-            // Handle regular fields
             setForm(prev => ({
                 ...prev,
-                [name]: type === "checkbox" ? checked : value
+                [name]: type === "checkbox" ? checked : 
+                        name === "year" ? parseInt(value) || "" : value
             }));
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setMessage("");
+
         try {
-            await create(form);
+            const carTypeData = {
+                type: form.carType.type,
+                fuelType: form.carType.fuelType,
+                numberOfWheels: form.carType.numberOfWheels,
+                numberOfSeats: form.carType.numberOfSeats
+            };
+
+            const carTypeResponse = await createCarType(carTypeData);
+            const createdCarType = carTypeResponse.data;
+
+            const carData = {
+                model: form.model,
+                brand: form.brand,
+                year: parseInt(form.year),
+                availability: form.availability,
+                rentalPrice: parseFloat(form.rentalPrice),
+                insurance: form.insurance,
+                imageUrl: form.imageUrl || null,
+                carTypeID: createdCarType.carTypeID 
+            };
+
+            await create(carData);
+            
             setMessage("Car registered successfully!");
-            // Reset form
+            
             setForm({
                 model: "",
                 brand: "",
@@ -60,6 +89,7 @@ function CarForm() {
                 availability: true,
                 rentalPrice: "",
                 insurance: false,
+                imageUrl: "",
                 carType: {
                     type: "",
                     fuelType: "",
@@ -67,14 +97,22 @@ function CarForm() {
                     numberOfSeats: 5
                 }
             });
+            
             setTimeout(() => setMessage(""), 3000);
         } catch (err) {
-            setMessage("Error registering car: " + (err.response?.data?.message || err.message));
+            console.error("Error registering car:", err);
+            const errorMessage = err.response?.data?.message || 
+                                err.response?.data || 
+                                err.message || 
+                                "Error registering car";
+            setMessage("Error: " + errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-black">
             {message && (
                 <p className={`mb-4 font-semibold ${
                     message.includes("Error") ? "text-red-700" : "text-green-700"
@@ -84,12 +122,12 @@ function CarForm() {
             )}
             
             <form onSubmit={handleSubmit} className="bg-red-100 p-8 rounded shadow-md w-full max-w-2xl">
-                <h2 className="text-2xl font-bold mb-6 text-center">Register New Car</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center text-black">Register New Car</h2>
                 
                 {/* Basic Car Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Brand</label>
+                        <label className="block mb-1 font-semibold text-black">Brand *</label>
                         <input 
                             type="text" 
                             name="brand" 
@@ -97,12 +135,13 @@ function CarForm() {
                             onChange={handleChange} 
                             placeholder="e.g., Toyota, BMW, Ford" 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Model</label>
+                        <label className="block mb-1 font-semibold text-black">Model *</label>
                         <input 
                             type="text" 
                             name="model" 
@@ -110,12 +149,13 @@ function CarForm() {
                             onChange={handleChange} 
                             placeholder="e.g., Camry, X5, Focus" 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Year</label>
+                        <label className="block mb-1 font-semibold text-black">Year *</label>
                         <input 
                             type="number" 
                             name="year" 
@@ -125,37 +165,57 @@ function CarForm() {
                             min="1900" 
                             max="2030" 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Rental Price (per day)</label>
+                        <label className="block mb-1 font-semibold text-black">Rental Price (per day) *</label>
                         <input 
                             type="number" 
                             name="rentalPrice" 
                             value={form.rentalPrice} 
                             onChange={handleChange} 
-                            placeholder="e.g., 50.00" 
+                            placeholder="e.g., 850.00" 
                             step="0.01" 
                             min="0" 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
                         />
                     </div>
                 </div>
 
+                {/* Image URL */}
+                <div className="mb-4">
+                    <label className="block mb-1 font-semibold text-black">Image URL (Optional)</label>
+                    <input 
+                        type="url" 
+                        name="imageUrl" 
+                        value={form.imageUrl} 
+                        onChange={handleChange} 
+                        placeholder="https://example.com/car-image.jpg" 
+                        disabled={loading}
+                        className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
+                    />
+                    <p className="text-xs text-gray-600 mt-1">
+                        Provide a URL to an image of the car (optional)
+                    </p>
+                </div>
+
                 {/* Car Type Information */}
-                <h3 className="text-lg font-bold mt-4 mb-2">Car Type Details</h3>
+                <h3 className="text-lg font-bold mt-4 mb-2 text-black">Car Type Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Type</label>
+                        <label className="block mb-1 font-semibold text-black">Type *</label>
                         <select 
                             name="carType.type" 
                             value={form.carType.type} 
                             onChange={handleChange} 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
                         >
                             <option value="">Select Type</option>
                             <option value="Sedan">Sedan</option>
@@ -172,13 +232,14 @@ function CarForm() {
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Fuel Type</label>
+                        <label className="block mb-1 font-semibold text-black">Fuel Type *</label>
                         <select 
                             name="carType.fuelType" 
                             value={form.carType.fuelType} 
                             onChange={handleChange} 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
                         >
                             <option value="">Select Fuel Type</option>
                             <option value="Petrol">Petrol</option>
@@ -190,7 +251,7 @@ function CarForm() {
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Number of Wheels</label>
+                        <label className="block mb-1 font-semibold text-black">Number of Wheels *</label>
                         <input 
                             type="number" 
                             name="carType.numberOfWheels" 
@@ -199,12 +260,13 @@ function CarForm() {
                             min="2" 
                             max="8" 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold">Number of Seats</label>
+                        <label className="block mb-1 font-semibold text-black">Number of Seats *</label>
                         <input 
                             type="number" 
                             name="carType.numberOfSeats" 
@@ -213,7 +275,8 @@ function CarForm() {
                             min="1" 
                             max="20" 
                             required 
-                            className="w-full px-3 py-2 border rounded"
+                            disabled={loading}
+                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
                         />
                     </div>
                 </div>
@@ -227,9 +290,10 @@ function CarForm() {
                                 name="availability" 
                                 checked={form.availability} 
                                 onChange={handleChange} 
-                                className="mr-2"
+                                disabled={loading}
+                                className="mr-2 disabled:bg-gray-100"
                             />
-                            <span className="font-semibold">Available for Rent</span>
+                            <span className="font-semibold text-black">Available for Rent</span>
                         </label>
                     </div>
                     
@@ -240,9 +304,10 @@ function CarForm() {
                                 name="insurance" 
                                 checked={form.insurance} 
                                 onChange={handleChange} 
-                                className="mr-2"
+                                disabled={loading}
+                                className="mr-2 disabled:bg-gray-100"
                             />
-                            <span className="font-semibold">Insurance Included</span>
+                            <span className="font-semibold text-black">Insurance Included</span>
                         </label>
                     </div>
                 </div>
@@ -251,20 +316,31 @@ function CarForm() {
                 <div className="flex gap-4 mt-6">
                     <button 
                         type="submit" 
-                        className="bg-green-800 text-white px-4 py-2 rounded hover:bg-green-700"
+                        disabled={loading}
+                        className={`px-4 py-2 rounded transition ${
+                            loading 
+                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                                : 'bg-green-800 text-white hover:bg-green-700'
+                        }`}
                     >
-                        Register Car
+                        {loading ? 'Registering...' : 'Register Car'}
                     </button>
                     <button 
                         type="reset" 
-                        className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700" 
-                        onClick={() => setForm({
+                        disabled={loading}
+                        className={`px-4 py-2 rounded transition ${
+                            loading 
+                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                                : 'bg-orange-600 text-white hover:bg-orange-700'
+                        }`}
+                        onClick={() => !loading && setForm({
                             model: "",
                             brand: "",
                             year: "",
                             availability: true,
                             rentalPrice: "",
                             insurance: false,
+                            imageUrl: "",
                             carType: {
                                 type: "",
                                 fuelType: "",
@@ -277,8 +353,13 @@ function CarForm() {
                     </button>
                     <button 
                         type="button" 
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" 
-                        onClick={() => navigate("/")}
+                        disabled={loading}
+                        className={`px-4 py-2 rounded transition ${
+                            loading 
+                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                                : 'bg-blue-500 text-white hover:bg-blue-700'
+                        }`}
+                        onClick={() => !loading && navigate("/")}
                     >
                         Back
                     </button>

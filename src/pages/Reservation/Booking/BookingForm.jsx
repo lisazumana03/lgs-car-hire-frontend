@@ -7,7 +7,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 
-
 function BookingForm() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
@@ -50,55 +49,58 @@ function BookingForm() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-            {message && <p className="mb-4 text-green-700 font-semibold">{message}</p>}
-            <form onSubmit={handleSubmit} className="bg-red-100 p-8 rounded shadow-md w-full max-w-md">
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold">Car being booked</label>
-                    <input type="text" name="cars" value={form.cars[0]} onChange={handleChange} placeholder="Enter car name or ID" required className="w-full px-3 py-2 border rounded"/>
-                </div>
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold">Booking Date & Time</label>
-                    <input type="datetime-local" name="bookingDateAndTime" value={form.bookingDateAndTime} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
-                </div>
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold">Start Date & Time</label>
-                    <input type="datetime-local" name="startDate" value={form.startDate} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
-                </div>
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold">End Date & Time</label>
-                    <input type="datetime-local" name="endDate" value={form.endDate} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
-                </div>
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold">Pick-up Location</label>
-                    <input type="text" name="pickupLocation" value={form.pickupLocation} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
-                </div>
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold">Drop-off Location</label>
-                    <input type="text" name="dropOffLocation" value={form.dropOffLocation} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
-                </div>
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold">Booking Status</label>
-                    <select name="bookingStatus" value={form.bookingStatus} onChange={handleChange} required className="w-full px-3 py-2 border rounded">
-                        <option value="confirmed">Confirmed</option>
-                        <option value="pending">Pending</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <div className="flex gap-4">
-                    <button type="submit" className="bg-green-800 text-white px-4 py-2 rounded hover:bg-red-700">Submit</button>
-                    <button type="reset" className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-gray-400" onClick={() => setForm({
-                        cars: [""],
-                        bookingDateAndTime: "",
-                        startDate: "",
-                        endDate: "",
-                        pickupLocation: "",
-                        dropOffLocation: "",
-                        bookingStatus: "pending"
-                    })}>Reset</button>
-                    <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/")}>Back</button>
-                </div>
-            </form>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+            <div className="w-full max-w-lg bg-white/90 rounded-xl shadow-lg p-8 mt-8">
+                <h2 className="text-2xl font-bold text-center text-red-700 mb-6">Make a Booking</h2>
+                {message && <p className="mb-4 text-center text-green-700 font-semibold">{message}</p>}
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label className="block mb-1 font-semibold">Car being booked</label>
+                        <input type="text" name="cars" value={form.cars[0]} onChange={handleChange} placeholder="Enter car name or ID" required className="w-full px-3 py-2 border rounded"/>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block mb-1 font-semibold">Booking Date & Time</label>
+                        <input type="datetime-local" name="bookingDateAndTime" value={form.bookingDateAndTime} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block mb-1 font-semibold">Start Date & Time</label>
+                        <input type="datetime-local" name="startDate" value={form.startDate} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block mb-1 font-semibold">End Date & Time</label>
+                        <input type="datetime-local" name="endDate" value={form.endDate} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block mb-1 font-semibold">Pick-up Location</label>
+                        <input type="text" name="pickupLocation" value={form.pickupLocation} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block mb-1 font-semibold">Drop-off Location</label>
+                        <input type="text" name="dropOffLocation" value={form.dropOffLocation} onChange={handleChange} required className="w-full px-3 py-2 border rounded"/>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block mb-1 font-semibold">Booking Status</label>
+                        <select name="bookingStatus" value={form.bookingStatus} onChange={handleChange} required className="w-full px-3 py-2 border rounded">
+                            <option value="confirmed">Confirmed</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div className="flex gap-4 justify-center">
+                        <button type="submit" className="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-900">Submit</button>
+                        <button type="reset" className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={() => setForm({
+                            cars: [""],
+                            bookingDateAndTime: "",
+                            startDate: "",
+                            endDate: "",
+                            pickupLocation: "",
+                            dropOffLocation: "",
+                            bookingStatus: "pending"
+                        })}>Reset</button>
+                        <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/")}>Back</button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
