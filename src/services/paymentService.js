@@ -3,12 +3,14 @@
  * invoiceService.js
  */
 
-import api from '../scripts/apiConfig';
+import axios from "axios";
+
+const API_URL = "http://localhost:3045";
 
 const paymentService = {
     create: async (paymentData) => {
         try {
-            const response = await api.post('/payment/create', paymentData);
+            const response = await axios.post(`${API_URL}/payment/create`, paymentData);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Payment processing failed');
@@ -17,7 +19,7 @@ const paymentService = {
 
     read: async (paymentId) => {
         try {
-            const response = await api.get(`/payment/read/${paymentId}`);
+            const response = await axios.get(`${API_URL}/payment/read/${paymentId}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to fetch payment');
@@ -26,7 +28,7 @@ const paymentService = {
 
     update: async (paymentData) => {
         try {
-            const response = await api.put('/payment/update', paymentData);
+            const response = await axios.put(`${API_URL}/payment/update`, paymentData);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to update payment');
@@ -35,7 +37,7 @@ const paymentService = {
 
     delete: async (paymentId) => {
         try {
-            const response = await api.delete(`/payment/delete/${paymentId}`);
+            const response = await axios.delete(`${API_URL}/payment/delete/${paymentId}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to delete payment');
@@ -44,7 +46,7 @@ const paymentService = {
 
     getUserPayments: async (userId) => {
         try {
-            const response = await api.get(`/payments/user/${userId}`);
+            const response = await axios.get(`${API_URL}/payments/user/${userId}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to fetch payments');
