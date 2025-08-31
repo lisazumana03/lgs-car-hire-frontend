@@ -27,3 +27,7 @@ export const deleteMaintenance = (id) => {
 export const cancelMaintenance = (id) => {
     return axios.delete(`${API_URL}/cancel/${id}`);
 }
+
+export const getAllMaintenance = () => {
+    return axios.get(`${API_URL}/all`);
+};
