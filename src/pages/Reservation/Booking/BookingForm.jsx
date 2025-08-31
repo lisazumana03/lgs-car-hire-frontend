@@ -97,7 +97,7 @@ function BookingForm() {
                             dropOffLocation: "",
                             bookingStatus: "pending"
                         })}>Reset</button>
-                        <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/")}>Back</button>
+                        <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/dashboard")}>Back</button>
                     </div>
                 </form>
             </div>
