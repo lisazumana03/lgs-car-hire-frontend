@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllCars, getAvailableCars } from "../../../services/carService.js";
+import { getAllCars, getAvailableCars } from "../../services/carService.js";
 
 /*
 Imtiyaaz Waggie 219374759
