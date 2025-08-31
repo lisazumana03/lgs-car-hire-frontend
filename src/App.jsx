@@ -18,6 +18,9 @@ import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
 import CarForm from "./pages/Reservation/Vehicle/CarForm.jsx";
 import CarList from "./pages/Reservation/Vehicle/CarList.jsx";
 import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
+import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
+import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
+import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
 
 
 function App() {
@@ -69,7 +72,9 @@ function App() {
                 <Route path="/cars" element={<div>Cars Page</div>} />
                 <Route path="/notifications" element={<div>Notifications Page</div>} />
                 <Route path="/history" element={<div>History Page</div>} />
-                <Route path="/payments" element={<div>Payments Page</div>} />
+                  <Route path="/payment" element={<PaymentForm />} />
+                  <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
+                  <Route path="/invoice/:id" element={<InvoiceView />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </main>
@@ -154,7 +159,7 @@ function Sidebar({ onLogout }) {
         <li>
           <Link 
             to="/payments" 
-            className={`sidebar-link ${location.pathname === '/payments' ? 'active' : ''}`}
+            className={`sidebar-link ${location.pathname === '/payment' ? 'active' : ''}`}
           >
             <span className="icon">💳</span>
             <span className="title">Payments</span>
@@ -234,6 +239,22 @@ function CarListHeader() {
     );
 }
 
+function PaymentHeader() {
+        return (
+            <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+                <h1 className="text-2xl font-bold">PAYMENT</h1>
+            </header>
+        );
+    }
+
+    function InvoiceHeader() {
+        return (
+            <header className="bg-red-600 text-white p-6 flex justify-center items-center">
+                <h1 className="text-2xl font-bold">INVOICE</h1>
+            </header>
+        );
+}
+
 function AppContent() {
     const location = useLocation();
     const isAdminMainPage = location.pathname === "/admin";
@@ -245,6 +266,8 @@ function AppContent() {
     const isLocationPage = location.pathname === "/register-location";
     const isCarPage = location.pathname === "/register-car";
     const isCarListPage = location.pathname === "/cars";
+    const isPaymentPage = location.pathname === "/payment";
+    const isInvoicePage = location.pathname.startsWith("/invoice/");
 
     return (
         <>
@@ -264,6 +287,10 @@ function AppContent() {
                 <CarHeader />
             ) : isCarListPage ? (
                 <CarListHeader />
+            ) : isPaymentPage ? (
+                <PaymentHeader />
+            ) : isInvoicePage ? (
+                <InvoiceHeader />
             ) : (
                 <Header showNavigation={isHomePage} />
             )}
@@ -278,6 +305,9 @@ function AppContent() {
                     <Route path="/register-car" element={<CarForm />} />
                     <Route path="/cars" element={<CarList />} />
                     <Route path="/admin" element={<AdminDashboard/>} />
+                    <Route path="/payment" element={<PaymentForm />} />
+                    <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
+                    <Route path="/invoice/:id" element={<InvoiceView />} />
                 </Routes>
             </main>
             <Footer />
