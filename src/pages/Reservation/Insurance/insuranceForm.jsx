@@ -11,7 +11,7 @@ import {
   updateInsurance,
   deleteInsurance,
   cancelInsurance,
-} from "../../services/insuranceService";
+} from "../../../services/insuranceService";
 
 function InsuranceForm() {
   const [form, setForm] = useState({
@@ -69,7 +69,7 @@ function InsuranceForm() {
         status: data.status ?? "",
         policyNumber: data.policyNumber ?? "",
         mechanic: data.mechanic ?? "",
-        carId: data.carId ?? data.car?.carID ?? "",
+        carId: data.carId ?? data.car?.carId ?? "",
       });
       msg("Read loaded");
     } catch {
