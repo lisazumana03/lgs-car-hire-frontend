@@ -17,9 +17,56 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Dropdown styles for dark theme */
+select.form-input {
+  background-color: #2c2c2c !important;
+  color: white !important;
+  border: 2px solid #555;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+select.form-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Dropdown options styling */
+select.form-input option {
+  background-color: #3a3a3a;
+  color: white;
+  padding: 10px;
+}
+
+/* For the booking selection dropdown specifically */
+#bookingSelect {
+  background-color: #2c2c2c;
+  color: white;
+  border: 2px solid #555;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+#bookingSelect option {
+  background-color: #3a3a3a;
+  color: white;
+  padding: 12px;
+}
+
+#bookingSelect:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+}
+
 /* Remove conflicting styles that override custom components */
 #root {
   width: 100%;
   min-height: 100vh;
 }
-
