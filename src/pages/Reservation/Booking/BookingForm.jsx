@@ -4,7 +4,7 @@ Date: 05/06/2025
  */
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 
 function BookingForm() {
@@ -19,6 +19,7 @@ function BookingForm() {
         bookingStatus: "pending"
     });
     const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState(""); 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -34,6 +35,7 @@ function BookingForm() {
         try {
             await create(form);
             setMessage("Booking created successfully!");
+            setMessageType("success");
             setForm({
                 cars: [""],
                 bookingDateAndTime: "",
@@ -45,14 +47,23 @@ function BookingForm() {
             });
         } catch (err) {
             setMessage("Error creating booking.");
+            setMessageType("error");
         }
     };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
-            <div className="w-full max-w-lg bg-gray-600/90 rounded-xl shadow-lg p-8 mt-8">
-                <h2 className="text-2xl font-bold text-center text-red-700 mb-6">Make a Booking</h2>
-                {message && <p className="mb-4 text-center text-green-700 font-semibold">{message}</p>}
+            <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
+                <h2 className="text-2xl font-bold text-center text-whit mb-8">Make a Booking</h2>
+
+                {message && (
+                    <div
+                        className={`mb-6 px-4 py-2 rounded-lg text-center font-semibold 
+                        ${messageType === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}
+                    >
+                        {message}
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold">Car being booked</label>
@@ -100,23 +111,6 @@ function BookingForm() {
                         <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/dashboard")}>Back</button>
                     </div>
                 </form>
-            </div>
-            <div className="w-full max-w-lg bg-white/90 rounded-xl shadow-lg p-8 mt-8">
-                <h2 className="text-center text-xl font-semibold mb-4">Booking Options</h2>
-                <div className="booking-links flex gap-4 mb-4">
-                    <Link
-                        to="/make-booking"
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-800"
-                    >
-                        Make Booking
-                    </Link>
-                    <Link
-                        to="/booking-history"
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-800"
-                    >
-                        View Booking History
-                    </Link>
-                </div>
             </div>
         </div>
     );

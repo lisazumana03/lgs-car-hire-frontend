@@ -1,6 +1,6 @@
 /**
  * Sanele Zondi (221602011)
- * invoiceService.js
+ * PaymentConfirmation.jsx (file)
  */
 
 import React from 'react';
@@ -63,7 +63,9 @@ const PaymentConfirmation = () => {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ color: '#aaa' }}>Booking Reference:</span>
-                        <span style={{ color: '#fff', fontWeight: '600' }}>#{booking.bookingID}</span>
+                        <span style={{ color: '#fff', fontWeight: '600' }}>
+                        #{booking.bookingID || booking.id}
+                        </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ color: '#aaa' }}>Date:</span>
@@ -85,6 +87,13 @@ const PaymentConfirmation = () => {
                     style={{ backgroundColor: '#6c757d' }}
                 >
                     Back to Dashboard
+                </button>
+                <button
+                    className="submit-btn"
+                    onClick={() => navigate('/invoices')}
+                    style={{ backgroundColor: '#28a745' }}
+                >
+                    View All Invoices
                 </button>
             </div>
         </div>

@@ -10,23 +10,57 @@ function LocationList() {
     const [locations, setLocations] = useState([]);
     const navigate = useNavigate();
 
+    const mockData = [
+    {
+        locationID: 1,
+        locationName: "Usasaza Branch",
+        streetName: "R58",
+        cityOrTown: "Colesberg",
+        provinceOrState: "Northern Cape",
+        country: "South Africa",
+        postalCode: "9795"
+    },
+    {
+        locationID: 2,
+        locationName: "Karoo Branch",
+        streetName: "N1 Donkin Street",
+        cityOrTown: "Beaufort West",
+        provinceOrState: "Western Cape",
+        country: "South Africa",
+        postalCode: "6970"
+    },
+    {
+        locationID: 3,
+        locationName: "CPT Branch",
+        streetName: "CTIA Road",
+        cityOrTown: "Cape Town",
+        provinceOrState: "Western Cape",
+        country: "South Africa",
+        postalCode: "7788"
+    }]
+
     useEffect(() => {
         getAllLocations()
-            .then(res => setLocations(res.data))
-            .catch(() => setLocations([]));
+            .then(res => {
+                setLocations([...mockData, ...res.data])
+            })
+            .catch(() =>
+            {setLocations(mockData)});
     }, []);
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-black-100">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl p-6">
+                <h2 className="text-2xl font-bold text-center text-white mb-8">View Locations</h2>
                 {locations.map(loc => (
-                    <div key={loc.locationID} className="bg-white rounded-lg shadow-lg p-6 flex flex-col">
-                        <h3 className="text-xl font-bold text-red-700 mb-2">{loc.locationName}</h3>
-                        <p className="text-gray-700"><span className="font-semibold">Street:</span> {loc.streetName}</p>
-                        <p className="text-gray-700"><span className="font-semibold">City/Town:</span> {loc.cityOrTown}</p>
-                        <p className="text-gray-700"><span className="font-semibold">Province/State:</span> {loc.provinceOrState}</p>
-                        <p className="text-gray-700"><span className="font-semibold">Country:</span> {loc.country}</p>
-                        <p className="text-gray-700"><span className="font-semibold">Postal Code:</span> {loc.postalCode}</p>
+                    <div key={loc.locationID} className="bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col">
+                        <h3 className="text-xl font-bold text-white mb-2">{loc.locationName}</h3>
+                        <p className="text-white"><span className="font-semibold">Street:</span> {loc.streetName}</p>
+                        <p className="text-white"><span className="font-semibold">City/Town:</span> {loc.cityOrTown}</p>
+                        <p className="text-white"><span className="font-semibold">Province/State:</span> {loc.provinceOrState}</p>
+                        <p className="text-white"><span className="font-semibold">Country:</span> {loc.country}</p>
+                        <p className="text-white"><span className="font-semibold">Postal Code:</span> {loc.postalCode}</p>
                         <div className="mt-4 flex gap-2">
                             <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700">Edit</button>
                             <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
@@ -36,8 +70,8 @@ function LocationList() {
             </div>
             <button
                 type="button"
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mt-6"
-                onClick={() => navigate("/")}
+                className="bg-blue-500 text-white px-4 py-8 rounded hover:bg-blue-700 mt-6"
+                onClick={() => navigate("/dashboard")}
             >
                 Back
             </button>
