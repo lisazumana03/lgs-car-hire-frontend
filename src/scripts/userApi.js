@@ -1,6 +1,6 @@
 import { API_BASE_URL, DEFAULT_HEADERS } from "./apiConfig.js";
 
-const USE_MOCK = true; // set to false when backend is ready
+const USE_MOCK = false; // set to false when backend is ready
 
 // Mock users for demo
 const mockUsers = [

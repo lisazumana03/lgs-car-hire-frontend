@@ -5,7 +5,7 @@
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3045";
+const API_URL = "http://localhost:3046";
 
 // Mock data for testing
 const mockInvoices = [

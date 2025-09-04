@@ -72,7 +72,10 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard user={currentUser} />} />
                 <Route path="/profile" element={<UserProfile user={currentUser} />} />
                   <Route path="/bookings" element={<BookingComponent/>} />
-                <Route path="/cars" element={<div>Cars Page</div>} />
+                <Route path="/make-booking" element={<BookingForm />} />
+                <Route path="/booking-history" element={<BookingHistory />} />
+                <Route path="/cars" element={<CarList />} />
+                <Route path="/register-car" element={<CarForm />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/history" element={<div>History Page</div>} />
                   <Route path="/payment" element={<PaymentForm />} />

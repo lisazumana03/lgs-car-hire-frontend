@@ -6,7 +6,7 @@ Date: 20/08/2025
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3045/api/maintenance";
+const API_URL = "http://localhost:3046/api/maintenance";
 
 export const createMaintenance = (maintenance) => {
     return axios.post(`${API_URL}/create`, maintenance);
