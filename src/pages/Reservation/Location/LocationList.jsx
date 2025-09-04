@@ -50,8 +50,8 @@ function LocationList() {
 
 
     return (
-        <div className="form">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl p-6">
+        <div>
+            <div className="form">
                 <h2 className="text-2xl font-bold text-center text-white mb-8">View Locations</h2>
                 {locations.map(loc => (
                     <div key={loc.locationID} className="bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col">
@@ -70,7 +70,8 @@ function LocationList() {
             </div>
             <button
                 type="button"
-                className="bg-blue-500 text-white px-4 py-8 rounded hover:bg-blue-700 mt-6"
+                style={{ marginTop: "20px", backgroundColor: "#003ffa" }}
+                className="submit-btn"
                 onClick={() => navigate("/dashboard")}
             >
                 Back

@@ -82,7 +82,7 @@ function App() {
                   <Route path="/booking-history" element={<BookingHistory />} />
                   <Route path= "reviews" element={<ReviewComponent/>} />
                   <Route path="review-form" element={<ReviewForm/>} />
-                 <Route path="review-list" element={<ReviewList/>} />
+                  <Route path="review-list" element={<ReviewList/>} />
                     <Route path="support" element={<SupportComponent/>} />
                     <Route path="support-form" element={<SupportForm/>} />
                     <Route path="support-list" element={<SupportList/>} />
@@ -94,6 +94,7 @@ function App() {
                   <Route path="/invoice/:id" element={<InvoiceView />} />
                   <Route path="/invoices" element={<InvoiceList />} />
                   <Route path="/locations" element={<LocationList />} />
+                  <Route path="/register-location" element={<LocationForm/>} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </main>
@@ -218,6 +219,15 @@ function Sidebar({ onLogout }) {
                     >
                         <span className="icon">📍</span>
                         <span className="title">Locations</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/register-location"
+                        className={`sidebar-link ${location.pathname === '/register-location' ? 'active' : ''}`}
+                    >
+                        <span className="icon">📌</span>
+                        <span className="title">Add Location</span>
                     </Link>
                 </li>
                 <li className="logout-item">
@@ -368,8 +378,6 @@ function AppContent() {
                     <Route path="/" element={<Home />} />
                     <Route path="/make-booking" element={<BookingForm />} />
                     <Route path="/bookings" element={<BookingList />} />
-                    <Route path="/locations" element={<LocationList />} />
-                    <Route path="/register-location" element={<LocationForm/>} />
                     <Route path="/register-car" element={<CarForm />} />
                     <Route path="/cars" element={<CarList />} />
                     <Route path="/admin" element={<AdminDashboard/>} />

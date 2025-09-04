@@ -30,8 +30,8 @@ function BookingForm() {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (error) => {
+        error.preventDefault();
         try {
             await create(form);
             setMessage("Booking created successfully!");
@@ -45,17 +45,17 @@ function BookingForm() {
                 dropOffLocation: "",
                 bookingStatus: "pending"
             });
-        } catch (err) {
+        } catch (error) {
             setMessage("Error creating booking.");
             setMessageType("error");
         }
     };
 
     return (
-        <div className="form">
+        <div className="form-group">
             <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
-                <h2 className="text-2xl font-bold text-center text-whit mb-8">Make a Booking</h2>
-                <form onSubmit={handleSubmit}>
+                <h2 style={{}}>Make a Booking</h2>
+                <form onSubmit={handleSubmit} className="form">
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold">Car being booked</label>
                         <input type="text" name="cars" value={form.cars[0]} onChange={handleChange} placeholder="Enter car name or ID" required className="w-full px-3 py-2 border rounded"/>
@@ -89,8 +89,12 @@ function BookingForm() {
                         </select>
                     </div>
                     <div style={{display: "flex", marginTop: "20px", gap: "10px"}}>
-                        <button type="submit" style={{backgroundColor: "#00ca09"}} className="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-900">Submit</button>
-                        <button type="reset" style={{backgroundColor: "#003ffa"}} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={() => setForm({
+                        <button type="submit"
+                                style={{backgroundColor: "#00ca09"}}
+                                className="submit-btn">Submit</button>
+                        <button type="reset"
+                                style={{backgroundColor: "#003ffa"}}
+                                className="submit-btn" onClick={() => setForm({
                             cars: [""],
                             bookingDateAndTime: "",
                             startDate: "",
@@ -99,7 +103,9 @@ function BookingForm() {
                             dropOffLocation: "",
                             bookingStatus: "pending"
                         })}>Reset</button>
-                        <button type="button" style={{backgroundColor: "#ff0000"}} className="text-white px-4 py-2 rounded hover:bg-blue-800"
+                        <button type="button"
+                                style={{backgroundColor: "#ff0000"}}
+                                className="submit-btn"
                                 onClick={() => navigate("/bookings")}>Back</button>
                     </div>
                     {message && (
