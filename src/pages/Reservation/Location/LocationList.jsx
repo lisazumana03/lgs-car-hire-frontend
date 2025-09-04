@@ -50,7 +50,7 @@ function LocationList() {
 
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-black-100">
+        <div className="form">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl p-6">
                 <h2 className="text-2xl font-bold text-center text-white mb-8">View Locations</h2>
                 {locations.map(loc => (

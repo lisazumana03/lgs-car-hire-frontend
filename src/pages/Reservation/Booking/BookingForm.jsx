@@ -88,9 +88,9 @@ function BookingForm() {
                             <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
-                    <div className="flex gap-4 justify-center">
-                        <button type="submit" className="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-900">Submit</button>
-                        <button type="reset" className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={() => setForm({
+                    <div style={{display: "flex", marginTop: "20px", gap: "10px"}}>
+                        <button type="submit" style={{backgroundColor: "#00ca09"}} className="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-900">Submit</button>
+                        <button type="reset" style={{backgroundColor: "#003ffa"}} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={() => setForm({
                             cars: [""],
                             bookingDateAndTime: "",
                             startDate: "",
@@ -99,7 +99,8 @@ function BookingForm() {
                             dropOffLocation: "",
                             bookingStatus: "pending"
                         })}>Reset</button>
-                        <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/dashboard")}>Back</button>
+                        <button type="button" style={{backgroundColor: "#ff0000"}} className="text-white px-4 py-2 rounded hover:bg-blue-800"
+                                onClick={() => navigate("/bookings")}>Back</button>
                     </div>
                     {message && (
                         <p className={`mb-4 px-4 py-2 rounded border ${message.includes("successfully")
