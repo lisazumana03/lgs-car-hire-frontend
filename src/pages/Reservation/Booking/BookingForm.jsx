@@ -52,7 +52,7 @@ function BookingForm() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+        <div className="form">
             <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
                 <h2 className="text-2xl font-bold text-center text-whit mb-8">Make a Booking</h2>
                 <form onSubmit={handleSubmit}>
