@@ -1,29 +1,35 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
-import './App.css'
-import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
-import LoginForm from "./pages/Users/LoginForm.jsx";
-import Dashboard from "./pages/Users/Dashboard.jsx";
-import UserProfile from "./pages/Users/UserProfile.jsx";
-import { getUserProfile } from "./scripts";
-import NotificationsPage from "./pages/Users/NotificationsPage.jsx";
+import { useState } from 'react';
+import { Link, Navigate, Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
+import './App.css';
 import Home from "./Home.jsx";
 import "./index.css";
+import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
 import Footer from "./pages/Common/Footer.jsx";
 import Header from "./pages/Common/Header.jsx";
 import BookingForm from "./pages/Reservation/Booking/BookingForm.jsx";
-import LocationList from "./pages/Reservation/Location/LocationList.jsx";
-import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
-import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
 import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
-import BookingComponent from "./pages/Reservation/Booking/BookingComponent.jsx";
+import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
+import InvoiceList from "./pages/Reservation/Invoice/InvoiceList.jsx";
+import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
+import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
+import LocationList from "./pages/Reservation/Location/LocationList.jsx";
+import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
+import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
+import Dashboard from "./pages/Users/Dashboard.jsx";
+import LoginForm from "./pages/Users/LoginForm.jsx";
+import NotificationsPage from "./pages/Users/NotificationsPage.jsx";
+import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
+import UserProfile from "./pages/Users/UserProfile.jsx";
 import CarForm from "./pages/Vehicle/CarForm.jsx";
 import CarList from "./pages/Vehicle/CarList.jsx";
-import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
-import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
-import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
-import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
-import InvoiceList from "./pages/Reservation/Invoice/InvoiceList.jsx";
+import ReviewForm from "./pages/Feedback/Review/reviewForm.jsx";
+import ReviewList from "./pages/Feedback/Review/reviewList.jsx";
+import SupportForm from "./pages/Reservation/Support/supportForm.jsx";
+import SupportList from "./pages/Reservation/Support/supportList.jsx";
+import { getUserProfile } from "./scripts";
+import ReviewComponent from './pages/Feedback/Review/reviewComponent.jsx';
+import SupportComponent from './pages/Reservation/Support/supportComponent.jsx';
+import BookingComponent from "./pages/Reservation/Booking/BookingComponent.jsx";
 
 
 function App() {
@@ -71,7 +77,15 @@ function App() {
               <Routes>
                 <Route path="/dashboard" element={<Dashboard user={currentUser} />} />
                 <Route path="/profile" element={<UserProfile user={currentUser} />} />
-                  <Route path="/bookings" element={<BookingComponent/>} />
+                  <Route path="/bookings" element={<BookingComponent/>}/>
+                  <Route path="/make-booking" element={<BookingForm/>} />
+                  <Route path="/booking-history" element={<BookingHistory />} />
+                  <Route path= "reviews" element={<ReviewComponent/>} />
+                  <Route path="review-form" element={<ReviewForm/>} />
+                 <Route path="review-list" element={<ReviewList/>} />
+                    <Route path="support" element={<SupportComponent/>} />
+                    <Route path="support-form" element={<SupportForm/>} />
+                    <Route path="support-list" element={<SupportList/>} />
                 <Route path="/cars" element={<div>Cars Page</div>} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/history" element={<div>History Page</div>} />
@@ -79,6 +93,7 @@ function App() {
                   <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
                   <Route path="/invoice/:id" element={<InvoiceView />} />
                   <Route path="/invoices" element={<InvoiceList />} />
+                  <Route path="/locations" element={<LocationList />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </main>
@@ -178,6 +193,33 @@ function Sidebar({ onLogout }) {
                         <span className="title">Invoices</span>
                     </Link>
                 </li>
+                <li>
+                    <Link
+                        to="/reviews"
+                        className={`sidebar-link ${location.pathname === '/reviews' ? 'active' : ''}`}
+                    >
+                        <span className="icon">⭐</span>
+                        <span className="title">Reviews</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/support"
+                        className={`sidebar-link ${location.pathname === '/reviews' ? 'active' : ''}`}
+                    >
+                        <span className="icon">👨‍💻</span>
+                        <span className="title">Query</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/locations"
+                        className={`sidebar-link ${location.pathname === '/locations' ? 'active' : ''}`}
+                    >
+                        <span className="icon">📍</span>
+                        <span className="title">Locations</span>
+                    </Link>
+                </li>
                 <li className="logout-item">
                     <button onClick={onLogout} className="logout-btn">
                         <span className="icon">🚪</span>
@@ -201,6 +243,14 @@ function BookingHeader() {
     return (
         <header className="bg-red-600 text-white p-6 flex justify-center items-center">
             <h1 className="text-2xl font-bold">MAKE YOUR BOOKING</h1>
+        </header>
+    );
+}
+
+function ReviewHeader() {
+    return (
+        <header className="bg-black-600 text-white p-6 flex justify-center items-center">
+            <h1 className="text-2xl font-bold">WRITE YOUR REVIEW</h1>
         </header>
     );
 }
@@ -318,7 +368,6 @@ function AppContent() {
                     <Route path="/" element={<Home />} />
                     <Route path="/make-booking" element={<BookingForm />} />
                     <Route path="/bookings" element={<BookingList />} />
-                    <Route path="/booking-history" element={<BookingHistory />} />
                     <Route path="/locations" element={<LocationList />} />
                     <Route path="/register-location" element={<LocationForm/>} />
                     <Route path="/register-car" element={<CarForm />} />
