@@ -55,15 +55,6 @@ function BookingForm() {
         <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
             <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
                 <h2 className="text-2xl font-bold text-center text-whit mb-8">Make a Booking</h2>
-
-                {message && (
-                    <div
-                        className={`mb-6 px-4 py-2 rounded-lg text-center font-semibold 
-                        ${messageType === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}
-                    >
-                        {message}
-                    </div>
-                )}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold">Car being booked</label>
@@ -110,6 +101,13 @@ function BookingForm() {
                         })}>Reset</button>
                         <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => navigate("/dashboard")}>Back</button>
                     </div>
+                    {message && (
+                        <p className={`mb-4 px-4 py-2 rounded border ${message.includes("successfully")
+                            ? "bg-[#1e4d2b] text-green-400 border-green-500"
+                            : "bg-[#4c1d1d] text-red-400 border-red-500"}`}>
+                            {message}
+                        </p>
+                    )}
                 </form>
             </div>
         </div>
