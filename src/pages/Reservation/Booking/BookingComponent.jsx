@@ -12,7 +12,8 @@ export default function BookingComponent(){
             <div className="booking-links flex flex-col gap-6 mb-4 w-full max-w-md">
                 <button
                     type="button"
-                    className="make-booking-btn"
+                    className="submit-btn"
+                    style={{ marginBottom: "10px", backgroundColor: "#ff0000" }}
                     onClick={() => navigate("/make-booking")}
                 >
                     Make Booking
@@ -20,6 +21,7 @@ export default function BookingComponent(){
                 <button
                     type="button"
                     className="submit-btn"
+                    style={{marginBottom: "10px", backgroundColor: "#ff0000"}}
                     onClick={() => navigate("/booking-history")}
                 >
                     View Booking History

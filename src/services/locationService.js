@@ -4,7 +4,7 @@ Date: 14/08/2025
  */
 import axios from "axios";
 
-const API_URL = "http://localhost:3045/location";
+const API_URL = "http://localhost:3045/api/location";
 
 export const create = (location) => {
     return axios.post(`${API_URL}/create`, location);

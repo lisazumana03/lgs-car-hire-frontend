@@ -5,7 +5,7 @@ Date: 14/08/2025
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3045/booking";
+const API_URL = "http://localhost:3045/api/booking";
 
 export const create = (booking) => {
     return axios.post(`${API_URL}/create`, booking);
