@@ -10,7 +10,7 @@ function ReviewForm({ onAdd }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post("http://localhost:3045/reviews", form)
+    axios.post("http://localhost:3045/api/reviews", form)
       .then(res => {
         onAdd(res.data);
         setForm({ reviewerName: "", comment: "", rating: 0 });

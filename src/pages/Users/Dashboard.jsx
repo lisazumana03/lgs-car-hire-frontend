@@ -1,7 +1,29 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './index.css';
 
 function Dashboard({ user }) {
+  const navigate = useNavigate();
+
+  const handleQuickAction = (action) => {
+    switch(action) {
+      case 'book-car':
+        navigate('/select-car');
+        break;
+      case 'bookings':
+        navigate('/bookings');
+        break;
+      case 'browse-cars':
+        navigate('/cars');
+        break;
+      case 'notifications':
+        navigate('/notifications');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <h1>Welcome to LG'S CAR HIRE</h1>
@@ -32,10 +54,30 @@ function Dashboard({ user }) {
       <div className="quick-actions">
         <h3>Quick Actions</h3>
         <div className="action-buttons">
-          <button className="action-btn">Book a Car</button>
-          <button className="action-btn">Bookings</button>
-          <button className="action-btn">Browse Cars</button>
-          <button className="action-btn">Update Profile</button>
+          <button 
+            className="action-btn" 
+            onClick={() => handleQuickAction('book-car')}
+          >
+            Book a Car
+          </button>
+          <button 
+            className="action-btn" 
+            onClick={() => handleQuickAction('bookings')}
+          >
+            Bookings
+          </button>
+          <button 
+            className="action-btn" 
+            onClick={() => handleQuickAction('browse-cars')}
+          >
+            Browse Cars
+          </button>
+          <button 
+            className="action-btn" 
+            onClick={() => handleQuickAction('notifications')}
+          >
+            Notifications
+          </button>
         </div>
       </div>
     </div>
