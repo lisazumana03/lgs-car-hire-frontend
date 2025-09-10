@@ -1,10 +1,11 @@
 /*
 Imtiyaaz Waggie 219374759
- */
+Car Type Service for managing car types
+*/
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3046/api/cartype";
+const API_URL = "http://localhost:3045/api/car-type";
 
 export const createCarType = (carType) => {
   return axios.post(`${API_URL}/create`, carType);

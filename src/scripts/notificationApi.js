@@ -4,7 +4,7 @@ import { API_BASE_URL, DEFAULT_HEADERS } from "./apiConfig.js";
 
 export async function getAllNotifications() {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+    const response = await fetch(`${API_BASE_URL}`, {
       method: "GET",
       headers: DEFAULT_HEADERS,
     });
@@ -24,7 +24,7 @@ export async function getAllNotifications() {
 
 export async function getNotificationById(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/notifications/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: "GET",
       headers: DEFAULT_HEADERS,
     });
@@ -44,7 +44,7 @@ export async function getNotificationById(id) {
 
 export async function createNotification(notificationData) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+    const response = await fetch(`${API_BASE_URL}`, {
       method: "POST",
       headers: DEFAULT_HEADERS,
       body: JSON.stringify(notificationData),
@@ -65,7 +65,7 @@ export async function createNotification(notificationData) {
 
 export async function updateNotification(id, notificationData) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/notifications/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: "PUT",
       headers: DEFAULT_HEADERS,
       body: JSON.stringify(notificationData),
@@ -86,7 +86,7 @@ export async function updateNotification(id, notificationData) {
 
 export async function deleteNotification(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/notifications/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: "DELETE",
       headers: DEFAULT_HEADERS,
     });

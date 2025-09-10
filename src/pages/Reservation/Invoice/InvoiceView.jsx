@@ -7,34 +7,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import invoiceService from '../../../services/invoiceService';
 
-//Mock data for demonstration purposes
-const mockInvoice = {
-    invoiceID: "INV001",
-    issueDate: new Date().toISOString(),
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "PAID",
-    subTotal: 2100,
-    taxAmount: 315,
-    totalAmount: 2415,
-    booking: {
-        bookingID: "BOOK001",
-        startDate: "2024-01-15T08:00:00",
-        endDate: "2024-01-20T17:00:00",
-        pickupLocation: "Cape Town International Airport",
-        user: {
-            name: "John Doe",
-            email: "admin@example.com"
-        },
-        cars: [
-            {
-                model: "Toyota Corolla"
-            }
-        ]
-    },
-    payment: {
-        paymentDate: new Date().toISOString()
-    }
-};
 
 const InvoiceView = () => {
     const { id } = useParams();
@@ -51,8 +23,8 @@ const InvoiceView = () => {
             } catch (err) {
                 setError('Failed to fetch invoice');
                 console.error('Error fetching invoice:', err);
-                // For demo purposes, use mock data if fetching fails
-                setInvoice(mockInvoice);
+                // Invoice not found
+                setInvoice(null);
             } finally {
                 setLoading(false);
             }

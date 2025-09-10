@@ -5,24 +5,48 @@ Date: 14/08/2025
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3045/booking";
+const API_URL = "http://localhost:3045/api/booking";
 
+// Create a new booking
 export const create = (booking) => {
-    return axios.post(`${API_URL}/create`, booking);
-}
+  return axios.post(`${API_URL}/create`, booking, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
 
+// Read a specific booking by ID
+export const read = (id) => {
+  return axios.get(`${API_URL}/read/${id}`);
+};
+
+// Update an existing booking
+export const update = (booking) => {
+  return axios.put(`${API_URL}/update`, booking);
+};
+
+// Delete a booking by ID
+export const deleteBooking = (id) => {
+  return axios.delete(`${API_URL}/delete/${id}`);
+};
+
+// Cancel a booking by ID
+export const cancel = (id) => {
+  return axios.delete(`${API_URL}/cancel/${id}`);
+};
+
+// Legacy function for backward compatibility
 export const getAllBookings = () => {
-    return axios.get(API_URL);
-}
+  return axios.get(API_URL);
+};
 
+// Legacy function for backward compatibility
 export const updateBooking = (booking) => {
-    return axios.put(`${API_URL}`, booking);
-}
+  return update(booking);
+};
 
-export const deleteBooking = (bookingId) => {
-    return axios.delete(`${API_URL}/${bookingId}`);
-}
-
-export const cancelBooking = (bookingId) => {
-    return axios.delete(`${API_URL}/${bookingId}`);
-}
+// Legacy function for backward compatibility
+export const cancelBooking = (id) => {
+  return cancel(id);
+};

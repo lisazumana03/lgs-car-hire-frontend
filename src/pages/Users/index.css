@@ -771,7 +771,7 @@ header h2 {
   padding: 16px 0;
   font-size: 1.1rem;
   cursor: pointer;
-  margin-top: 25px;
+  /* margin-top: 25px; */
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -871,4 +871,15 @@ header h2 {
   background-color: #1e7e34;
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.booking-btn.tertiary {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.booking-btn.tertiary:hover {
+  background-color: #5a32a3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(111, 66, 193, 0.4);
 }

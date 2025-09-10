@@ -5,7 +5,6 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonIcon from "@mui/icons-material/Person";
 import PaymentIcon from "@mui/icons-material/Payment";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import HistoryIcon from "@mui/icons-material/History";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 // List of sidebar items
 const SidebarData = [
@@ -33,11 +32,6 @@ const SidebarData = [
     title: "Profile",
     path: "/profile",
     icon: PersonIcon,
-  },
-  {
-    title: "History",
-    path: "/history",
-    icon: HistoryIcon,
   },
   {
     title: "Payments",

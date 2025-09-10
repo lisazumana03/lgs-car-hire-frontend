@@ -1,17 +1,42 @@
 import { Link } from "react-router-dom";
+import "./assets/styling/home.css";
+import homeImage from "./assets/samuel-hagger-qoZSYNBvIxg-unsplash.jpg"
 
 function Home(){
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-black-100 p-4">
-            <p>The number one spot where you can rent a car of your dreams.</p>
-                <div className="flex flex-wrap justify-center gap-4">
-                    <Link to="/make-booking" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition">Make Booking</Link>
-                    <Link to="/locations" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> View Locations </Link>
-                    <Link to="/cars" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> View Cars </Link>
-                    <Link to="/queries" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> Submit a Query </Link>
-                    <Link to="/payments" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> View Payment History </Link>
-                    <Link to="/bookings" className="mt-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-800 transition"> View Booking History </Link>
+        <div className="home-page">
+            {/* Hero Section */}
+            <section className="hero">
+                <div className="hero-text">
+                    <h1>Welcome to LG'S CAR HIRE</h1>
+                    <p>Experience luxury car rentals with our premium fleet. From economy to luxury vehicles, we have the perfect car for your journey.</p>
+                    <Link to="/register" className="btn">Get Started</Link>
                 </div>
+                <div className="hero-image">
+                    <img src={homeImage}  alt="Luxury Cars" />
+                </div>
+            </section>
+
+            {/* Features Section */}
+            <section className="features">
+                <div className="container">
+                    <h2>Why Choose LG'S CAR HIRE?</h2>
+                    <div className="features-grid">
+                        <div className="feature-card">
+                            <h3>Premium Fleet</h3>
+                            <p>Choose from our wide selection of luxury and economy vehicles</p>
+                        </div>
+                        <div className="feature-card">
+                            <h3>24/7 Support</h3>
+                            <p>Round-the-clock customer support for all your needs</p>
+                        </div>
+                        <div className="feature-card">
+                            <h3>Easy Booking</h3>
+                            <p>Simple and secure online booking process</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

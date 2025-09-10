@@ -4,7 +4,7 @@ Imtiyaaz Waggie 219374759
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3046/api/car";
+const API_URL = "http://localhost:3045/api/car";
 
 export const create = (car) => {
   return axios.post(`${API_URL}/create`, car);
