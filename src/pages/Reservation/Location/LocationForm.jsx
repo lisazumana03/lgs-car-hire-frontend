@@ -1,4 +1,4 @@
-/*
+/**
 Lisakhanya Zumana (230864821)
 Date: 24/08/2025
  */
@@ -43,9 +43,9 @@ function LocationForm(){
     };
 
     return(
-        <div className="flex flex-col items-center justify-center min-h-screen bg-black">
+        <div className="form-group">
             {message && <p className="mb-4 text-green-700 font-semibold">{message}</p>}
-            <form onSubmit={handleSubmit} className="bg-red-100 p-8 rounded shadow-md w-full max-w-md">
+            <form onSubmit={handleSubmit} className="form">
                 <div className="mb-4">
                     <label className="block mb-1 font-semibold">Location Name</label>
                     <input type="text" name="locationName" value={form.locationName} onChange={handleChange} placeholder="Enter location name" required className="w-full px-3 py-2 border rounded"/>

@@ -7,8 +7,8 @@ This guide will explain how to set up and run the frontend using Vite and React.
 You will need to implement the Spring Boot backend separately, as this guide focuses solely on the frontend aspect.
 
 ## Prerequisites
-React and Vite are required to run the frontend. Make sure you have Node.js 18.20.3 and npm installed on your machine.
-The CSS used for the project is Tailwind CSS.
+React and Vite are required to run the frontend. Make sure you have Node.js 20.17.3 and npm installed on your machine.
+The CSS used for the project is Normal CSS.
 
 ## Steps to start the project
 1. Clone the repository to your local machine.
