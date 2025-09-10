@@ -1,7 +1,20 @@
+
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
+import './App.css'
+import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
+import LoginForm from "./pages/Users/LoginForm.jsx";
+import Dashboard from "./pages/Users/Dashboard.jsx";
+import UserProfile from "./pages/Users/UserProfile.jsx";
+import { getUserProfile } from "./scripts";
+import NotificationsPage from "./pages/Users/NotificationsPage.jsx";
+import Message from "./pages/Users/Message.jsx";
 import { useState } from 'react';
 import { Link, Navigate, Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import './App.css';
 import Home from "./Home.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./Contact.jsx";
 import "./index.css";
 import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
 import Footer from "./pages/Common/Footer.jsx";
@@ -22,6 +35,12 @@ import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
 import UserProfile from "./pages/Users/UserProfile.jsx";
 import CarForm from "./pages/Vehicle/CarForm.jsx";
 import CarList from "./pages/Vehicle/CarList.jsx";
+import CarSelection from "./pages/Reservation/Booking/CarSelection.jsx";
+import AdminDashboard from "./pages/Authentication/AdminDashboard.jsx";
+import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
+import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
+import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
+import InvoiceList from "./pages/Reservation/Invoice/InvoiceList.jsx";
 import ReviewForm from "./pages/Feedback/Review/reviewForm.jsx";
 import ReviewList from "./pages/Feedback/Review/reviewList.jsx";
 import SupportForm from "./pages/Reservation/Support/supportForm.jsx";
@@ -160,20 +179,20 @@ function Sidebar({ onLogout }) {
                 </li>
                 <li>
                     <Link
+                        to="/notification-test"
+                        className={`sidebar-link ${location.pathname === '/notification-test' ? 'active' : ''}`}
+                    >
+                        <span className="icon">🧪</span>
+                        <span className="title">Messages</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
                         to="/profile"
                         className={`sidebar-link ${location.pathname === '/profile' ? 'active' : ''}`}
                     >
                         <span className="icon">👤</span>
                         <span className="title">Profile</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link
-                        to="/history"
-                        className={`sidebar-link ${location.pathname === '/history' ? 'active' : ''}`}
-                    >
-                        <span className="icon">📜</span>
-                        <span className="title">History</span>
                     </Link>
                 </li>
                 <li>
@@ -241,6 +260,7 @@ function Sidebar({ onLogout }) {
     );
 }
 
+function App() {
 function AdminHeader(){
     return (
         <header className="bg-red-600 text-white p-6 flex justify-center items-center">
@@ -313,66 +333,79 @@ function CarListHeader() {
     );
 }
 
-function PaymentHeader() {
-    return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">PAYMENT</h1>
-        </header>
-    );
-}
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
-function InvoiceHeader() {
-    return (
-        <header className="bg-red-600 text-white p-6 flex justify-center items-center">
-            <h1 className="text-2xl font-bold">INVOICE</h1>
-        </header>
-    );
-}
+  const handleLogin = async (userData) => {
+    console.log('🔐 Login received userData:', userData);
+    console.log('🆔 User ID in login response:', userData.id);
 
+    setIsAuthenticated(true);
+    setCurrentUser(userData);
 
-function AppContent() {
-    const location = useLocation();
-    const isAdminMainPage = location.pathname === "/admin";
-    const isBookingPage = location.pathname === "/make-booking";
-    const isLocationListPage = location.pathname === "/locations";
-    const isHomePage = location.pathname === "/";
-    const isBookingListPage = location.pathname === "/bookings";
-    const isBookingHistoryPage = location.pathname === "/booking-history";
-    const isLocationPage = location.pathname === "/register-location";
-    const isCarPage = location.pathname === "/register-car";
-    const isCarListPage = location.pathname === "/cars";
-    const isPaymentPage = location.pathname === "/payment";
-    const isInvoicePage = location.pathname.startsWith("/invoice/");
-    const isInvoicesPage = location.pathname === "/invoices";
+    // Fetch complete profile data using the user ID
+    if (userData.id) {
+      console.log('📡 Fetching complete profile...');
+      try {
+        const fullProfile = await getUserProfile(userData.id);
+        console.log('✅ Full profile loaded:', fullProfile);
+        console.log('🆔 User ID in profile:', fullProfile.id);
+        setCurrentUser(fullProfile); // Update with complete profile data
+      } catch (error) {
+        console.error('❌ Failed to fetch complete profile:', error);
+        // Keep the basic user data if profile fetch fails
+      }
+    } else {
+      console.log('⚠️ No user ID available, skipping profile fetch');
+    }
+  };
 
-    return (
-        <>
-            {isBookingPage ? (
-                <BookingHeader />
-            ) : isAdminMainPage ? (
-                <AdminHeader />
-            ) : isLocationListPage ? (
-                <LocationViewHeader />
-            ) : isBookingListPage ? (
-                <BookingListHeader />
-            ) : isLocationPage ? (
-                <LocationHeader />
-            ) : isBookingHistoryPage ? (
-                <BookingHistoryHeader />
-            ) : isCarPage ? (
-                <CarHeader />
-            ) : isCarListPage ? (
-                <CarListHeader />
-            ) : isPaymentPage ? (
-                <PaymentHeader />
-            ) : isInvoicePage ? (
-                <InvoiceHeader />
-            ) : isInvoicesPage ? (
-                <InvoiceHeader />
-            ) : (
-                <Header showNavigation={isHomePage} />
-            )}
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+  };
 
+  return (
+    <Router>
+      <div className={`app ${isAuthenticated ? 'authenticated' : 'unauthenticated'}`}>
+        {isAuthenticated ? (
+          // Authenticated user - show sidebar with main menu
+          <>
+            <Sidebar onLogout={handleLogout} />
+            <main className="main-content">
+              <Routes>
+                <Route path="/dashboard" element={<Dashboard user={currentUser} />} />
+                <Route path="/profile" element={<UserProfile user={currentUser} />} />
+                  <Route path="/bookings" element={<BookingComponent/>} />
+                <Route path="/make-booking" element={<BookingForm />} />
+                <Route path="/booking-history" element={<BookingHistory />} />
+                <Route path="/booking-list" element={<BookingList />} />
+                <Route path="/cars" element={<CarList />} />
+                <Route path="/register-car" element={<CarForm />} />
+                <Route path="/select-car" element={<CarSelection />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                        <Route path="/notification-test" element={<Message />} />
+                  <Route path="/payment" element={<PaymentForm />} />
+                  <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
+                  <Route path="/invoice/:id" element={<InvoiceView />} />
+                  <Route path={"/invoices"} element={<InvoiceList />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </main>
+          </>
+        ) : (
+          // Not authenticated - show public pages with header
+          <>
+            <Header />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
+                <Route path="/register" element={<RegistrationForm />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
             <main>
                 <Routes>
                     <Route path="/" element={<Home />} />
@@ -388,15 +421,11 @@ function AppContent() {
                 </Routes>
             </main>
             <Footer />
-        </>
-    );
-}
-function Routers() {
-     return (
-         <Router>
-             <AppContent/>
-         </Router>
-    );
+          </>
+        )}
+      </div>
+    </Router>
+  );
 }
 
 export default App;

@@ -10,42 +10,16 @@ function LocationList() {
     const [locations, setLocations] = useState([]);
     const navigate = useNavigate();
 
-    const mockData = [
-    {
-        locationID: 1,
-        locationName: "Usasaza Branch",
-        streetName: "R58",
-        cityOrTown: "Colesberg",
-        provinceOrState: "Northern Cape",
-        country: "South Africa",
-        postalCode: "9795"
-    },
-    {
-        locationID: 2,
-        locationName: "Karoo Branch",
-        streetName: "N1 Donkin Street",
-        cityOrTown: "Beaufort West",
-        provinceOrState: "Western Cape",
-        country: "South Africa",
-        postalCode: "6970"
-    },
-    {
-        locationID: 3,
-        locationName: "CPT Branch",
-        streetName: "CTIA Road",
-        cityOrTown: "Cape Town",
-        provinceOrState: "Western Cape",
-        country: "South Africa",
-        postalCode: "7788"
-    }]
 
     useEffect(() => {
         getAllLocations()
             .then(res => {
-                setLocations([...mockData, ...res.data])
+                setLocations(res.data || [])
             })
-            .catch(() =>
-            {setLocations(mockData)});
+            .catch(error => {
+                console.error('Failed to fetch locations:', error);
+                setLocations([]);
+            });
     }, []);
 
 

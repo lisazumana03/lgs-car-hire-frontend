@@ -115,19 +115,19 @@ function CarForm() {
         <div className="flex flex-col items-center justify-center min-h-screen bg-black">
             {message && (
                 <p className={`mb-4 font-semibold ${
-                    message.includes("Error") ? "text-red-700" : "text-green-700"
+                    message.includes("Error") ? "text-red-400" : "text-green-400"
                 }`}>
                     {message}
                 </p>
             )}
             
-            <form onSubmit={handleSubmit} className="bg-red-100 p-8 rounded shadow-md w-full max-w-2xl">
-                <h2 className="text-2xl font-bold mb-6 text-center text-black">Register New Car</h2>
+            <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl border border-gray-700">
+                <h2 className="text-2xl font-bold mb-6 text-center text-white">Register New Car</h2>
                 
                 {/* Basic Car Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Brand *</label>
+                        <label className="block mb-1 font-semibold text-white">Brand *</label>
                         <input 
                             type="text" 
                             name="brand" 
@@ -136,12 +136,12 @@ function CarForm() {
                             placeholder="e.g., Toyota, BMW, Ford" 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Model *</label>
+                        <label className="block mb-1 font-semibold text-white">Model *</label>
                         <input 
                             type="text" 
                             name="model" 
@@ -150,12 +150,12 @@ function CarForm() {
                             placeholder="e.g., Camry, X5, Focus" 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Year *</label>
+                        <label className="block mb-1 font-semibold text-white">Year *</label>
                         <input 
                             type="number" 
                             name="year" 
@@ -166,12 +166,12 @@ function CarForm() {
                             max="2030" 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Rental Price (per day) *</label>
+                        <label className="block mb-1 font-semibold text-white">Rental Price (per day) *</label>
                         <input 
                             type="number" 
                             name="rentalPrice" 
@@ -182,14 +182,14 @@ function CarForm() {
                             min="0" 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
                         />
                     </div>
                 </div>
 
                 {/* Image URL */}
                 <div className="mb-4">
-                    <label className="block mb-1 font-semibold text-black">Image URL (Optional)</label>
+                    <label className="block mb-1 font-semibold text-white">Image URL (Optional)</label>
                     <input 
                         type="url" 
                         name="imageUrl" 
@@ -197,25 +197,25 @@ function CarForm() {
                         onChange={handleChange} 
                         placeholder="https://example.com/car-image.jpg" 
                         disabled={loading}
-                        className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black placeholder:text-gray-500"
+                        className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
                     />
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-gray-400 mt-1">
                         Provide a URL to an image of the car (optional)
                     </p>
                 </div>
 
                 {/* Car Type Information */}
-                <h3 className="text-lg font-bold mt-4 mb-2 text-black">Car Type Details</h3>
+                <h3 className="text-lg font-bold mt-4 mb-2 text-white">Car Type Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Type *</label>
+                        <label className="block mb-1 font-semibold text-white">Type *</label>
                         <select 
                             name="carType.type" 
                             value={form.carType.type} 
                             onChange={handleChange} 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                         >
                             <option value="">Select Type</option>
                             <option value="Sedan">Sedan</option>
@@ -232,14 +232,14 @@ function CarForm() {
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Fuel Type *</label>
+                        <label className="block mb-1 font-semibold text-white">Fuel Type *</label>
                         <select 
                             name="carType.fuelType" 
                             value={form.carType.fuelType} 
                             onChange={handleChange} 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                         >
                             <option value="">Select Fuel Type</option>
                             <option value="Petrol">Petrol</option>
@@ -251,7 +251,7 @@ function CarForm() {
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Number of Wheels *</label>
+                        <label className="block mb-1 font-semibold text-white">Number of Wheels *</label>
                         <input 
                             type="number" 
                             name="carType.numberOfWheels" 
@@ -261,12 +261,12 @@ function CarForm() {
                             max="8" 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
                         />
                     </div>
                     
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-black">Number of Seats *</label>
+                        <label className="block mb-1 font-semibold text-white">Number of Seats *</label>
                         <input 
                             type="number" 
                             name="carType.numberOfSeats" 
@@ -276,7 +276,7 @@ function CarForm() {
                             max="20" 
                             required 
                             disabled={loading}
-                            className="w-full px-3 py-2 border rounded disabled:bg-gray-100 text-black"
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
                         />
                     </div>
                 </div>
@@ -293,7 +293,7 @@ function CarForm() {
                                 disabled={loading}
                                 className="mr-2 disabled:bg-gray-100"
                             />
-                            <span className="font-semibold text-black">Available for Rent</span>
+                            <span className="font-semibold text-white">Available for Rent</span>
                         </label>
                     </div>
                     
@@ -307,7 +307,7 @@ function CarForm() {
                                 disabled={loading}
                                 className="mr-2 disabled:bg-gray-100"
                             />
-                            <span className="font-semibold text-black">Insurance Included</span>
+                            <span className="font-semibold text-white">Insurance Included</span>
                         </label>
                     </div>
                 </div>
@@ -320,7 +320,7 @@ function CarForm() {
                         className={`px-4 py-2 rounded transition ${
                             loading 
                                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                                : 'bg-green-800 text-white hover:bg-green-700'
+                                : 'bg-green-600 text-white hover:bg-green-700'
                         }`}
                     >
                         {loading ? 'Registering...' : 'Register Car'}
@@ -331,7 +331,7 @@ function CarForm() {
                         className={`px-4 py-2 rounded transition ${
                             loading 
                                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                                : 'bg-orange-600 text-white hover:bg-orange-700'
+                                : 'bg-orange-500 text-white hover:bg-orange-600'
                         }`}
                         onClick={() => !loading && setForm({
                             model: "",
@@ -357,7 +357,7 @@ function CarForm() {
                         className={`px-4 py-2 rounded transition ${
                             loading 
                                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                                : 'bg-blue-500 text-white hover:bg-blue-700'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                         onClick={() => !loading && navigate("/")}
                     >
