@@ -7,19 +7,21 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
+import { getAllLocations } from "../../../services/locationService";
 
-function BookingForm() {
+export default function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const selectedCar = location.state?.selectedCar;
+    const selectedLocation = location.state?.selectedLocation;
     
     const [form, setForm] = useState({
         cars: [selectedCar?.carID || ""],
         bookingDateAndTime: "",
         startDate: "",
         endDate: "",
-        pickupLocation: "",
-        dropOffLocation: "",
+        pickupLocation: [selectedLocation?.locationID || ""],
+        dropOffLocation: [selectedLocation?.locationID || ""],
         bookingStatus: "pending"
     });
     const [message, setMessage] = useState("");
@@ -56,11 +58,7 @@ function BookingForm() {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMessage("");
-        setMessageType("");
-        
+
     const handleSubmit = async (error) => {
         error.preventDefault();
         try {
@@ -111,7 +109,7 @@ function BookingForm() {
         } catch (err) {
             console.error("Error creating booking:", err);
             let errorMessage = "Error creating booking.";
-            
+
             if (err.response?.status === 404) {
                 errorMessage = "Booking endpoint not found. Please check if the backend is running correctly.";
             } else if (err.response?.status === 500) {
@@ -121,11 +119,7 @@ function BookingForm() {
             } else if (err.message) {
                 errorMessage = err.message;
             }
-            
             setMessage(errorMessage);
-        } catch (error) {
-            setMessage("Error creating booking.");
-            setMessageType("error");
         }
     };
 
@@ -169,26 +163,32 @@ function BookingForm() {
                             </div>
                         )}
                     </div>
+
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Booking Date & Time *</label>
                         <input type="datetime-local" name="bookingDateAndTime" value={form.bookingDateAndTime} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
                     </div>
+
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Start Date & Time *</label>
                         <input type="datetime-local" name="startDate" value={form.startDate} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
                     </div>
+
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">End Date & Time *</label>
                         <input type="datetime-local" name="endDate" value={form.endDate} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
                     </div>
+
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Pick-up Location *</label>
                         <input type="text" name="pickupLocation" value={form.pickupLocation} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none" placeholder="Enter pickup location"/>
                     </div>
+
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Drop-off Location *</label>
                         <input type="text" name="dropOffLocation" value={form.dropOffLocation} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none" placeholder="Enter drop-off location"/>
                     </div>
+
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Booking Status *</label>
                         <select name="bookingStatus" value={form.bookingStatus} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none">
@@ -197,6 +197,7 @@ function BookingForm() {
                             <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
+
                     <div style={{display: "flex", marginTop: "20px", gap: "10px"}}>
                         <button type="submit"
                                 style={{backgroundColor: "#00ca09"}}
@@ -217,6 +218,7 @@ function BookingForm() {
                                 className="submit-btn"
                                 onClick={() => navigate("/bookings")}>Back</button>
                     </div>
+
                     {message && (
                         <p className={`mb-4 px-4 py-2 rounded border ${message.includes("successfully")
                             ? "bg-[#1e4d2b] text-green-400 border-green-500"
@@ -229,5 +231,3 @@ function BookingForm() {
         </div>
     );
 }
-
-export default BookingForm;

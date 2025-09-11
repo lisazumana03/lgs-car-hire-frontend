@@ -2,7 +2,7 @@
 Lisakhanya Zumana (230864821)
 Date: 31/08/2025
  */
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 export default function BookingComponent(){
     const navigate = useNavigate();
@@ -53,7 +53,8 @@ export default function BookingComponent(){
                         Manage Bookings
                     </Link>
                 </div>
-        <div>
+            </div>
+            <div>
             <h2 className="text-4xl font-bold text-white mb-8">Booking Options</h2>
             <div className="booking-links flex flex-col gap-6 mb-4 w-full max-w-md">
                 <button
@@ -73,6 +74,7 @@ export default function BookingComponent(){
                     View Booking History
                 </button>
             </div>
+        </div>
         </div>
     );
 }
