@@ -11,7 +11,11 @@ export const create = (location) => {
 }
 
 export const getAllLocations = () => {
-    return axios.get(API_URL);
+    return axios.get(`${API_URL}/all`);
+}
+
+export const getLocationByProvinceOrState = (provinceOrState) => {
+    return axios.get(`${API_URL}/province-or-state/${provinceOrState}`);
 }
 
 export const updateLocation = (location) => {

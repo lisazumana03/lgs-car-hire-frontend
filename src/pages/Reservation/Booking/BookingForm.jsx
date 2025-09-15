@@ -7,7 +7,12 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
-import { getAllLocations } from "../../../services/locationService";
+
+const getCurrentDateTime = () => {
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, "0");
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+};
 
 export default function BookingForm() {
     const navigate = useNavigate();
@@ -17,7 +22,7 @@ export default function BookingForm() {
     
     const [form, setForm] = useState({
         cars: [selectedCar?.carID || ""],
-        bookingDateAndTime: "",
+        bookingDateAndTime: getCurrentDateTime(),
         startDate: "",
         endDate: "",
         pickupLocation: [selectedLocation?.locationID || ""],
@@ -29,6 +34,7 @@ export default function BookingForm() {
     const [cars, setCars] = useState([]);
     const [loading, setLoading] = useState(false);
     const [carsLoading, setCarsLoading] = useState(true);
+
 
     // Fetch available cars on component mount
     useEffect(() => {
@@ -71,8 +77,8 @@ export default function BookingForm() {
                 bookingDateAndTime: "",
                 startDate: "",
                 endDate: "",
-                pickupLocation: "",
-                dropOffLocation: "",
+                pickupLocation: [""],
+                dropOffLocation: [""],
                 bookingStatus: "pending"
             });
             
@@ -166,7 +172,7 @@ export default function BookingForm() {
 
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Booking Date & Time *</label>
-                        <input type="datetime-local" name="bookingDateAndTime" value={form.bookingDateAndTime} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
+                        <input type="datetime-local" name="bookingDateAndTime" value={form.bookingDateAndTime} onChange={handleChange} readOnly required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
                     </div>
 
                     <div className="mb-4">
@@ -181,12 +187,28 @@ export default function BookingForm() {
 
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Pick-up Location *</label>
-                        <input type="text" name="pickupLocation" value={form.pickupLocation} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none" placeholder="Enter pickup location"/>
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Drop-off Location *</label>
-                        <input type="text" name="dropOffLocation" value={form.dropOffLocation} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none" placeholder="Enter drop-off location"/>
+                        {selectedLocation ? (
+                            <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
+                                <h3 className="text-lg font-semibold text-white">{selectedLocation.locationName}</h3>
+                                <p className="text-gray-300">{selectedLocation.streetNumber}, {selectedLocation.streetName}, {selectedLocation.cityOrTown}</p>
+                                <p className="text-gray-300">{selectedLocation.provinceOrState}, {selectedLocation.country}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/choose-location')}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
+                                >
+                                    Choose Different Location
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => navigate('/choose-location')}
+                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                            >
+                                Choose a Location
+                            </button>
+                        )}
                     </div>
 
                     <div className="mb-4">
@@ -209,8 +231,8 @@ export default function BookingForm() {
                             bookingDateAndTime: "",
                             startDate: "",
                             endDate: "",
-                            pickupLocation: "",
-                            dropOffLocation: "",
+                            pickupLocation: [""],
+                            dropOffLocation: [""],
                             bookingStatus: "pending"
                         })}>Reset</button>
                         <button type="button"
