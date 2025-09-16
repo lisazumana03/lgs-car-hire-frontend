@@ -9,6 +9,7 @@ const API_URL = "http://localhost:3045/api/booking";
 
 // Create a new booking
 export const create = (booking) => {
+  console.log("Creating booking:", booking);
   return axios.post(`${API_URL}/create`, booking, {
     headers: {
       "Content-Type": "application/json",
@@ -38,7 +39,7 @@ export const cancel = (id) => {
 
 // Legacy function for backward compatibility
 export const getAllBookings = () => {
-  return axios.get(API_URL);
+  return axios.get(`${API_URL}/all`);
 };
 
 // Legacy function for backward compatibility
