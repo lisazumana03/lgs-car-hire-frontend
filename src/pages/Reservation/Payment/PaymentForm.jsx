@@ -82,14 +82,27 @@ const PaymentForm = () => {
         onSuccess: async (response) => {
             console.log("Payment success:", response);
 
+            // Calculate the correct amount
+            const paymentAmount = selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500;
+            const bookingId = selectedBooking?.bookingID || selectedBooking?.id;
+
+            console.log("Payment verification data:", {
+                amount: paymentAmount,
+                bookingId: bookingId,
+                reference: response.reference,
+                paymentMethod: "PAYSTACK"
+            });
+
             // Send to backend for verification
             try {
                 const res = await fetch("http://localhost:3045/api/payments/verify", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                        amount: paymentAmount,
+                        bookingId: bookingId,
                         reference: response.reference,
-                        bookingId: selectedBooking?.bookingID || selectedBooking?.id,
+                        paymentMethod: "PAYSTACK"
                     }),
                 });
 
