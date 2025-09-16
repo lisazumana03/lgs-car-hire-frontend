@@ -377,7 +377,7 @@ function CarListHeader() {
                 <Route path="/dashboard" element={<Dashboard user={currentUser} />} />
                 <Route path="/profile" element={<UserProfile user={currentUser} />} />
                   <Route path="/bookings" element={<BookingComponent/>} />
-                <Route path="/make-booking" element={<BookingForm />} />
+                <Route path="/make-booking" element={<BookingForm user={currentUser} />} />
                 <Route path="/booking-history" element={<BookingHistory />} />
                 <Route path="/booking-list" element={<BookingList />} />
                 <Route path="/cars" element={<CarList />} />

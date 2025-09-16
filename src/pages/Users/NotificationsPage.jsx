@@ -42,47 +42,9 @@ function NotificationsPage() {
       }
     } catch (err) {
       console.error('Failed to fetch notifications:', err);
-      setError(null); // API is working, no error needed
-      
-      // Show mock data when API fails (for demo purposes) - limited to 10
       if (!silent) {
-        const mockData = [
-          {
-            notificationID: 1,
-            title: "Welcome to LG's Car Hire!",
-            message: "Thank you for choosing our premium car rental service. Your account is now active.",
-            status: "COMPLETED",
-            createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
-          },
-          {
-            notificationID: 2,
-            title: "Booking Confirmation",
-            message: "Your booking #BK001 has been confirmed. Pickup scheduled for tomorrow at 10:00 AM.",
-            status: "PENDING",
-            createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString() // 30 minutes ago
-          },
-          {
-            notificationID: 3,
-            title: "Payment Processed",
-            message: "Your payment of R850.00 has been successfully processed for booking #BK001.",
-            status: "COMPLETED",
-            createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString() // 15 minutes ago
-          },
-          {
-            notificationID: 4,
-            title: "Vehicle Ready",
-            message: "Your reserved vehicle (Toyota Corolla) is ready for pickup at our main location.",
-            status: "PENDING",
-            createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString() // 5 minutes ago
-          }
-        ];
-        
-        // Sort and limit mock data to 10 as well
-        const sortedMockData = mockData
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .slice(0, 10);
-        
-        setNotifications(sortedMockData);
+        setError('Failed to load notifications. Please try again later.');
+        setNotifications([]); // Clear any existing notifications
       }
     } finally {
       if (!silent) setLoading(false);
@@ -167,7 +129,10 @@ function NotificationsPage() {
       {error && (
         <div className="error-banner">
           <span>⚠️ {error}</span>
-          <button onClick={handleRefresh} className="retry-btn">
+          <button onClick={() => {
+            setError(null);
+            fetchNotifications();
+          }} className="retry-btn">
             Retry
           </button>
         </div>
