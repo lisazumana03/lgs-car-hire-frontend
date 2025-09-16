@@ -212,6 +212,32 @@ export default function BookingForm() {
                     </div>
 
                     <div className="mb-4">
+                        <label className="block mb-1 font-semibold text-white">Drop-Off Location *</label>
+                        {selectedLocation ? (
+                            <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
+                                <h3 className="text-lg font-semibold text-white">{selectedLocation.locationName}</h3>
+                                <p className="text-gray-300">{selectedLocation.streetNumber}, {selectedLocation.streetName}, {selectedLocation.cityOrTown}</p>
+                                <p className="text-gray-300">{selectedLocation.provinceOrState}, {selectedLocation.country}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/choose-location')}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
+                                >
+                                    Choose Different Location
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => navigate('/choose-location')}
+                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                            >
+                                Choose a Location
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Booking Status *</label>
                         <select name="bookingStatus" value={form.bookingStatus} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none">
                             <option value="confirmed">Confirmed</option>
