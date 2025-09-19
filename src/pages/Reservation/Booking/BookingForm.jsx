@@ -3,8 +3,8 @@ Lisakhanya Zumana (230864821)
 Date: 05/06/2025
  */
 
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
 
@@ -18,16 +18,18 @@ export default function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const selectedCar = location.state?.selectedCar;
-    const selectedLocation = location.state?.selectedLocation;
-    
+
+    const selectedPickupLocation = location.state?.selectedPickupLocation;
+    const selectedDropOffLocation = location.state?.selectedDropOffLocation;
+
     const [form, setForm] = useState({
         cars: [selectedCar?.carID || ""],
         bookingDateAndTime: getCurrentDateTime(),
         startDate: "",
         endDate: "",
-        pickupLocation: [selectedLocation?.locationID || ""],
-        dropOffLocation: [selectedLocation?.locationID || ""],
-        bookingStatus: "pending"
+        pickupLocation: selectedPickupLocation ? selectedPickupLocation.locationID : "",
+        dropOffLocation: selectedDropOffLocation ? selectedDropOffLocation.locationID : "",
+        bookingStatus: "PENDING"
     });
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
@@ -55,20 +57,52 @@ export default function BookingForm() {
         fetchCars();
     }, []);
 
+    // Update form state if locations change (e.g., after navigation)
+    useEffect(() => {
+        setForm(prev => ({
+            ...prev,
+            pickupLocation: selectedPickupLocation ? selectedPickupLocation.locationID : "",
+            dropOffLocation: selectedDropOffLocation ? selectedDropOffLocation.locationID : ""
+        }));
+    }, [selectedPickupLocation, selectedDropOffLocation]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === "cars") {
             setForm((prev) => ({ ...prev, cars: [value] }));
+        } else if (name === "bookingStatus") {
+            setForm((prev) => ({ ...prev, bookingStatus: value.toUpperCase() }));
         } else {
             setForm((prev) => ({ ...prev, [name]: value }));
         }
     };
 
+    const isStartDateValid = !form.startDate || form.startDate >= form.bookingDateAndTime;
+    const isEndDateValid = !form.endDate || form.endDate > form.startDate;
 
     const handleSubmit = async (error) => {
         error.preventDefault();
+        if (!isStartDateValid) {
+            setMessage("Start date/time must be after or equal to booking date/time.");
+            setMessageType("error");
+            return;
+        }
+        if (!isEndDateValid) {
+            setMessage("End date/time must be after start date/time.");
+            setMessageType("error");
+            return;
+        }
+
+        // Prepare payload with correct structure
+        const payload = {
+            ...form,
+            cars: selectedCar ? [{ carID: selectedCar.carID }] : [],
+            pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
+            dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
+        };
+
         try {
-            const response = await create(form);
+            const response = await create(payload);
             console.log("Booking created:", response.data);
             setMessage("Booking created successfully!");
             setMessageType("success");
@@ -79,11 +113,9 @@ export default function BookingForm() {
                 endDate: "",
                 pickupLocation: [""],
                 dropOffLocation: [""],
-                bookingStatus: "pending"
+                bookingStatus: "PENDING"
             });
             
-            // Redirect to payment after successful creation with booking data
-            // Calculate total amount based on rental period
             const calculateTotalAmount = () => {
                 if (!selectedCar?.rentalPrice || !form.startDate || !form.endDate) {
                     return selectedCar?.rentalPrice || 500;
@@ -172,29 +204,66 @@ export default function BookingForm() {
 
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Booking Date & Time *</label>
-                        <input type="datetime-local" name="bookingDateAndTime" value={form.bookingDateAndTime} onChange={handleChange} readOnly required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
+                        <input
+                            type="datetime-local"
+                            name="bookingDateAndTime"
+                            value={form.bookingDateAndTime}
+                            onChange={handleChange}
+                            readOnly
+                            required
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
+                        />
                     </div>
 
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Start Date & Time *</label>
-                        <input type="datetime-local" name="startDate" value={form.startDate} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
+                        <input
+                            type="datetime-local"
+                            name="startDate"
+                            value={form.startDate}
+                            onChange={handleChange}
+                            required
+                            min={form.bookingDateAndTime}
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
+                        />
+                        {!isStartDateValid && (
+                            <div className="text-red-400 text-sm mt-1">Start date/time must be after or equal to booking date/time.</div>
+                        )}
                     </div>
 
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">End Date & Time *</label>
-                        <input type="datetime-local" name="endDate" value={form.endDate} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
+                        <input
+                            type="datetime-local"
+                            name="endDate"
+                            value={form.endDate}
+                            onChange={handleChange}
+                            required
+                            min={form.startDate || form.bookingDateAndTime}
+                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
+                        />
+                        {!isEndDateValid && (
+                            <div className="text-red-400 text-sm mt-1">End date/time must be after start date/time.</div>
+                        )}
                     </div>
 
+                    {/* Show selected pickup location */}
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Pick-up Location *</label>
-                        {selectedLocation ? (
+                        {selectedPickupLocation ? (
                             <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
-                                <h3 className="text-lg font-semibold text-white">{selectedLocation.locationName}</h3>
-                                <p className="text-gray-300">{selectedLocation.streetNumber}, {selectedLocation.streetName}, {selectedLocation.cityOrTown}</p>
-                                <p className="text-gray-300">{selectedLocation.provinceOrState}, {selectedLocation.country}</p>
+                                <h3 className="text-lg font-semibold text-white">{selectedPickupLocation.locationName}</h3>
+                                <p className="text-gray-300">{selectedPickupLocation.streetNumber}, {selectedPickupLocation.streetName}, {selectedPickupLocation.cityOrTown}</p>
+                                <p className="text-gray-300">{selectedPickupLocation.provinceOrState}, {selectedPickupLocation.country}</p>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/choose-location')}
+                                    onClick={() => navigate('/choose-location', {
+                                        state: {
+                                            selectedCar,
+                                            selectedPickupLocation,
+                                            selectedDropOffLocation
+                                        }
+                                    })}
                                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
                                 >
                                     Choose Different Location
@@ -203,24 +272,36 @@ export default function BookingForm() {
                         ) : (
                             <button
                                 type="button"
-                                onClick={() => navigate('/choose-location')}
+                                onClick={() => navigate('/choose-location', {
+                                    state: {
+                                        selectedCar,
+                                        selectedPickupLocation,
+                                        selectedDropOffLocation
+                                    }
+                                })}
                                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
                             >
                                 Choose a Location
                             </button>
                         )}
                     </div>
-
+                    {/* Show selected drop-off location */}
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Drop-Off Location *</label>
-                        {selectedLocation ? (
+                        {selectedDropOffLocation ? (
                             <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
-                                <h3 className="text-lg font-semibold text-white">{selectedLocation.locationName}</h3>
-                                <p className="text-gray-300">{selectedLocation.streetNumber}, {selectedLocation.streetName}, {selectedLocation.cityOrTown}</p>
-                                <p className="text-gray-300">{selectedLocation.provinceOrState}, {selectedLocation.country}</p>
+                                <h3 className="text-lg font-semibold text-white">{selectedDropOffLocation.locationName}</h3>
+                                <p className="text-gray-300">{selectedDropOffLocation.streetNumber}, {selectedDropOffLocation.streetName}, {selectedDropOffLocation.cityOrTown}</p>
+                                <p className="text-gray-300">{selectedDropOffLocation.provinceOrState}, {selectedDropOffLocation.country}</p>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/choose-location')}
+                                    onClick={() => navigate('/choose-location', {
+                                        state: {
+                                            selectedCar,
+                                            selectedPickupLocation,
+                                            selectedDropOffLocation
+                                        }
+                                    })}
                                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
                                 >
                                     Choose Different Location
@@ -229,7 +310,13 @@ export default function BookingForm() {
                         ) : (
                             <button
                                 type="button"
-                                onClick={() => navigate('/choose-location')}
+                                onClick={() => navigate('/choose-location', {
+                                    state: {
+                                        selectedCar,
+                                        selectedPickupLocation,
+                                        selectedDropOffLocation
+                                    }
+                                })}
                                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
                             >
                                 Choose a Location
@@ -240,9 +327,9 @@ export default function BookingForm() {
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Booking Status *</label>
                         <select name="bookingStatus" value={form.bookingStatus} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none">
-                            <option value="confirmed">Confirmed</option>
-                            <option value="pending">Pending</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="CONFIRMED">Confirmed</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="CANCELLED">Cancelled</option>
                         </select>
                     </div>
 
@@ -259,7 +346,7 @@ export default function BookingForm() {
                             endDate: "",
                             pickupLocation: [""],
                             dropOffLocation: [""],
-                            bookingStatus: "pending"
+                            bookingStatus: "PENDING" // <-- Use uppercase
                         })}>Reset</button>
                         <button type="button"
                                 style={{backgroundColor: "#ff0000"}}

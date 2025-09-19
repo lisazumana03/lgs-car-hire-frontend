@@ -11,6 +11,7 @@ function LocationForm(){
     const navigate  = useNavigate();
     const [form, setForm] = useState({
         locationName: "",
+        streetNumber: "",
         streetName: "",
         cityOrTown: "",
         provinceOrState: "", 
@@ -26,11 +27,14 @@ function LocationForm(){
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Ensure streetNumber is a number
+        const payload = { ...form, streetNumber: Number(form.streetNumber) };
         try {
-            await create(form);
+            await create(payload);
             setMessage("Location created successfully!");
             setForm({
                 locationName: "",
+                streetNumber: "",
                 streetName: "",
                 cityOrTown: "",
                 provinceOrState: "",
@@ -38,7 +42,7 @@ function LocationForm(){
                 postalCode: "",
             });
         } catch (err) {
-            setMessage("Error creating location.");
+            setMessage("Error creating location. " + (err?.response?.data?.message || err.message));
         }
     };
 
@@ -49,6 +53,10 @@ function LocationForm(){
                 <div className="mb-4">
                     <label className="block mb-1 font-semibold">Location Name</label>
                     <input type="text" name="locationName" value={form.locationName} onChange={handleChange} placeholder="Enter location name" required className="w-full px-3 py-2 border rounded"/>
+                </div>
+                <div>
+                    <label> Street Number: </label>
+                    <input type="number" name="streetNumber" value={form.streetNumber} onChange={handleChange} placeholder="Enter street number" required className="w-full px-3 py-2 border rounded"/>
                 </div>
                 <div className="mb-4">
                     <label className="block mb-1 font-semibold">Street Name</label>
@@ -74,6 +82,7 @@ function LocationForm(){
                 <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Submit</button>
                 <button type="reset" className="bg-orange-600 text-white px-4 py-2 rounded" onClick={() => setForm({
                     locationName: "",
+                    streetNumber: "",
                     streetName: "",
                     cityOrTown: "",
                     provinceOrState: "",

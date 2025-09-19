@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getAllLocations } from "../../../services/locationService";
 import "./LocationSelector.css";
 
@@ -10,43 +10,86 @@ const PROVINCES = [
 
 function LocationSelector() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const selectedCar = location.state?.selectedCar;
     const [locations, setLocations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selectedProvince, setSelectedProvince] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
+    // New: Separate state for pickup and dropoff, and keep them until reset
+    const [pickupLocation, setPickupLocation] = useState(null);
+    const [dropOffLocation, setDropOffLocation] = useState(null);
 
     useEffect(() => {
-        fetchLocations();
+        getAllLocations()
+            .then(res => {
+                if (!Array.isArray(res.data)) {
+                    setError("Backend did not return a list of locations. Check your backend controller return type.");
+                    setLocations([]);
+                } else {
+                    setLocations(res.data);
+                }
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError("Failed to load locations. " + (err?.response?.data?.message || err.message));
+                setLoading(false);
+            });
     }, []);
-
-    const fetchLocations = async () => {
-        try {
-            setLoading(true);
-            setError("");
-            const response = await getAllLocations();
-            setLocations(response.data || []);
-        } catch (err) {
-            setError("Failed to load locations. Please try again later.");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Filter by province and search term
     let filteredLocations = locations.filter(loc => {
-        const matchesProvince = selectedProvince === "all" || loc.provinceOrState === selectedProvince;
-        const matchesSearch = loc.locationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            loc.cityOrTown.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesProvince = selectedProvince === "all" || (loc.provinceOrState || "") === selectedProvince;
+        const matchesSearch = (loc.locationName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (loc.cityOrTown || "").toLowerCase().includes(searchTerm.toLowerCase());
         return matchesProvince && matchesSearch;
     });
+
+    // Prevent selecting the same location for both pickup and dropoff
+    const isSameLocation = pickupLocation && dropOffLocation && pickupLocation.locationID === dropOffLocation.locationID;
+
+    const handleSelectPickup = (loc) => {
+        setPickupLocation(loc);
+        // If dropoff is the same, clear dropoff
+        if (dropOffLocation && dropOffLocation.locationID === loc.locationID) {
+            setDropOffLocation(null);
+        }
+    };
+
+    const handleSelectDropOff = (loc) => {
+        setDropOffLocation(loc);
+        // If pickup is the same, clear pickup
+        if (pickupLocation && pickupLocation.locationID === loc.locationID) {
+            setPickupLocation(null);
+        }
+    };
+
+    const handleReset = () => {
+        setPickupLocation(null);
+        setDropOffLocation(null);
+        setSelectedProvince("all");
+        setSearchTerm("");
+    };
+
+    const handleProceed = () => {
+        if (pickupLocation && dropOffLocation && pickupLocation.locationID !== dropOffLocation.locationID) {
+            navigate("/make-booking", {
+                state: {
+                    selectedCar,
+                    selectedPickupLocation: pickupLocation,
+                    selectedDropOffLocation: dropOffLocation
+                }
+            });
+        }
+    };
 
     return (
         <div className="location-selection-container">
             <div className="location-selection-wrapper">
                 <div className="selection-header">
-                    <h1>Choose a Pick Up Location</h1>
-                    <p>Select a province to see available locations</p>
+                    <h1>Choose Pick Up and Drop Off Locations</h1>
+                    <p>Select two different locations for your booking</p>
                 </div>
 
                 {error && <div className="error-message">{error}</div>}
@@ -83,6 +126,27 @@ function LocationSelector() {
                     </div>
                 </div>
 
+                {/* Selected Locations */}
+                <div className="selected-locations">
+                    <div>
+                        <b>Pick Up Location:</b>{" "}
+                        {pickupLocation
+                            ? `${pickupLocation.locationName} (${pickupLocation.cityOrTown})`
+                            : <span style={{ color: "#aaa" }}>None selected</span>}
+                    </div>
+                    <div>
+                        <b>Drop Off Location:</b>{" "}
+                        {dropOffLocation
+                            ? `${dropOffLocation.locationName} (${dropOffLocation.cityOrTown})`
+                            : <span style={{ color: "#aaa" }}>None selected</span>}
+                    </div>
+                    {isSameLocation && (
+                        <div style={{ color: "red", marginTop: 8 }}>
+                            Pick up and drop off locations must be different.
+                        </div>
+                    )}
+                </div>
+
                 {/* Locations Grid */}
                 {loading ? (
                     <div className="loading-container">
@@ -96,29 +160,58 @@ function LocationSelector() {
                 ) : (
                     <div className="locations-grid">
                         {filteredLocations.map(loc => (
-                            <div key={loc._id} className="location-card">
+                            <div key={loc.locationID || loc.id || Math.random()} className="location-card">
                                 <div className="location-details">
-                                    <h3 className="location-title">{loc.locationName}</h3>
-                                    <p className="location-meta">{loc.streetName}, {loc.cityOrTown}</p>
-                                    <p className="location-meta">{loc.provinceOrState}, {loc.country}</p>
-                                    <p className="location-meta">Postal Code: {loc.postalCode}</p>
+                                    <h3 className="location-title">{loc.locationName || "No Name"}</h3>
+                                    <p className="location-meta">{loc.streetName || ""}, {loc.cityOrTown || ""}</p>
+                                    <p className="location-meta">{loc.provinceOrState || ""}, {loc.country || ""}</p>
+                                    <p className="location-meta">Postal Code: {loc.postalCode || ""}</p>
                                 </div>
-                                <button
-                                    onClick={() => navigate("/make-booking", { state: { selectedLocation: loc } })}
-                                    className="select-location-button"
-                                >
-                                    Select Location
-                                </button>
+                                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                                    <button
+                                        onClick={() => handleSelectPickup(loc)}
+                                        className="select-location-button"
+                                        disabled={pickupLocation && pickupLocation.locationID === loc.locationID}
+                                    >
+                                        {pickupLocation && pickupLocation.locationID === loc.locationID ? "Selected as Pickup" : "Select as Pickup"}
+                                    </button>
+                                    <button
+                                        onClick={() => handleSelectDropOff(loc)}
+                                        className="select-location-button"
+                                        disabled={dropOffLocation && dropOffLocation.locationID === loc.locationID}
+                                    >
+                                        {dropOffLocation && dropOffLocation.locationID === loc.locationID ? "Selected as Drop Off" : "Select as Drop Off"}
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
                 )}
 
-                {/* Back Button */}
-                <div className="back-section">
+                {/* Action Buttons */}
+                <div className="back-section" style={{ display: "flex", gap: 10, marginTop: 20 }}>
                     <button
-                        onClick={() => navigate('/bookings')}
-                        className="back-button"
+                        onClick={handleProceed}
+                        className="select-location-button"
+                        disabled={
+                            !pickupLocation ||
+                            !dropOffLocation ||
+                            pickupLocation.locationID === dropOffLocation.locationID
+                        }
+                    >
+                        Proceed to Booking
+                    </button>
+                    <button
+                        onClick={handleReset}
+                        className="select-location-button"
+                        style={{ backgroundColor: "#ff9800" }}
+                    >
+                        Reset
+                    </button>
+                    <button
+                        onClick={() => navigate('/booking-history')}
+                        className="select-location-button"
+                        style={{ backgroundColor: "#888" }}
                     >
                         Back to Bookings
                     </button>

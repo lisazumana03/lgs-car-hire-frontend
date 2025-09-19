@@ -5,51 +5,100 @@ Date: 24/08/2025
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllLocations } from "../../../services/locationService";
+import "./LocationList.css";
+
+const PROVINCES = [
+    "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal",
+    "Limpopo", "Mpumalanga", "Northern Cape", "North West", "Western Cape"
+];
+
+function LocationCard({ location }) {
+    return (
+        <div className="location-card">
+            <div className="location-card__header">
+                <h3>{location.locationName}</h3>
+                <p><b>Street Number:</b> {location.streetNumber}</p>
+                <p><b>Street:</b> {location.streetName}</p>
+                <p><b>City/Town:</b> {location.cityOrTown}</p>
+                <p><b>Province:</b> {location.provinceOrState}</p>
+                <p><b>Country:</b> {location.country}</p>
+                <p><b>Postal Code:</b> {location.postalCode}</p>
+            </div>
+        </div>
+    );
+}
 
 function LocationList() {
-    const [locations, setLocations] = useState([]);
     const navigate = useNavigate();
-
+    const [locations, setLocations] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedProvince, setSelectedProvince] = useState("all");
 
     useEffect(() => {
+        setLoading(true);
         getAllLocations()
             .then(res => {
-                setLocations(res.data || [])
+                if (!Array.isArray(res.data)) {
+                    setError("Backend did not return a list of locations. Check your backend controller return type.");
+                    setLocations([]);
+                } else {
+                    setLocations(res.data);
+                }
+                setLoading(false);
             })
-            .catch(error => {
-                console.error('Failed to fetch locations:', error);
-                setLocations([]);
+            .catch((err) => {
+                setError("Failed to fetch locations. " + (err?.response?.data?.message || err.message));
+                setLoading(false);
             });
     }, []);
 
+    const filteredLocations = locations.filter(loc => {
+        const matchesProvince = selectedProvince === "all" || (loc.provinceOrState || "") === selectedProvince;
+        const matchesSearch =
+            (loc.locationName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (loc.cityOrTown || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (loc.streetName || "").toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesProvince && matchesSearch;
+    });
+
+    if (loading) return <div className="loading">Loading locations...</div>;
+    if (error) return <div className="error">{error}</div>;
 
     return (
-        <div>
-            <div className="form">
-                <h2 className="text-2xl font-bold text-center text-white mb-8">View Locations</h2>
-                {locations.map(loc => (
-                    <div key={loc.locationID} className="bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col">
-                        <h3 className="text-xl font-bold text-white mb-2">{loc.locationName}</h3>
-                        <p className="text-white"><span className="font-semibold">Street:</span> {loc.streetName}</p>
-                        <p className="text-white"><span className="font-semibold">City/Town:</span> {loc.cityOrTown}</p>
-                        <p className="text-white"><span className="font-semibold">Province/State:</span> {loc.provinceOrState}</p>
-                        <p className="text-white"><span className="font-semibold">Country:</span> {loc.country}</p>
-                        <p className="text-white"><span className="font-semibold">Postal Code:</span> {loc.postalCode}</p>
-                        <div className="mt-4 flex gap-2">
-                            <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700">Edit</button>
-                            <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
-                        </div>
-                    </div>
-                ))}
+        <div className="location-list-container">
+            <div className="location-controls">
+                <input
+                    type="text"
+                    placeholder="Search by name, city, or street..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="location-search"
+                />
+                <select
+                    value={selectedProvince}
+                    onChange={e => setSelectedProvince(e.target.value)}
+                    className="location-filter"
+                >
+                    <option value="all">All Provinces</option>
+                    {PROVINCES.map(prov => (
+                        <option key={prov} value={prov}>{prov}</option>
+                    ))}
+                </select>
+                <span className="results-count">
+                    {filteredLocations.length} {filteredLocations.length === 1 ? "location" : "locations"} found
+                </span>
             </div>
-            <button
-                type="button"
-                style={{ marginTop: "20px", backgroundColor: "#003ffa" }}
-                className="submit-btn"
-                onClick={() => navigate("/dashboard")}
-            >
-                Back
-            </button>
+            <div className="location-grid">
+                {filteredLocations.length === 0 ? (
+                    <div className="no-results">No locations found.</div>
+                ) : (
+                    filteredLocations.map(loc => (
+                        <LocationCard key={loc.locationID || loc.id || Math.random()} location={loc} />
+                    ))
+                )}
+            </div>
         </div>
     );
 }
