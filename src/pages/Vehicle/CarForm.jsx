@@ -1,370 +1,535 @@
-/*
-Imtiyaaz Waggie 219374759
- */
-
-
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { create } from "../../services/carService.js";
-import { createCarType } from "../../services/carTypeService.js";
+import { useState, useEffect } from "react";
+import { create, updateCar } from "../../services/carService.js";
+import { createCarType, getAllCarTypes } from "../../services/carTypeService.js";
+import "./AdminCarForm.css";
 
 function CarForm() {
-    const navigate = useNavigate();
-    const [form, setForm] = useState({
+    const [step, setStep] = useState(1); // 1 = Car Info, 2 = Car Type Info
+    const [createdCarId, setCreatedCarId] = useState(null);
+    const [existingCarTypes, setExistingCarTypes] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    
+    // Combined form data for both car and car type
+    const [formData, setFormData] = useState({
+        // Car fields
         model: "",
         brand: "",
-        year: "",
+        year: new Date().getFullYear(),
         availability: true,
         rentalPrice: "",
-        insurance: false,
         imageUrl: "",
-        carType: {
-            type: "",
-            fuelType: "",
-            numberOfWheels: 4,
-            numberOfSeats: 5
-        }
-    });
-    const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
         
-        if (name.startsWith("carType.")) {
-            const field = name.split(".")[1];
-            setForm(prev => ({
-                ...prev,
-                carType: {
-                    ...prev.carType,
-                    [field]: type === "checkbox" ? checked : 
-                            field === "numberOfWheels" || field === "numberOfSeats" ? 
-                            parseInt(value) || 0 : value
-                }
-            }));
-        } else {
-            setForm(prev => ({
-                ...prev,
-                [name]: type === "checkbox" ? checked : 
-                        name === "year" ? parseInt(value) || "" : value
-            }));
+        // Car Type fields (for this specific car)
+        createNewType: true,
+        typeName: "",
+        fuelType: "Petrol",
+        numberOfWheels: 4,
+        numberOfSeats: 5,
+        
+        // For linking existing type
+        existingTypeId: null
+    });
+
+    // Popular car brands
+    const carBrands = [
+        "Toyota", "Honda", "BMW", "Mercedes-Benz", "Audi", "Volkswagen",
+        "Ford", "Chevrolet", "Nissan", "Hyundai", "Mazda", "Kia",
+        "Tesla", "Porsche", "Lexus", "Jeep", "Bentley", "Ferrari"
+    ];
+
+    // Car type templates
+    const carTypeTemplates = [
+        { name: "Economy", fuelType: "Petrol", seats: 5, wheels: 4 },
+        { name: "Sedan", fuelType: "Petrol", seats: 5, wheels: 4 },
+        { name: "SUV", fuelType: "Petrol", seats: 7, wheels: 4 },
+        { name: "Luxury", fuelType: "Petrol", seats: 5, wheels: 4 },
+        { name: "Sports", fuelType: "Petrol", seats: 2, wheels: 4 },
+        { name: "Electric", fuelType: "Electric", seats: 5, wheels: 4 },
+        { name: "Hybrid", fuelType: "Hybrid", seats: 5, wheels: 4 },
+        { name: "Minivan", fuelType: "Petrol", seats: 8, wheels: 4 },
+        { name: "Convertible", fuelType: "Petrol", seats: 2, wheels: 4 },
+        { name: "Truck", fuelType: "Diesel", seats: 3, wheels: 6 }
+    ];
+
+    useEffect(() => {
+        fetchExistingCarTypes();
+    }, []);
+
+    const fetchExistingCarTypes = async () => {
+        try {
+            const response = await getAllCarTypes();
+            setExistingCarTypes(response.data);
+        } catch (err) {
+            console.error("Error fetching car types:", err);
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value
+        }));
+    };
+
+    const applyTypeTemplate = (template) => {
+        setFormData(prev => ({
+            ...prev,
+            typeName: template.name,
+            fuelType: template.fuelType,
+            numberOfSeats: template.seats,
+            numberOfWheels: template.wheels
+        }));
+    };
+
+    const validateCarInfo = () => {
+        if (!formData.model.trim()) return "Model is required";
+        if (!formData.brand.trim()) return "Brand is required";
+        if (!formData.year || formData.year < 1900 || formData.year > new Date().getFullYear() + 1) {
+            return "Please enter a valid year";
+        }
+        if (!formData.rentalPrice || formData.rentalPrice <= 0) {
+            return "Please enter a valid rental price";
+        }
+        return null;
+    };
+
+    const validateCarTypeInfo = () => {
+        if (formData.createNewType) {
+            if (!formData.typeName.trim()) return "Type name is required";
+            if (!formData.fuelType) return "Fuel type is required";
+            if (formData.numberOfSeats < 1 || formData.numberOfSeats > 50) {
+                return "Number of seats must be between 1 and 50";
+            }
+            if (formData.numberOfWheels < 2 || formData.numberOfWheels > 18) {
+                return "Number of wheels must be between 2 and 18";
+            }
+        }
+        return null;
+    };
+
+    const handleStep1Submit = async (e) => {
         e.preventDefault();
+        
+        const validationError = validateCarInfo();
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
         setLoading(true);
-        setMessage("");
+        setError("");
 
         try {
-            const carTypeData = {
-                type: form.carType.type,
-                fuelType: form.carType.fuelType,
-                numberOfWheels: form.carType.numberOfWheels,
-                numberOfSeats: form.carType.numberOfSeats
-            };
-
-            const carTypeResponse = await createCarType(carTypeData);
-            const createdCarType = carTypeResponse.data;
-
+            // Create the car first
             const carData = {
-                model: form.model,
-                brand: form.brand,
-                year: parseInt(form.year),
-                availability: form.availability,
-                rentalPrice: parseFloat(form.rentalPrice),
-                insurance: form.insurance,
-                imageUrl: form.imageUrl || null,
-                carTypeID: createdCarType.carTypeID 
+                model: formData.model,
+                brand: formData.brand,
+                year: parseInt(formData.year),
+                availability: formData.availability,
+                rentalPrice: parseFloat(formData.rentalPrice),
+                imageUrl: formData.imageUrl || null
             };
 
-            await create(carData);
+            const carResponse = await create(carData);
+            const createdCar = carResponse.data;
+            setCreatedCarId(createdCar.carID);
             
-            setMessage("Car registered successfully!");
-            
-            setForm({
-                model: "",
-                brand: "",
-                year: "",
-                availability: true,
-                rentalPrice: "",
-                insurance: false,
-                imageUrl: "",
-                carType: {
-                    type: "",
-                    fuelType: "",
-                    numberOfWheels: 4,
-                    numberOfSeats: 5
-                }
-            });
-            
-            setTimeout(() => setMessage(""), 3000);
+            // Move to step 2
+            setStep(2);
+            setError("");
         } catch (err) {
-            console.error("Error registering car:", err);
-            const errorMessage = err.response?.data?.message || 
-                                err.response?.data || 
-                                err.message || 
-                                "Error registering car";
-            setMessage("Error: " + errorMessage);
+            setError(err.response?.data?.message || "Failed to create car. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-black">
-            {message && (
-                <p className={`mb-4 font-semibold ${
-                    message.includes("Error") ? "text-red-400" : "text-green-400"
-                }`}>
-                    {message}
-                </p>
-            )}
+    const handleStep2Submit = async (e) => {
+        e.preventDefault();
+        
+        if (formData.createNewType) {
+            const validationError = validateCarTypeInfo();
+            if (validationError) {
+                setError(validationError);
+                return;
+            }
+        }
+
+        setLoading(true);
+        setError("");
+
+        try {
+            if (formData.createNewType) {
+                // Create new car type and link it to the car
+                const carTypeData = {
+                    type: formData.typeName,
+                    fuelType: formData.fuelType,
+                    numberOfWheels: parseInt(formData.numberOfWheels),
+                    numberOfSeats: parseInt(formData.numberOfSeats),
+                    carID: createdCarId // Link to the created car
+                };
+
+                const typeResponse = await createCarType(carTypeData);
+                const createdType = typeResponse.data;
+
+                // Update the car with the car type reference
+                const updatedCarData = {
+                    carID: createdCarId,
+                    model: formData.model,
+                    brand: formData.brand,
+                    year: parseInt(formData.year),
+                    availability: formData.availability,
+                    rentalPrice: parseFloat(formData.rentalPrice),
+                    imageUrl: formData.imageUrl || null,
+                    carTypeID: createdType.carTypeID,
+                    carTypeName: createdType.type,
+                    carTypeFuelType: createdType.fuelType,
+                    carTypeNumberOfWheels: createdType.numberOfWheels,
+                    carTypeNumberOfSeats: createdType.numberOfSeats
+                };
+
+                await updateCar(updatedCarData);
+            }
+
+            setSuccess(`Successfully added ${formData.brand} ${formData.model} with its type configuration!`);
             
-            <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl border border-gray-700">
-                <h2 className="text-2xl font-bold mb-6 text-center text-white">Register New Car</h2>
+            // Reset form
+            setFormData({
+                model: "",
+                brand: "",
+                year: new Date().getFullYear(),
+                availability: true,
+                rentalPrice: "",
+                imageUrl: "",
+                createNewType: true,
+                typeName: "",
+                fuelType: "Petrol",
+                numberOfWheels: 4,
+                numberOfSeats: 5,
+                existingTypeId: null
+            });
+            setStep(1);
+            setCreatedCarId(null);
+            
+            // Refresh car types list
+            fetchExistingCarTypes();
+            
+            setTimeout(() => setSuccess(""), 7000);
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to create car type. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSkipType = async () => {
+        // Skip creating type and just finish with the car
+        setSuccess(`Successfully added ${formData.brand} ${formData.model} without type configuration!`);
+        
+        // Reset form
+        setFormData({
+            model: "",
+            brand: "",
+            year: new Date().getFullYear(),
+            availability: true,
+            rentalPrice: "",
+            imageUrl: "",
+            createNewType: true,
+            typeName: "",
+            fuelType: "Petrol",
+            numberOfWheels: 4,
+            numberOfSeats: 5,
+            existingTypeId: null
+        });
+        setStep(1);
+        setCreatedCarId(null);
+        
+        setTimeout(() => setSuccess(""), 7000);
+    };
+
+    return (
+        <div className="admin-form-container">
+            <div className="admin-form-wrapper">
+                <h2 className="admin-form-title">Add New Car & Type</h2>
                 
-                {/* Basic Car Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Brand *</label>
-                        <input 
-                            type="text" 
-                            name="brand" 
-                            value={form.brand} 
-                            onChange={handleChange} 
-                            placeholder="e.g., Toyota, BMW, Ford" 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
-                        />
+                {/* Progress Indicator */}
+                <div className="progress-indicator">
+                    <div className={`progress-step ${step >= 1 ? 'active' : ''}`}>
+                        <span className="step-number">1</span>
+                        <span className="step-label">Car Information</span>
                     </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Model *</label>
-                        <input 
-                            type="text" 
-                            name="model" 
-                            value={form.model} 
-                            onChange={handleChange} 
-                            placeholder="e.g., Camry, X5, Focus" 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
-                        />
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Year *</label>
-                        <input 
-                            type="number" 
-                            name="year" 
-                            value={form.year} 
-                            onChange={handleChange} 
-                            placeholder="e.g., 2024" 
-                            min="1900" 
-                            max="2030" 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
-                        />
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Rental Price (per day) *</label>
-                        <input 
-                            type="number" 
-                            name="rentalPrice" 
-                            value={form.rentalPrice} 
-                            onChange={handleChange} 
-                            placeholder="e.g., 850.00" 
-                            step="0.01" 
-                            min="0" 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
-                        />
+                    <div className="progress-line"></div>
+                    <div className={`progress-step ${step >= 2 ? 'active' : ''}`}>
+                        <span className="step-number">2</span>
+                        <span className="step-label">Type Configuration</span>
                     </div>
                 </div>
 
-                {/* Image URL */}
-                <div className="mb-4">
-                    <label className="block mb-1 font-semibold text-white">Image URL (Optional)</label>
-                    <input 
-                        type="url" 
-                        name="imageUrl" 
-                        value={form.imageUrl} 
-                        onChange={handleChange} 
-                        placeholder="https://example.com/car-image.jpg" 
-                        disabled={loading}
-                        className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
-                    />
-                    <p className="text-xs text-gray-400 mt-1">
-                        Provide a URL to an image of the car (optional)
-                    </p>
-                </div>
+                {error && (
+                    <div className="alert alert-error">
+                        {error}
+                    </div>
+                )}
+                
+                {success && (
+                    <div className="alert alert-success">
+                        {success}
+                    </div>
+                )}
 
-                {/* Car Type Information */}
-                <h3 className="text-lg font-bold mt-4 mb-2 text-white">Car Type Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Type *</label>
-                        <select 
-                            name="carType.type" 
-                            value={form.carType.type} 
-                            onChange={handleChange} 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
-                        >
-                            <option value="">Select Type</option>
-                            <option value="Sedan">Sedan</option>
-                            <option value="SUV">SUV</option>
-                            <option value="Hatchback">Hatchback</option>
-                            <option value="Coupe">Coupe</option>
-                            <option value="Convertible">Convertible</option>
-                            <option value="Minivan">Minivan</option>
-                            <option value="Pickup">Pickup Truck</option>
-                            <option value="Van">Van</option>
-                            <option value="Sports">Sports Car</option>
-                            <option value="Luxury">Luxury</option>
-                        </select>
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Fuel Type *</label>
-                        <select 
-                            name="carType.fuelType" 
-                            value={form.carType.fuelType} 
-                            onChange={handleChange} 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
-                        >
-                            <option value="">Select Fuel Type</option>
-                            <option value="Petrol">Petrol</option>
-                            <option value="Diesel">Diesel</option>
-                            <option value="Electric">Electric</option>
-                            <option value="Hybrid">Hybrid</option>
-                            <option value="Plug-in Hybrid">Plug-in Hybrid</option>
-                        </select>
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Number of Wheels *</label>
-                        <input 
-                            type="number" 
-                            name="carType.numberOfWheels" 
-                            value={form.carType.numberOfWheels} 
-                            onChange={handleChange} 
-                            min="2" 
-                            max="8" 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
-                        />
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Number of Seats *</label>
-                        <input 
-                            type="number" 
-                            name="carType.numberOfSeats" 
-                            value={form.carType.numberOfSeats} 
-                            onChange={handleChange} 
-                            min="1" 
-                            max="20" 
-                            required 
-                            disabled={loading}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
-                        />
-                    </div>
-                </div>
+                {/* Step 1: Car Information */}
+                {step === 1 && (
+                    <form onSubmit={handleStep1Submit} className="admin-form">
+                        <div className="form-section">
+                            <h3 className="section-title">Step 1: Car Information</h3>
+                            
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label htmlFor="brand">Brand *</label>
+                                    <select
+                                        id="brand"
+                                        name="brand"
+                                        value={formData.brand}
+                                        onChange={handleInputChange}
+                                        className="form-select"
+                                        required
+                                    >
+                                        <option value="">Select a brand</option>
+                                        {carBrands.map(brand => (
+                                            <option key={brand} value={brand}>{brand}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                {/* Checkboxes */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="mb-4">
-                        <label className="flex items-center">
-                            <input 
-                                type="checkbox" 
-                                name="availability" 
-                                checked={form.availability} 
-                                onChange={handleChange} 
+                                <div className="form-group">
+                                    <label htmlFor="model">Model *</label>
+                                    <input
+                                        type="text"
+                                        id="model"
+                                        name="model"
+                                        value={formData.model}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g., Corolla"
+                                        className="form-input"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="year">Year *</label>
+                                    <input
+                                        type="number"
+                                        id="year"
+                                        name="year"
+                                        value={formData.year}
+                                        onChange={handleInputChange}
+                                        min="1900"
+                                        max={new Date().getFullYear() + 1}
+                                        className="form-input"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="rentalPrice">Rental Price (R/day) *</label>
+                                    <input
+                                        type="number"
+                                        id="rentalPrice"
+                                        name="rentalPrice"
+                                        value={formData.rentalPrice}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g., 350"
+                                        step="0.01"
+                                        min="0"
+                                        className="form-input"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="imageUrl">Image URL</label>
+                                <input
+                                    type="url"
+                                    id="imageUrl"
+                                    name="imageUrl"
+                                    value={formData.imageUrl}
+                                    onChange={handleInputChange}
+                                    placeholder="https://example.com/car-image.jpg"
+                                    className="form-input"
+                                />
+                            </div>
+
+                            <div className="form-group checkbox-group">
+                                <label className="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        name="availability"
+                                        checked={formData.availability}
+                                        onChange={handleInputChange}
+                                        className="form-checkbox"
+                                    />
+                                    <span>Available for rent immediately</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="form-actions">
+                            <button
+                                type="submit"
                                 disabled={loading}
-                                className="mr-2 disabled:bg-gray-100"
-                            />
-                            <span className="font-semibold text-white">Available for Rent</span>
-                        </label>
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="flex items-center">
-                            <input 
-                                type="checkbox" 
-                                name="insurance" 
-                                checked={form.insurance} 
-                                onChange={handleChange} 
-                                disabled={loading}
-                                className="mr-2 disabled:bg-gray-100"
-                            />
-                            <span className="font-semibold text-white">Insurance Included</span>
-                        </label>
-                    </div>
-                </div>
+                                className="btn btn-primary"
+                            >
+                                {loading ? 'Creating Car...' : 'Next: Configure Type'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({
+                                    model: "",
+                                    brand: "",
+                                    year: new Date().getFullYear(),
+                                    availability: true,
+                                    rentalPrice: "",
+                                    imageUrl: "",
+                                    createNewType: true,
+                                    typeName: "",
+                                    fuelType: "Petrol",
+                                    numberOfWheels: 4,
+                                    numberOfSeats: 5,
+                                    existingTypeId: null
+                                })}
+                                className="btn btn-secondary"
+                            >
+                                Clear Form
+                            </button>
+                        </div>
+                    </form>
+                )}
 
-                {/* Buttons */}
-                <div className="flex gap-4 mt-6">
-                    <button 
-                        type="submit" 
-                        disabled={loading}
-                        className={`px-4 py-2 rounded transition ${
-                            loading 
-                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                                : 'bg-green-600 text-white hover:bg-green-700'
-                        }`}
-                    >
-                        {loading ? 'Registering...' : 'Register Car'}
-                    </button>
-                    <button 
-                        type="reset" 
-                        disabled={loading}
-                        className={`px-4 py-2 rounded transition ${
-                            loading 
-                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                                : 'bg-orange-500 text-white hover:bg-orange-600'
-                        }`}
-                        onClick={() => !loading && setForm({
-                            model: "",
-                            brand: "",
-                            year: "",
-                            availability: true,
-                            rentalPrice: "",
-                            insurance: false,
-                            imageUrl: "",
-                            carType: {
-                                type: "",
-                                fuelType: "",
-                                numberOfWheels: 4,
-                                numberOfSeats: 5
-                            }
-                        })}
-                    >
-                        Reset
-                    </button>
-                    <button 
-                        type="button" 
-                        disabled={loading}
-                        className={`px-4 py-2 rounded transition ${
-                            loading 
-                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                                : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                        onClick={() => !loading && navigate("/")}
-                    >
-                        Back
-                    </button>
-                </div>
-            </form>
+                {/* Step 2: Car Type Configuration */}
+                {step === 2 && (
+                    <form onSubmit={handleStep2Submit} className="admin-form">
+                        <div className="form-section">
+                            <h3 className="section-title">Step 2: Configure Type for {formData.brand} {formData.model}</h3>
+                            
+                            {/* Quick Templates */}
+                            <div className="template-section">
+                                <p className="template-label">Quick Templates:</p>
+                                <div className="template-grid">
+                                    {carTypeTemplates.map((template, index) => (
+                                        <button
+                                            key={index}
+                                            type="button"
+                                            onClick={() => applyTypeTemplate(template)}
+                                            className="template-button"
+                                        >
+                                            <span className="template-name">{template.name}</span>
+                                            <span className="template-details">
+                                                {template.fuelType} • {template.seats} seats
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label htmlFor="typeName">Type Name *</label>
+                                    <input
+                                        type="text"
+                                        id="typeName"
+                                        name="typeName"
+                                        value={formData.typeName}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g., SUV, Sedan, Sports"
+                                        className="form-input"
+                                        required={formData.createNewType}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="fuelType">Fuel Type *</label>
+                                    <select
+                                        id="fuelType"
+                                        name="fuelType"
+                                        value={formData.fuelType}
+                                        onChange={handleInputChange}
+                                        className="form-select"
+                                        required={formData.createNewType}
+                                    >
+                                        <option value="Petrol">Petrol</option>
+                                        <option value="Diesel">Diesel</option>
+                                        <option value="Electric">Electric</option>
+                                        <option value="Hybrid">Hybrid</option>
+                                        <option value="CNG">CNG</option>
+                                        <option value="LPG">LPG</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="numberOfSeats">Number of Seats *</label>
+                                    <input
+                                        type="number"
+                                        id="numberOfSeats"
+                                        name="numberOfSeats"
+                                        value={formData.numberOfSeats}
+                                        onChange={handleInputChange}
+                                        min="1"
+                                        max="50"
+                                        className="form-input"
+                                        required={formData.createNewType}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="numberOfWheels">Number of Wheels *</label>
+                                    <input
+                                        type="number"
+                                        id="numberOfWheels"
+                                        name="numberOfWheels"
+                                        value={formData.numberOfWheels}
+                                        onChange={handleInputChange}
+                                        min="2"
+                                        max="18"
+                                        className="form-input"
+                                        required={formData.createNewType}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="form-actions">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="btn btn-primary"
+                            >
+                                {loading ? 'Creating Type...' : 'Complete Setup'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleSkipType}
+                                className="btn btn-secondary"
+                            >
+                                Skip Type Configuration
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setStep(1);
+                                    setError("");
+                                }}
+                                className="btn btn-secondary"
+                            >
+                                Back to Car Info
+                            </button>
+                        </div>
+                    </form>
+                )}
+            </div>
         </div>
     );
 }
