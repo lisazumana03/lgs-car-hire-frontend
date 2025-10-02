@@ -170,6 +170,9 @@ function Sidebar({ onLogout }) {
                 <li>
                     <Link to="/register-location" className={`sidebar-link ${location.pathname === '/register-location' ? 'active' : ''}`}><span className="icon">📌</span><span className="title">Add Location</span></Link>
                 </li>
+                <li>
+                    <Link to="/register-car" className={`sidebar-link ${location.pathname === '/register-car' ? 'active' : ''}`}><span className="icon">🚗</span><span className="title">Add Car</span></Link>
+                </li>
                 <li className="logout-item">
                     <button onClick={onLogout} className="logout-btn">
                         <span className="icon">🚪</span>
