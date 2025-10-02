@@ -5,7 +5,7 @@ Date: 05/06/2025
 
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { create } from "../../../services/bookingService";
+import { create, update } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
 
 const getCurrentDateTime = () => {
@@ -21,6 +21,8 @@ export default function BookingForm() {
 
     const selectedPickupLocation = location.state?.selectedPickupLocation;
     const selectedDropOffLocation = location.state?.selectedDropOffLocation;
+
+    const editingBooking = location.state?.booking;
 
     const [form, setForm] = useState({
         cars: [selectedCar?.carID || ""],
@@ -66,6 +68,21 @@ export default function BookingForm() {
         }));
     }, [selectedPickupLocation, selectedDropOffLocation]);
 
+    // Prefill form if editing an existing booking
+    useEffect(() => {
+        if (editingBooking) {
+            setForm({
+                cars: editingBooking.cars ? editingBooking.cars.map(car => car.carID || car) : [""],
+                bookingDateAndTime: editingBooking.bookingDateAndTime || getCurrentDateTime(),
+                startDate: editingBooking.startDate || "",
+                endDate: editingBooking.endDate || "",
+                pickupLocation: editingBooking.pickupLocation?.locationID || editingBooking.pickupLocation || "",
+                dropOffLocation: editingBooking.dropOffLocation?.locationID || editingBooking.dropOffLocation || "",
+                bookingStatus: editingBooking.bookingStatus || "PENDING"
+            });
+        }
+    }, [editingBooking]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === "cars") {
@@ -96,15 +113,26 @@ export default function BookingForm() {
         // Prepare payload with correct structure
         const payload = {
             ...form,
-            cars: selectedCar ? [{ carID: selectedCar.carID }] : [],
-            pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
-            dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
+            cars: selectedCar ? [{ carID: selectedCar.carID }] :
+                (editingBooking?.cars ? editingBooking.cars.map(car => ({ carID: car.carID })) : []),
+            pickupLocation: selectedPickupLocation
+                ? { locationID: selectedPickupLocation.locationID }
+                : (editingBooking?.pickupLocation ? { locationID: editingBooking.pickupLocation.locationID } : null),
+            dropOffLocation: selectedDropOffLocation
+                ? { locationID: selectedDropOffLocation.locationID }
+                : (editingBooking?.dropOffLocation ? { locationID: editingBooking.dropOffLocation.locationID } : null),
+            bookingID: editingBooking?.bookingID // for update
         };
 
         try {
-            const response = await create(payload);
-            console.log("Booking created:", response.data);
-            setMessage("Booking created successfully!");
+            let response;
+            if (editingBooking) {
+                response = await update(payload);
+                setMessage("Booking updated successfully!");
+            } else {
+                response = await create(payload);
+                setMessage("Booking created successfully!");
+            }
             setMessageType("success");
             setForm({
                 cars: [""],

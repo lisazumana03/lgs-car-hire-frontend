@@ -2,9 +2,10 @@
 Lisakhanya Zumana (230864821)
 Date: 13/08/2025
  */
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllBookings, deleteBooking, cancel } from "../../../services/bookingService";
+import { cancel, deleteBooking, getAllBookings } from "../../../services/bookingService";
+import "./BookingHistory.css"; // (Create this CSS file for custom styles)
 
 function BookingHistory(){
     const navigate = useNavigate();
@@ -37,7 +38,7 @@ function BookingHistory(){
                 await deleteBooking(id);
                 setMessage("Booking deleted successfully");
                 setMessageType("success");
-                fetchBookings(); // Refresh the list
+                fetchBookings();
             } catch (error) {
                 console.error("Error deleting booking:", error);
                 setMessage("Error deleting booking");
@@ -52,7 +53,7 @@ function BookingHistory(){
                 await cancel(id);
                 setMessage("Booking cancelled successfully");
                 setMessageType("success");
-                fetchBookings(); // Refresh the list
+                fetchBookings();
             } catch (error) {
                 console.error("Error cancelling booking:", error);
                 setMessage("Error cancelling booking");
@@ -61,13 +62,18 @@ function BookingHistory(){
         }
     };
 
+    const handleEdit = (booking) => {
+        navigate("/make-booking", { state: { booking } });
+    };
+
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         return new Date(dateString).toLocaleString();
     };
 
     const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
+        if (!status || typeof status !== "string") return 'text-gray-400 bg-gray-900/30';
+        switch (status.toLowerCase()) {
             case 'confirmed': return 'text-green-400 bg-green-900/30';
             case 'pending': return 'text-yellow-400 bg-yellow-900/30';
             case 'cancelled': return 'text-red-400 bg-red-900/30';
@@ -107,40 +113,71 @@ function BookingHistory(){
                         </button>
                     </div>
                 ) : (
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="booking-cards-grid grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {bookings.map((booking) => (
-                            <div key={booking.id || booking.bookingId} className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+                            <div key={booking.bookingID || booking.id || booking.bookingId} className="booking-card bg-gray-800/50 rounded-lg p-6 border border-gray-700 flex flex-col">
                                 <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-lg font-semibold">Booking #{booking.id || booking.bookingId}</h3>
+                                    <h3 className="text-lg font-semibold">Booking #{booking.bookingID || booking.id || booking.bookingId}</h3>
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.bookingStatus)}`}>
                                         {booking.bookingStatus || 'Unknown'}
                                     </span>
                                 </div>
-                                
-                                <div className="space-y-2 text-sm">
-                                    <p><span className="text-gray-400">Car:</span> {booking.cars?.[0] || 'N/A'}</p>
-                                    <p><span className="text-gray-400">Booking Date:</span> {formatDate(booking.bookingDateAndTime)}</p>
-                                    <p><span className="text-gray-400">Start Date:</span> {formatDate(booking.startDate)}</p>
-                                    <p><span className="text-gray-400">End Date:</span> {formatDate(booking.endDate)}</p>
-                                    <p><span className="text-gray-400">Pickup:</span> {booking.pickupLocation || 'N/A'}</p>
-                                    <p><span className="text-gray-400">Drop-off:</span> {booking.dropOffLocation || 'N/A'}</p>
+                                <div className="space-y-2 text-sm flex-1">
+                                    <p>
+                                        <span className="text-gray-400">Car:</span>{" "}
+                                        {booking.cars && booking.cars.length > 0
+                                            ? (typeof booking.cars[0] === "object"
+                                                ? `${booking.cars[0].brand || ""} ${booking.cars[0].model || ""}`
+                                                : booking.cars[0])
+                                            : "N/A"}
+                                    </p>
+                                    <p>
+                                        <span className="text-gray-400">Booking Date:</span> {formatDate(booking.bookingDateAndTime)}
+                                    </p>
+                                    <p>
+                                        <span className="text-gray-400">Start Date:</span> {formatDate(booking.startDate)}
+                                    </p>
+                                    <p>
+                                        <span className="text-gray-400">End Date:</span> {formatDate(booking.endDate)}
+                                    </p>
+                                    <p>
+                                        <span className="text-gray-400">Pickup:</span>{" "}
+                                        {booking.pickupLocation
+                                            ? (typeof booking.pickupLocation === "object"
+                                                ? booking.pickupLocation.locationName
+                                                : booking.pickupLocation)
+                                            : "N/A"}
+                                    </p>
+                                    <p>
+                                        <span className="text-gray-400">Drop-off:</span>{" "}
+                                        {booking.dropOffLocation
+                                            ? (typeof booking.dropOffLocation === "object"
+                                                ? booking.dropOffLocation.locationName
+                                                : booking.dropOffLocation)
+                                            : "N/A"}
+                                    </p>
                                 </div>
-
                                 <div className="flex gap-2 mt-4">
+                                    <button
+                                        onClick={() => handleEdit(booking)}
+                                        className="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(booking.bookingID || booking.id || booking.bookingId)}
+                                        className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition"
+                                    >
+                                        Delete
+                                    </button>
                                     {booking.bookingStatus?.toLowerCase() !== 'cancelled' && (
                                         <button
-                                            onClick={() => handleCancel(booking.id || booking.bookingId)}
-                                            className="flex-1 bg-orange-600 text-white px-3 py-2 rounded text-sm hover:bg-orange-700"
+                                            onClick={() => handleCancel(booking.bookingID || booking.id || booking.bookingId)}
+                                            className="flex-1 bg-orange-600 text-white px-3 py-2 rounded text-sm hover:bg-orange-700 transition"
                                         >
                                             Cancel
                                         </button>
                                     )}
-                                    <button
-                                        onClick={() => handleDelete(booking.id || booking.bookingId)}
-                                        className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700"
-                                    >
-                                        Delete
-                                    </button>
                                 </div>
                             </div>
                         ))}

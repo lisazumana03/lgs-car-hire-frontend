@@ -7,13 +7,15 @@ export default function ReviewComponent(){
             <div className="booking-links flex flex-col gap-6 mb-4 w-full max-w-md">
                 <Link
                     to="/review-form"
-                    className="px-8 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-800 text-xl font-semibold text-center transition duration-300 transform hover:scale-105"
+                    type="button"
+                    style={{backgroundColor: "#ff0000"}}
                 >
                     Write a Review
                 </Link>
                 <Link
                     to="/review-list"
-                    className="px-8 py-4 bg-green-500 text-white rounded-lg hover:bg-green-800 text-xl font-semibold text-center transition duration-300 transform hover:scale-105"
+                    type="button"
+                    style={{backgroundColor: "#ff0000"}}
                 >
                     View Customer Reviews
                 </Link>

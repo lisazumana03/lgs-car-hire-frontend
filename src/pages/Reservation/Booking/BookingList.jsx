@@ -2,9 +2,9 @@
 Lisakhanya Zumana (230864821)
 Date: 13/08/2025
  */
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllBookings, deleteBooking, cancel, update } from "../../../services/bookingService";
+import { cancel, deleteBooking, getAllBookings, update } from "../../../services/bookingService";
 
 function BookingList() {
     const navigate = useNavigate();

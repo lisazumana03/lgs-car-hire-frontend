@@ -17,7 +17,6 @@ function LocationSelector() {
     const [error, setError] = useState("");
     const [selectedProvince, setSelectedProvince] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
-    // New: Separate state for pickup and dropoff, and keep them until reset
     const [pickupLocation, setPickupLocation] = useState(null);
     const [dropOffLocation, setDropOffLocation] = useState(null);
 
