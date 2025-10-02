@@ -11,6 +11,7 @@ import Header from "./pages/Common/Header.jsx";
 import ReviewComponent from './pages/Feedback/Review/reviewComponent.jsx';
 import ReviewForm from "./pages/Feedback/Review/reviewForm.jsx";
 import ReviewList from "./pages/Feedback/Review/reviewList.jsx";
+import ReviewEditList from "./pages/Feedback/Review/reviewEditList.jsx";
 import BookingComponent from "./pages/Reservation/Booking/BookingComponent.jsx";
 import BookingForm from "./pages/Reservation/Booking/BookingForm.jsx";
 import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
@@ -86,6 +87,7 @@ function App() {
                                 <Route path="/register-location" element={<LocationForm/>} />
                                 <Route path="/reviews" element={<ReviewComponent/>} />
                                 <Route path="/review-form" element={<ReviewForm/>} />
+                                <Route path="/edit-reviews" element={<ReviewEditList/>} />
                                 <Route path="/review-list" element={<ReviewList/>} />
                                 <Route path="/support" element={<SupportComponent/>} />
                                 <Route path="/support-form" element={<SupportForm/>} />
