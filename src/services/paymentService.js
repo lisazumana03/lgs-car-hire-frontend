@@ -1,6 +1,6 @@
 /**
  * Sanele Zondi (221602011)
- * invoiceService.js
+ * paymentService.js
  */
 
 import axios from "axios";
