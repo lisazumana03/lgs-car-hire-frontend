@@ -47,7 +47,7 @@ export default function BookingComponent(){
                     <h3>Manage All Bookings</h3>
                     <p>Admin view to manage all bookings in the system.</p>
                     <Link
-                        to="/booking-list"
+                        to="/booking-history"
                         className="booking-btn tertiary"
                     >
                         Manage Bookings
