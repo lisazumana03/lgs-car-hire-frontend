@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { createNotification, getAllNotifications, updateNotification, deleteNotification } from '../../scripts/notificationApi.js';
 import '../../assets/styling/Notification.css';
 
-function Message() {
+function Message({ user }) {
   const [formData, setFormData] = useState({
     message: '',
     status: 'PENDING',
-    userId: 1,
-    userName: 'Test User'
+    userId: user?.id || '',
+    userName: user?.name || ''
   });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -20,6 +20,17 @@ function Message() {
       fetchNotifications();
     }
   }, [viewMode]);
+
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        userId: user.id || '',
+        userName: user.name || ''
+      }));
+    }
+  }, [user]);
 
   const fetchNotifications = async () => {
     try {
@@ -36,14 +47,37 @@ function Message() {
     setLoading(true);
     setResult(null);
 
+    // Validate required fields
+    if (!formData.message.trim()) {
+      setResult({ success: false, error: "Message is required" });
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.userId) {
+      setResult({ success: false, error: "User ID is required. Please make sure you are logged in." });
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.userName) {
+      setResult({ success: false, error: "User name is required. Please make sure you are logged in." });
+      setLoading(false);
+      return;
+    }
+
     try {
       const notificationData = {
-        message: formData.message,
+        message: formData.message.trim(),
         status: formData.status,
         userId: formData.userId,
         userName: formData.userName,
         dateSent: new Date().toISOString().split('T')[0] // Format as YYYY-MM-DD
       };
+
+      console.log("Form data being sent:", formData);
+      console.log("Notification data being created:", notificationData);
+      console.log("Current user:", user);
 
       let response;
       if (editingId) {
@@ -54,7 +88,7 @@ function Message() {
       }
       
       setResult({ success: true, data: response });
-      setFormData({ message: '', status: 'PENDING', userId: 1, userName: 'Test User' });
+      setFormData({ message: '', status: 'PENDING', userId: user?.id || '', userName: user?.name || '' });
       
       // Refresh the list if in view mode
       if (viewMode === 'view') {
@@ -99,7 +133,7 @@ function Message() {
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setFormData({ message: '', status: 'PENDING', userId: 1, userName: 'Test User' });
+    setFormData({ message: '', status: 'PENDING', userId: user?.id || '', userName: user?.name || '' });
   };
 
   const getStatusColor = (status) => {
@@ -179,9 +213,9 @@ function Message() {
                 type="number"
                 name="userId"
                 value={formData.userId}
-                onChange={handleChange}
-                required
-                min="1"
+                readOnly
+                className="readonly-field"
+                title="User ID is automatically set from your login"
               />
             </div>
 
@@ -191,9 +225,9 @@ function Message() {
                 type="text"
                 name="userName"
                 value={formData.userName}
-                onChange={handleChange}
-                required
-                placeholder="Enter user name..."
+                readOnly
+                className="readonly-field"
+                title="User name is automatically set from your login"
               />
             </div>
 

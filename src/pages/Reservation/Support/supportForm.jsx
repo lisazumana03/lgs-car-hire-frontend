@@ -1,10 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { create } from "../../../services/supportService";
 
-function SupportTicketForm() {
+function SupportTicketForm({ user }) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ subject: "", message: "" });
+  const [form, setForm] = useState({ 
+    subject: "", 
+    message: "",
+    userId: user?.id || '',
+    userName: user?.name || ''
+  });
+
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        userId: user.id || '',
+        userName: user.name || ''
+      }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -43,9 +59,21 @@ function SupportTicketForm() {
           </svg>
         </div>
 
-        <h3 className="text-3xl font-extrabold text-green-700 mb-8 text-center drop-shadow">
+        <h3 className="text-3xl font-extrabold text-green-700 mb-4 text-center drop-shadow">
           Submit a Support Ticket
         </h3>
+        
+        {/* User Information Display */}
+        {user && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <h4 className="text-lg font-semibold text-blue-800 mb-2">User Information</h4>
+            <div className="text-sm text-blue-700">
+              <p><strong>Name:</strong> {user.name || 'Not available'}</p>
+              <p><strong>User ID:</strong> {user.id || 'Not available'}</p>
+              <p><strong>Email:</strong> {user.email || 'Not available'}</p>
+            </div>
+          </div>
+        )}
 
         {/* FORM */}
         <form onSubmit={handleSubmit}>

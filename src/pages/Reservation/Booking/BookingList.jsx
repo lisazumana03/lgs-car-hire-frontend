@@ -72,7 +72,7 @@ function BookingList() {
             endDate: booking.endDate || "",
             pickupLocation: booking.pickupLocation || "",
             dropOffLocation: booking.dropOffLocation || "",
-            bookingStatus: booking.bookingStatus || "pending"
+            bookingStatus: booking.bookingStatus || "PENDING"
         });
     };
 
@@ -171,9 +171,9 @@ function BookingList() {
                                                     onChange={handleEditChange}
                                                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
                                                 >
-                                                    <option value="confirmed">Confirmed</option>
-                                                    <option value="pending">Pending</option>
-                                                    <option value="cancelled">Cancelled</option>
+                                                    <option value="CONFIRMED">Confirmed</option>
+                                                    <option value="PENDING">Pending</option>
+                                                    <option value="CANCELLED">Cancelled</option>
                                                 </select>
                                             </div>
                                             <div>

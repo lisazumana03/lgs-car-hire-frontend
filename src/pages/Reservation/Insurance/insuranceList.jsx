@@ -5,7 +5,7 @@ Date: 31/08/2025
  */
 
 import { useEffect, useState } from "react";
-import { getAllInsurance } from "../../services/insuranceService";
+import { getAllInsurance } from "../../../services/insuranceService";
 
 function InsuranceList() {
   const [records, setRecords] = useState([]);

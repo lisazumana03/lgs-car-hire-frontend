@@ -47,18 +47,41 @@ export async function getNotificationById(id) {
 
 export async function createNotification(notificationData) {
   try {
+    console.log("Creating notification with data:", notificationData);
+    console.log("API URL:", `${NOTIFICATION_API_URL}`);
+
     const response = await fetch(`${NOTIFICATION_API_URL}`, {
       method: "POST",
       headers: DEFAULT_HEADERS,
       body: JSON.stringify(notificationData),
     });
 
+    console.log("Response status:", response.status);
+    console.log("Response ok:", response.ok);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to create notification");
+      let errorData;
+      try {
+        errorData = await response.json();
+        console.log("Error response data:", errorData);
+      } catch (parseError) {
+        console.log("Could not parse error response as JSON");
+        const textError = await response.text();
+        console.log("Error response text:", textError);
+        throw new Error(
+          `HTTP ${response.status}: ${
+            textError || "Failed to create notification"
+          }`
+        );
+      }
+      throw new Error(
+        errorData.message ||
+          `HTTP ${response.status}: Failed to create notification`
+      );
     }
 
     const data = await response.json();
+    console.log("Success response:", data);
     return data;
   } catch (error) {
     console.error("Create notification error:", error);
