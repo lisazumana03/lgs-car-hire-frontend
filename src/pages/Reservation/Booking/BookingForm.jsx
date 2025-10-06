@@ -7,21 +7,36 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
+import NotificationService from "../../../services/notificationService";
+import LocationPicker from "../Location/LocationPicker";
 
-function BookingForm() {
+function BookingForm({ user }) {
     const navigate = useNavigate();
     const location = useLocation();
     const selectedCar = location.state?.selectedCar;
     
     const [form, setForm] = useState({
-        cars: [selectedCar?.carID || ""],
+        userId: user?.id || 1, // Default to user ID 1 for testing
+        carIds: selectedCar?.carID ? [selectedCar.carID] : [],
         bookingDateAndTime: "",
         startDate: "",
         endDate: "",
         pickupLocation: "",
         dropOffLocation: "",
-        bookingStatus: "pending"
+        bookingStatus: "PENDING"
     });
+    
+    // Check if locations were passed from maps page
+    useEffect(() => {
+        if (location.state?.locations) {
+            const { locations } = location.state;
+            setForm(prev => ({
+                ...prev,
+                pickupLocation: locations.pickupLocation || prev.pickupLocation,
+                dropOffLocation: locations.dropoffLocation || prev.dropOffLocation
+            }));
+        }
+    }, [location.state]);
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
     const [cars, setCars] = useState([]);
@@ -49,8 +64,8 @@ function BookingForm() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === "cars") {
-            setForm((prev) => ({ ...prev, cars: [value] }));
+        if (name === "carIds") {
+            setForm((prev) => ({ ...prev, carIds: value ? [value] : [] }));
         } else {
             setForm((prev) => ({ ...prev, [name]: value }));
         }
@@ -61,21 +76,57 @@ function BookingForm() {
         setMessage("");
         setMessageType("");
         
-    const handleSubmit = async (error) => {
-        error.preventDefault();
+        // Validate required fields
+        // Note: userId defaults to 1 for testing if no user is logged in
+        
+        if (!form.carIds || form.carIds.length === 0 || form.carIds[0] === "") {
+            setMessage("Please select a car");
+            setMessageType("error");
+            return;
+        }
+        
+        if (!form.startDate || !form.endDate) {
+            setMessage("Start date and end date are required");
+            setMessageType("error");
+            return;
+        }
+        
+        if (!form.pickupLocation || !form.dropOffLocation) {
+            setMessage("Pickup and drop-off locations are required");
+            setMessageType("error");
+            return;
+        }
+        
         try {
+            console.log("Sending booking data:", form);
             const response = await create(form);
             console.log("Booking created:", response.data);
             setMessage("Booking created successfully!");
             setMessageType("success");
+
+            // Create notification for successful booking
+            try {
+                const bookingData = {
+                    ...response.data,
+                    car: selectedCar,
+                    startDate: form.startDate,
+                    endDate: form.endDate
+                };
+                await NotificationService.createBookingNotification(user, bookingData, 'BOOKED');
+                console.log("Booking notification created successfully");
+            } catch (notificationError) {
+                console.error("Failed to create booking notification:", notificationError);
+                // Don't fail the booking if notification fails
+            }
             setForm({
-                cars: [""],
+                userId: user?.id || 1,
+                carIds: [],
                 bookingDateAndTime: "",
                 startDate: "",
                 endDate: "",
                 pickupLocation: "",
                 dropOffLocation: "",
-                bookingStatus: "pending"
+                bookingStatus: "PENDING"
             });
             
             // Redirect to payment after successful creation with booking data
@@ -101,7 +152,7 @@ function BookingForm() {
                             bookingDateAndTime: form.bookingDateAndTime,
                             startDate: form.startDate,
                             endDate: form.endDate,
-                            bookingStatus: "pending",
+                            bookingStatus: "PENDING",
                             car: selectedCar,
                             totalAmount: calculateTotalAmount()
                         }
@@ -123,8 +174,6 @@ function BookingForm() {
             }
             
             setMessage(errorMessage);
-        } catch (error) {
-            setMessage("Error creating booking.");
             setMessageType("error");
         }
     };
@@ -182,19 +231,25 @@ function BookingForm() {
                         <input type="datetime-local" name="endDate" value={form.endDate} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"/>
                     </div>
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Pick-up Location *</label>
-                        <input type="text" name="pickupLocation" value={form.pickupLocation} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none" placeholder="Enter pickup location"/>
+                        <LocationPicker
+                            onLocationSelect={(location) => setForm(prev => ({ ...prev, pickupLocation: location }))}
+                            selectedLocation={form.pickupLocation}
+                            placeholder="Pick-up Location"
+                        />
                     </div>
                     <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Drop-off Location *</label>
-                        <input type="text" name="dropOffLocation" value={form.dropOffLocation} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none" placeholder="Enter drop-off location"/>
+                        <LocationPicker
+                            onLocationSelect={(location) => setForm(prev => ({ ...prev, dropOffLocation: location }))}
+                            selectedLocation={form.dropOffLocation}
+                            placeholder="Drop-off Location"
+                        />
                     </div>
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Booking Status *</label>
                         <select name="bookingStatus" value={form.bookingStatus} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none">
-                            <option value="confirmed">Confirmed</option>
-                            <option value="pending">Pending</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="CONFIRMED">Confirmed</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="CANCELLED">Cancelled</option>
                         </select>
                     </div>
                     <div style={{display: "flex", marginTop: "20px", gap: "10px"}}>
@@ -204,13 +259,14 @@ function BookingForm() {
                         <button type="reset"
                                 style={{backgroundColor: "#003ffa"}}
                                 className="submit-btn" onClick={() => setForm({
-                            cars: [""],
+                            userId: user?.id || 1,
+                            carIds: [],
                             bookingDateAndTime: "",
                             startDate: "",
                             endDate: "",
                             pickupLocation: "",
                             dropOffLocation: "",
-                            bookingStatus: "pending"
+                            bookingStatus: "PENDING"
                         })}>Reset</button>
                         <button type="button"
                                 style={{backgroundColor: "#ff0000"}}

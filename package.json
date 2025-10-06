@@ -24,6 +24,8 @@
     "clean": "rimraf node_modules package-lock.json"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^2.0.1",
+    "@googlemaps/react-wrapper": "^1.2.0",
     "axios": "^1.11.0",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",

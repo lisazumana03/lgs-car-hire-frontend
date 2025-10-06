@@ -5,7 +5,7 @@ Date: 31/08/2025
  */
 
 import { useEffect, useState } from "react";
-import { getAllMaintenance } from "../../services/maintenanceService";
+import { getAllMaintenance } from "../../../services/maintenanceService";
 
 function MaintenanceList() {
   const [records, setRecords] = useState([]);
