@@ -10,7 +10,6 @@ import {
   readInsurance,
   updateInsurance,
   deleteInsurance,
-  cancelInsurance,
 } from "../../../services/insuranceService";
 
 function InsuranceForm({ user }) {
@@ -52,7 +51,18 @@ function InsuranceForm({ user }) {
   const onCreate = async (e) => {
     e.preventDefault();
     try {
-      await createInsurance(form);
+      // Only send fields that the backend expects
+      const insuranceData = {
+        insuranceStartDate: form.insuranceStartDate,
+        insuranceCost: parseFloat(form.insuranceCost),
+        insuranceProvider: form.insuranceProvider,
+        status: form.status,
+        policyNumber: parseInt(form.policyNumber),
+        mechanic: form.mechanic,
+        carId: parseInt(form.carId)
+      };
+      
+      await createInsurance(insuranceData);
       msg("Insurance created successfully");
       setForm({
         insuranceID: "",
@@ -63,8 +73,11 @@ function InsuranceForm({ user }) {
         policyNumber: "",
         mechanic: "",
         carId: "",
+        userId: user?.id || '',
+        userName: user?.name || ''
       });
-    } catch {
+    } catch (error) {
+      console.error("Insurance creation error:", error);
       msg("Insurance creation failed");
     }
   };
@@ -91,10 +104,23 @@ function InsuranceForm({ user }) {
   };
 
   const onUpdate = async () => {
+    if (!form.insuranceID) return msg("Please enter insurance ID to update");
     try {
-      await updateInsurance(form);
+      // Only send fields that the backend expects
+      const insuranceData = {
+        insuranceStartDate: form.insuranceStartDate,
+        insuranceCost: parseFloat(form.insuranceCost),
+        insuranceProvider: form.insuranceProvider,
+        status: form.status,
+        policyNumber: parseInt(form.policyNumber),
+        mechanic: form.mechanic,
+        carId: parseInt(form.carId)
+      };
+      
+      await updateInsurance(form.insuranceID, insuranceData);
       msg("Insurance updated");
-    } catch {
+    } catch (error) {
+      console.error("Insurance update error:", error);
       msg("Insurance update failed");
     }
   };
@@ -109,12 +135,29 @@ function InsuranceForm({ user }) {
     }
   };
 
+  const resetForm = () => {
+    setForm({
+      insuranceID: "",
+      insuranceStartDate: "",
+      insuranceCost: "",
+      insuranceProvider: "",
+      status: "",
+      policyNumber: "",
+      mechanic: "",
+      carId: "",
+      userId: user?.id || '',
+      userName: user?.name || ''
+    });
+  };
+
   const onCancel = async () => {
     if (!form.insuranceID) return msg("Please enter insurance ID to cancel");
     try {
-      await cancelInsurance(form.insuranceID);
+      await deleteInsurance(form.insuranceID);
       msg("Insurance cancelled");
-    } catch {
+      resetForm();
+    } catch (error) {
+      console.error("Insurance cancellation error:", error);
       msg("Insurance cancellation failed");
     }
   };

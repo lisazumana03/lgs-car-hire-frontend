@@ -98,9 +98,23 @@ function BookingForm({ user }) {
         }
         
         try {
-            console.log("Sending booking data:", form);
-            const response = await create(form);
-            console.log("Booking created:", response.data);
+            // Send data in the format backend expects
+            const bookingData = {
+                userId: form.userId,
+                carIds: form.carIds,
+                bookingDateAndTime: form.bookingDateAndTime,
+                startDate: form.startDate,
+                endDate: form.endDate,
+                pickupLocation: form.pickupLocation,
+                dropOffLocation: form.dropOffLocation,
+                bookingStatus: form.bookingStatus || "PENDING"
+            };
+            
+            console.log("Sending booking data:", bookingData);
+            const response = await create(bookingData);
+            console.log("Booking created - full response:", response);
+            console.log("Booking response data:", response.data);
+            console.log("Booking ID from response:", response.data?.bookingID);
             setMessage("Booking created successfully!");
             setMessageType("success");
 
@@ -145,25 +159,36 @@ function BookingForm({ user }) {
             };
 
             setTimeout(() => {
+                const bookingID = response.data?.bookingID;
+                console.log("Navigating to payment with booking ID:", bookingID);
+                
                 navigate("/payment", {
                     state: { 
                         booking: {
-                            bookingID: response.data?.bookingID,
+                            bookingID: bookingID,
                             bookingDateAndTime: form.bookingDateAndTime,
                             startDate: form.startDate,
                             endDate: form.endDate,
                             bookingStatus: "PENDING",
                             car: selectedCar,
-                            totalAmount: calculateTotalAmount()
+                            totalAmount: calculateTotalAmount(),
+                            userId: form.userId // Pass user ID to payment page
                         }
                     }
                 });
             }, 2000);
         } catch (err) {
             console.error("Error creating booking:", err);
+            console.error("Error response:", JSON.stringify(err.response?.data, null, 2));
+            console.error("Error status:", err.response?.status);
+            console.error("Form data that was sent:", JSON.stringify(form, null, 2));
+            console.error("Booking data that was sent:", JSON.stringify(bookingData, null, 2));
+            
             let errorMessage = "Error creating booking.";
             
-            if (err.response?.status === 404) {
+            if (err.response?.status === 400) {
+                errorMessage = "Invalid booking data: " + (err.response?.data?.message || err.response?.data || "Please check all required fields");
+            } else if (err.response?.status === 404) {
                 errorMessage = "Booking endpoint not found. Please check if the backend is running correctly.";
             } else if (err.response?.status === 500) {
                 errorMessage = "Server error. Please try again later.";

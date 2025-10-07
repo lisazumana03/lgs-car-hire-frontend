@@ -5,17 +5,17 @@
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3045/api";
+const API_URL = "http://localhost:3045";
 
 const paymentService = {
   // Verify payment with backend (after Paystack success)
   verify: async (reference, bookingId, amount) => {
     try {
-      const response = await axios.post(`${API_URL}/payments/verify`, {
-        reference,
+      const response = await axios.post(`${API_URL}/payment/verify`, {
         bookingId,
         amount,
         paymentMethod: "PAYSTACK",
+        reference,
       });
       return response.data;
     } catch (error) {

@@ -1,334 +1,213 @@
-import React, { useState, useEffect } from 'react';
-import { createNotification, getAllNotifications, updateNotification, deleteNotification } from '../../scripts/notificationApi.js';
-import '../../assets/styling/Notification.css';
+import { useState, useEffect } from 'react';
+import NotificationService from '../../services/notificationService'; // Import notification service
+import '../../assets/styling/Notification.css'; // Import notification styles
 
-function Message({ user }) {
-  const [formData, setFormData] = useState({
-    message: '',
-    status: 'PENDING',
-    userId: user?.id || '',
-    userName: user?.name || ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-  const [viewMode, setViewMode] = useState('create'); // 'create' or 'view'
-  const [editingId, setEditingId] = useState(null);
+export default function CreateNotification() { // Define the CreateNotification component as default export
+    // State for current logged-in user
+    const [currentUser, setCurrentUser] = useState(null);
 
-  useEffect(() => {
-    if (viewMode === 'view') {
-      fetchNotifications();
-    }
-  }, [viewMode]);
-
-  // Update form data when user changes
-  useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        userId: user.id || '',
-        userName: user.name || ''
-      }));
-    }
-  }, [user]);
-
-  const fetchNotifications = async () => {
-    try {
-      const data = await getAllNotifications();
-      setNotifications(data);
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
-      setResult({ success: false, error: 'Failed to fetch notifications' });
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
-
-    // Validate required fields
-    if (!formData.message.trim()) {
-      setResult({ success: false, error: "Message is required" });
-      setLoading(false);
-      return;
-    }
-
-    if (!formData.userId) {
-      setResult({ success: false, error: "User ID is required. Please make sure you are logged in." });
-      setLoading(false);
-      return;
-    }
-
-    if (!formData.userName) {
-      setResult({ success: false, error: "User name is required. Please make sure you are logged in." });
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const notificationData = {
-        message: formData.message.trim(),
-        status: formData.status,
-        userId: formData.userId,
-        userName: formData.userName,
-        dateSent: new Date().toISOString().split('T')[0] // Format as YYYY-MM-DD
-      };
-
-      console.log("Form data being sent:", formData);
-      console.log("Notification data being created:", notificationData);
-      console.log("Current user:", user);
-
-      let response;
-      if (editingId) {
-        response = await updateNotification(editingId, notificationData);
-        setEditingId(null);
-      } else {
-        response = await createNotification(notificationData);
-      }
-      
-      setResult({ success: true, data: response });
-      setFormData({ message: '', status: 'PENDING', userId: user?.id || '', userName: user?.name || '' });
-      
-      // Refresh the list if in view mode
-      if (viewMode === 'view') {
-        fetchNotifications();
-      }
-    } catch (error) {
-      setResult({ success: false, error: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+    // Initialize form state with empty values
+    const [formData, setFormData] = useState({
+        userId: '', // Target user ID
+        message: '' // Notification message
     });
-  };
 
-  const handleEdit = (notification) => {
-    setFormData({
-      message: notification.message,
-      status: notification.status,
-      userId: notification.userId,
-      userName: notification.userName
-    });
-    setEditingId(notification.notificationID);
-    setViewMode('create');
-  };
+    // State for form submission
+    const [loading, setLoading] = useState(false); // Loading state for form submission
+    const [message, setMessage] = useState(''); // Success/error message
+    const [messageType, setMessageType] = useState(''); // Message type (success/error)
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this notification?')) {
-      try {
-        await deleteNotification(id);
-        setResult({ success: true, data: { message: 'Notification deleted successfully' } });
-        fetchNotifications();
-      } catch (error) {
-        setResult({ success: false, error: error.message });
-      }
-    }
-  };
+    // Get current user on component mount
+    useEffect(() => {
+        const userStr = sessionStorage.getItem("user") || localStorage.getItem("user");
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                setCurrentUser(user);
+            } catch (error) {
+                console.error("Error parsing user from session:", error);
+            }
+        }
+    }, []);
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setFormData({ message: '', status: 'PENDING', userId: user?.id || '', userName: user?.name || '' });
-  };
+    // Function to handle input changes in the form
+    const handleChange = (e) => {
+        setFormData({
+            ...formData, // Keep existing form data
+            [e.target.name]: e.target.value // Update the specific field that changed
+        });
+    };
 
-  const getStatusColor = (status) => {
-    switch (status?.toUpperCase()) {
-      case 'BOOKED':
-      case 'COMPLETED':
-        return '#4ade80';
-      case 'PENDING':
-        return '#fbbf24';
-      case 'CANCELLED':
-        return '#ef4444';
-      default:
-        return '#6b7280';
-    }
-  };
+    // Function to handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Prevent default form submission behavior
+        setLoading(true); // Set loading state to true
+        setMessage(''); // Clear previous messages
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+        try {
+            // Validate form data
+            if (!formData.userId || !formData.message) {
+                throw new Error('Please fill in all required fields'); // Throw error if fields are empty
+            }
 
-  return (
-    <div className="notifications-container">
-      <div className="notifications-header">
-        <h1>Notification Management</h1>
-        <div className="header-actions">
-          <button 
-            onClick={() => setViewMode('create')}
-            className={`mode-btn ${viewMode === 'create' ? 'active' : ''}`}
-          >
-            Create Notification
-          </button>
-          <button 
-            onClick={() => setViewMode('view')}
-            className={`mode-btn ${viewMode === 'view' ? 'active' : ''}`}
-          >
-            View All Notifications
-          </button>
-        </div>
-      </div>
-      
-      {viewMode === 'create' && (
-        <div className="notification-form">
-          <h2>{editingId ? 'Edit Notification' : 'Create New Notification'}</h2>
-          
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Message:</label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows="3"
-                placeholder="Enter notification message..."
-              />
+            // Create notification data matching backend DTO structure
+            const notificationData = {
+                userId: parseInt(formData.userId), // Convert userId to integer
+                message: formData.message.trim() // Trim whitespace from message
+            };
+
+            // Call the notification service to create notification
+            const response = await NotificationService.createNotification(notificationData);
+            
+            // Show success message
+            setMessage('Notification sent successfully!'); // Set success message
+            setMessageType('success'); // Set message type to success
+            
+            // Reset form after successful submission
+            setFormData({
+                userId: '',
+                message: ''
+            });
+
+        } catch (error) {
+            console.error('Error creating notification:', error); // Log error for debugging
+            
+            // Extract detailed error message
+            let errorMessage = 'Failed to send notification. Please try again.';
+            if (error.response) {
+                // Server responded with error
+                errorMessage = error.response.data?.message || error.response.data?.error || `Server error: ${error.response.status}`;
+            } else if (error.request) {
+                // Request was made but no response
+                errorMessage = 'Cannot connect to server. Please check if the backend is running on port 3045.';
+            } else {
+                // Something else happened
+                errorMessage = error.message;
+            }
+            
+            setMessage(errorMessage); // Set error message
+            setMessageType('error'); // Set message type to error
+        } finally {
+            setLoading(false); // Set loading state to false
+        }
+    };
+
+    return (
+        <>
+            <div className="create-notification-container">
+                {/* Page header */}
+                <section className="notification-header">
+                    <h1 className="notification-title">Send Notification</h1> {/* Page title */}
+                    <p className="notification-subtitle">Create and send notifications to users</p> {/* Page subtitle */}
+                    {currentUser && (
+                        <div className="user-info-banner" style={{
+                            padding: '15px',
+                            backgroundColor: 'transparent',
+                            borderRadius: '8px',
+                            marginTop: '15px',
+                            border: '1px solid #555'
+                        }}>
+                            <p className="user-info" style={{ margin: 0, color: 'white' }}>
+                                <strong>Logged in as:</strong> {currentUser.name || currentUser.email} 
+                                {currentUser.role && <span className="user-role"> ({currentUser.role})</span>}
+                                <span className="user-id" style={{ color: 'white', fontWeight: 'bold' }}> | User ID: {
+                                console.log("User object in message:", currentUser) ||
+                                console.log("User properties:", Object.keys(currentUser)) ||
+                                    (currentUser.id || currentUser.userID || currentUser.userId || currentUser.ID || 'N/A')
+                                }</span>
+                            </p>
+                        </div>
+                    )}
+                </section>
+
+                {/* Notification form */}
+                <section className="notification-form-section">
+                    <div className="form-container">
+                        <h2 className="form-title">Create New Notification</h2> {/* Form title */}
+                        
+                        <form className="notification-form" onSubmit={handleSubmit} autoComplete="off">
+                            {/* User ID input field */}
+                            <div className="form-group">
+                                <label htmlFor="userId" className="form-label">
+                                    Target User ID <span className="required">*</span> {/* Required field indicator */}
+                                </label>
+                                <input
+                                    type="number"
+                                    id="userId"
+                                    name="userId"
+                                    value={formData.userId}
+                                    onChange={handleChange}
+                                    className="form-input"
+                                    placeholder="Enter user ID to send notification to"
+                                    autoComplete="off"
+                                    required
+                                    min="1"
+                                />
+                                <small className="form-help">
+                                    Enter the ID of the user who should receive this notification
+                                </small>
+                            </div>
+
+                            {/* Message textarea field */}
+                            <div className="form-group">
+                                <label htmlFor="message" className="form-label">
+                                    Notification Message <span className="required">*</span> {/* Required field indicator */}
+                                </label>
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    className="form-textarea"
+                                    placeholder="Enter your notification message here..."
+                                    autoComplete="off"
+                                    rows="5"
+                                    required
+                                    maxLength="500"
+                                />
+                                <small className="form-help">
+                                    Maximum 500 characters. Be clear and concise in your message.
+                                </small>
+                            </div>
+
+                            {/* Submit button */}
+                            <button 
+                                type="submit" 
+                                className="submit-btn"
+                                disabled={loading} // Disable button while loading
+                            >
+                                {loading ? 'Sending...' : 'Send Notification'} {/* Show loading text or normal text */}
+                            </button>
+                        </form>
+
+                        {/* Success/Error message display */}
+                        {message && (
+                            <div className={`message ${messageType}`}>
+                                {message} {/* Display success or error message */}
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* Information section */}
+                <section className="notification-info">
+                    <h3 className="info-title">Notification Guidelines</h3> {/* Info section title */}
+                    <div className="info-content">
+                        <div className="info-item">
+                            <h4>User ID</h4> {/* Info item title */}
+                            <p>Make sure you have the correct user ID before sending the notification.</p> {/* Info item description */}
+                        </div>
+                        <div className="info-item">
+                            <h4>Message Content</h4> {/* Info item title */}
+                            <p>Keep messages clear, professional, and relevant to the user's booking or account.</p> {/* Info item description */}
+                        </div>
+                        <div className="info-item">
+                            <h4>Delivery</h4> {/* Info item title */}
+                            <p>Notifications are delivered immediately and will appear in the user's notification center.</p> {/* Info item description */}
+                        </div>
+                    </div>
+                </section>
             </div>
-
-            <div className="form-group">
-              <label>Status:</label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-              >
-                <option value="PENDING">Pending</option>
-                <option value="BOOKED">Booked</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="CANCELLED">Cancelled</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>User ID:</label>
-              <input
-                type="number"
-                name="userId"
-                value={formData.userId}
-                readOnly
-                className="readonly-field"
-                title="User ID is automatically set from your login"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>User Name:</label>
-              <input
-                type="text"
-                name="userName"
-                value={formData.userName}
-                readOnly
-                className="readonly-field"
-                title="User name is automatically set from your login"
-              />
-            </div>
-
-            <div className="form-actions">
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary"
-              >
-                {loading ? 'Saving...' : (editingId ? 'Update Notification' : 'Create Notification')}
-              </button>
-              
-              {editingId && (
-                <button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  className="btn-secondary"
-                >
-                  Cancel Edit
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-      )}
-
-      {viewMode === 'view' && (
-        <div className="notifications-list">
-          <div className="list-header">
-            <h2>All Notifications ({notifications.length})</h2>
-            <button onClick={fetchNotifications} className="refresh-btn">
-              🔄 Refresh
-            </button>
-          </div>
-          
-          {notifications.length === 0 ? (
-            <div className="no-notifications">
-              <h3>No notifications found</h3>
-              <p>Create your first notification using the "Create Notification" tab.</p>
-            </div>
-          ) : (
-            notifications.map((notification) => (
-              <div key={notification.notificationID} className="notification-card">
-                <div className="notification-content">
-                  <h3 className="notification-title">
-                    Notification #{notification.notificationID}
-                  </h3>
-                  <p className="notification-message">
-                    {notification.message || 'No message'}
-                  </p>
-                  <div className="notification-meta">
-                    <span className="notification-time">
-                      {formatDate(notification.dateSent)}
-                    </span>
-                    <span className="notification-user">
-                      From: {notification.userName} (ID: {notification.userId})
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="notification-actions">
-                  <span 
-                    className="status-badge"
-                    style={{ backgroundColor: getStatusColor(notification.status) }}
-                  >
-                    {notification.status}
-                  </span>
-                  <button
-                    onClick={() => handleEdit(notification)}
-                    className="btn-edit"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(notification.notificationID)}
-                    className="btn-delete"
-                  >
-                    🗑️ Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {result && (
-        <div className={`result-banner ${result.success ? 'success' : 'error'}`}>
-          {result.success ? (
-            <div>
-              <strong>Success!</strong> {result.data.message || 'Operation completed successfully'}
-            </div>
-          ) : (
-            <div>
-              <strong>Error:</strong> {result.error}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+        </>
+    );
 }
-
-export default Message;

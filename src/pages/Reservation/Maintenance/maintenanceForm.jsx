@@ -10,7 +10,6 @@ import {
   readMaintenance,
   updateMaintenance,
   deleteMaintenance,
-  cancelMaintenance,
 } from "../../../services/maintenanceService";
 
 function MaintenanceForm({ user }) {
@@ -109,8 +108,9 @@ function MaintenanceForm({ user }) {
   const onCancel = async () => {
     if (!form.maintenanceID) return msg("Please enter maintenance ID to cancel");
     try {
-      await cancelMaintenance(form.maintenanceID);
+      await deleteMaintenance(form.maintenanceID);
       msg("Maintenance cancelled");
+      resetForm();
     } catch {
       msg("Maintenance cancellation failed");
     }

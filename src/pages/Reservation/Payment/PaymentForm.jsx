@@ -86,10 +86,18 @@ const PaymentForm = ({ user }) => {
             // Calculate the correct amount
             const paymentAmount = selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500;
             const bookingId = selectedBooking?.bookingID || selectedBooking?.id;
+            
+            // Get user ID from multiple possible sources
+            const userId = user?.id || user?.userID || user?.userId || 
+                          selectedBooking?.user?.userId || selectedBooking?.user?.id ||
+                          selectedBooking?.userId;
 
             console.log("Payment verification data:", {
                 amount: paymentAmount,
                 bookingId: bookingId,
+                userId: userId,
+                user: user,
+                selectedBooking: selectedBooking,
                 reference: response.reference,
                 paymentMethod: "PAYSTACK"
             });
@@ -101,8 +109,17 @@ const PaymentForm = ({ user }) => {
                 
                 // Create notification for successful payment
                 try {
-                    await NotificationService.createPaymentNotification(user, selectedBooking, 'COMPLETED');
-                    console.log("Payment notification created successfully");
+                    if (userId && bookingId) {
+                        await NotificationService.createPaymentNotification(
+                            userId, 
+                            bookingId, 
+                            paymentAmount,
+                            'COMPLETED'
+                        );
+                        console.log("Payment notification created successfully");
+                    } else {
+                        console.warn("Skipping notification - missing userId or bookingId:", { userId, bookingId });
+                    }
                 } catch (notificationError) {
                     console.error("Failed to create payment notification:", notificationError);
                     // Don't fail the payment if notification fails
