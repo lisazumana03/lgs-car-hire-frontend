@@ -1,108 +1,81 @@
-import { API_BASE_URL, DEFAULT_HEADERS } from "./apiConfig.js";
+import axios from "axios";
+import { API_BASE_URL } from "./apiConfig.js";
 
-// User Authentication API Functions
+// User Authentication API Functions using Axios
 
 export async function loginUser(email, password) {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
-      method: "POST",
-      headers: DEFAULT_HEADERS,
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
+    const response = await axios.post(`${API_BASE_URL}/users/login`, {
+      email: email,
+      password: password,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Login failed");
-    }
-
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
     console.error("Login error:", error);
-    throw error;
+    throw new Error(error.response?.data?.message || "Login failed");
   }
 }
 
 export async function registerUser(userData) {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/signup`, {
-      method: "POST",
-      headers: DEFAULT_HEADERS,
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Registration failed");
-    }
-
-    const data = await response.json();
-    return data;
+    const response = await axios.post(`${API_BASE_URL}/users/signup`, userData);
+    return response.data;
   } catch (error) {
     console.error("Registration error:", error);
-    throw error;
+    throw new Error(error.response?.data?.message || "Registration failed");
   }
 }
 
 export async function getUserProfile(userId) {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-      method: "GET",
-      headers: DEFAULT_HEADERS,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to fetch profile");
-    }
-
-    const data = await response.json();
-    return data;
+    const response = await axios.get(`${API_BASE_URL}/users/${userId}`);
+    return response.data;
   } catch (error) {
     console.error("Get profile error:", error);
-    throw error;
+    throw new Error(error.response?.data?.message || "Failed to fetch profile");
   }
 }
 
 export async function updateUserProfile(userId, profileData) {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-      method: "PUT",
-      headers: DEFAULT_HEADERS,
-      body: JSON.stringify(profileData),
-    });
+    console.log("Updating user profile...");
+    console.log("User ID:", userId);
+    console.log("Profile data being sent:", profileData);
+    console.log("API URL:", `${API_BASE_URL}/users/${userId}`);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to update profile");
-    }
+    const response = await axios.put(
+      `${API_BASE_URL}/users/${userId}`,
+      profileData
+    );
 
-    const data = await response.json();
-    return data;
+    console.log("Profile update response:", response.data);
+    return response.data;
   } catch (error) {
     console.error("Update profile error:", error);
-    throw error;
+    console.error("Error response data:", error.response?.data);
+    console.error("Error status:", error.response?.status);
+    throw new Error(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to update profile"
+    );
   }
 }
 
 export async function logoutUser() {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/logout`, {
-      method: "POST",
-      headers: DEFAULT_HEADERS,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Logout failed");
-    }
-
-    return true;
+    const response = await axios.post(`${API_BASE_URL}/users/logout`);
+    return response.data || true;
   } catch (error) {
     console.error("Logout error:", error);
-    throw error;
+    throw new Error(error.response?.data?.message || "Logout failed");
   }
 }
+
+export default {
+  loginUser,
+  registerUser,
+  getUserProfile,
+  updateUserProfile,
+  logoutUser,
+};

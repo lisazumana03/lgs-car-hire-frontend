@@ -34,7 +34,12 @@ function MapsPage() {
 
     const handleSaveLocations = () => {
         if (!pickupLocation || !dropoffLocation) {
-            alert('Please select both pickup and drop-off locations');
+            alert('Please enter both pickup and drop-off locations');
+            return;
+        }
+
+        if (!pickupCoords || !dropoffCoords) {
+            alert('Please select valid locations from the suggestions');
             return;
         }
 
@@ -92,8 +97,8 @@ function MapsPage() {
                             <GoogleMaps
                                 onPickupSelect={handlePickupSelect}
                                 onDropoffSelect={handleDropoffSelect}
-                                pickupLocation={pickupCoords}
-                                dropoffLocation={dropoffCoords}
+                                initialPickup={pickupLocation}
+                                initialDropoff={dropoffLocation}
                             />
                         </div>
 

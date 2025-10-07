@@ -75,32 +75,44 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   const handleLogin = async (userData) => {
-    console.log('🔐 Login received userData:', userData);
-    console.log('🆔 User ID in login response:', userData.id);
+    console.log('Login received userData:', userData);
+    console.log('User ID in login response:', userData.id);
+    console.log('All user data properties:', Object.keys(userData));
 
     setIsAuthenticated(true);
     setCurrentUser(userData);
+    
+    // Store user in both session and local storage
+    sessionStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('user', JSON.stringify(userData));
 
     // Fetch complete profile data using the user ID
     if (userData.id) {
-      console.log('📡 Fetching complete profile...');
+      console.log('Fetching complete profile...');
       try {
         const fullProfile = await getUserProfile(userData.id);
-        console.log('✅ Full profile loaded:', fullProfile);
-        console.log('🆔 User ID in profile:', fullProfile.id);
+        console.log('Full profile loaded:', fullProfile);
+        console.log('User ID in profile:', fullProfile.id);
         setCurrentUser(fullProfile); // Update with complete profile data
+        
+        // Update storage with full profile
+        sessionStorage.setItem('user', JSON.stringify(fullProfile));
+        localStorage.setItem('user', JSON.stringify(fullProfile));
       } catch (error) {
-        console.error('❌ Failed to fetch complete profile:', error);
+        console.error('Failed to fetch complete profile:', error);
         // Keep the basic user data if profile fetch fails
       }
     } else {
-      console.log('⚠️ No user ID available, skipping profile fetch');
+      console.log('No user ID available, skipping profile fetch');
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
+    // Clear user from storage
+    sessionStorage.removeItem('user');
+    localStorage.removeItem('user');
   };
 
   return (
