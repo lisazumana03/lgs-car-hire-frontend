@@ -10,9 +10,9 @@ const AppSidebar = ({ onLogout }) => {
     { path: ROUTES.BOOKINGS, icon: '📅', title: 'Bookings' },
     { path: ROUTES.CARS, icon: '🚗', title: 'Cars' },
     { path: ROUTES.LOCATIONS, icon: '📍', title: 'Locations' },
-    { path: ROUTES.PROFILE, icon: '👤', title: 'Profile' },
     { path: ROUTES.REGISTER_LOCATION, icon: '📌', title: 'Add Location' },
     { path: ROUTES.REGISTER_CAR, icon: '➕', title: 'Add Car' },
+    { path: ROUTES.PROFILE, icon: '👤', title: 'Profile' },
   ];
 
   return (
