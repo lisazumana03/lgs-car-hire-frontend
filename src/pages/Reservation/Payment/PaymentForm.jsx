@@ -78,72 +78,149 @@ const PaymentForm = () => {
         onSuccess: async (response) => {
             console.log("Payment success:", response);
 
-            // Calculate the correct amount
             const paymentAmount = selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500;
             const bookingId = selectedBooking?.bookingID || selectedBooking?.id;
 
-            console.log("Creating payment for booking:", bookingId);
-
-            // Simple payment creation - no verification needed
             try {
-                const res = await fetch("http://localhost:3045/api/payment/create-payment", {
+                // Create payment
+                const paymentRes = await fetch("http://localhost:3045/api/payment/create-payment", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        bookingId: parseInt(bookingId), // Ensure it's a number
+                        bookingId: parseInt(bookingId),
                         amount: paymentAmount,
                         paymentMethod: "PAYSTACK"
                     }),
                 });
 
-                console.log("Response status:", res.status);
+                console.log("Payment creation response status:", paymentRes.status);
 
-                // If payment is created (201) OR if there's any successful status
-                if (res.status === 201 || res.status === 200) {
+                if (paymentRes.ok) {
+                    const paymentText = await paymentRes.text();
+                    console.log("Payment creation response text:", paymentText);
+
+                    let paymentData;
                     try {
-                        const paymentData = await res.json();
-                        console.log("Payment created successfully:", paymentData);
+                        paymentData = JSON.parse(paymentText);
+                    } catch (parseError) {
+                        console.error("JSON parse error:", parseError);
+                        paymentData = {
+                            paymentID: Date.now(),
+                            status: "PAID"
+                        };
+                    }
 
-                        navigate('/payment/confirmation', {
-                            state: {
-                                payment: paymentData,
-                                booking: selectedBooking
+                    // Update payment status to PAID
+                    if (paymentData.paymentID && paymentData.paymentID > 0) {
+                        try {
+                            const updateRes = await fetch(`http://localhost:3045/api/payment/update-status/${paymentData.paymentID}/PAID`, {
+                                method: "PUT",
+                                headers: { "Content-Type": "application/json" }
+                            });
+
+                            if (updateRes.ok) {
+                                console.log("Payment status updated to PAID");
                             }
-                        });
-                    } catch (jsonError) {
-                        console.log("Payment created successfully (non-JSON response)");
-                        // Even if we can't parse JSON, proceed to confirmation
-                        navigate('/payment/confirmation', {
-                            state: {
-                                payment: { status: "success" },
-                                booking: selectedBooking
-                            }
-                        });
+                        } catch (updateError) {
+                            console.error("Status update error:", updateError);
+                        }
+
+                        // CREATE INVOICE
+                        await createInvoice(paymentData.paymentID);
+                    } else {
+                        navigate('/invoices');
                     }
                 } else {
-                    // Payment is still successful from Paystack, just show warning
-                    console.warn("Payment processed but backend response was:", res.status);
-                    navigate('/payment/confirmation', {
-                        state: {
-                            payment: { status: "processed" },
-                            booking: selectedBooking
-                        }
-                    });
+                    console.error("Payment creation failed");
+                    navigate('/invoices');
                 }
             } catch (err) {
-                console.error("Network error:", err);
-                // Even with network errors, if Paystack succeeded, payment went through
-                navigate('/payment/confirmation', {
-                    state: {
-                        payment: { status: "completed" },
-                        booking: selectedBooking
-                    }
-                });
+                console.error("Payment processing error:", err);
+                navigate('/invoices');
             }
         },
         onClose: () => {
             setMessage("Payment cancelled.");
         },
+    };
+
+    const createInvoice = async (paymentId) => {
+        try {
+            console.log("Creating invoice for payment:", paymentId);
+
+            const invoiceRes = await fetch("http://localhost:3045/api/invoice/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    paymentId: paymentId
+                }),
+            });
+
+            if (invoiceRes.ok) {
+                const invoiceData = await invoiceRes.json();
+                console.log("Invoice created successfully:", invoiceData.invoiceID);
+
+                // Wait a moment for the invoice to be fully processed
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Redirect to the new invoice
+                navigate(`/invoice/${invoiceData.invoiceID}`);
+            } else {
+                console.error("Invoice creation failed, trying to find existing invoice");
+                await redirectToInvoice(paymentId);
+            }
+        } catch (error) {
+            console.error("Error creating invoice:", error);
+            await redirectToInvoice(paymentId);
+        }
+    };
+
+    // ADD THIS HELPER FUNCTION TO PaymentForm.jsx:
+    const redirectToInvoice = async (paymentId) => {
+        try {
+            console.log("Finding invoice for payment:", paymentId);
+
+            // Wait a moment for invoice generation
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Try to get invoices by payment ID
+            const invoiceRes = await fetch(`http://localhost:3045/api/invoice/payment/${paymentId}`);
+
+            if (invoiceRes.ok) {
+                const invoices = await invoiceRes.json();
+                if (invoices.length > 0) {
+                    // Redirect to the first invoice found
+                    const invoiceId = invoices[0].invoiceID;
+                    console.log("Redirecting to invoice:", invoiceId);
+                    navigate(`/invoice/${invoiceId}`);
+                    return;
+                }
+            }
+
+            // If no invoice found by payment, try to get user invoices and find the latest
+            const userId = localStorage.getItem('userId') || '1';
+            const userInvoicesRes = await fetch(`http://localhost:3045/api/invoice/user/${userId}`);
+
+            if (userInvoicesRes.ok) {
+                const userInvoices = await userInvoicesRes.json();
+                if (userInvoices.length > 0) {
+                    // Find the most recent invoice (last in array)
+                    const latestInvoice = userInvoices[userInvoices.length - 1];
+                    console.log("Redirecting to latest invoice:", latestInvoice.invoiceID);
+                    navigate(`/invoice/${latestInvoice.invoiceID}`);
+                    return;
+                }
+            }
+
+            // Fallback: go to invoices list
+            console.log("No invoice found, redirecting to invoices list");
+            navigate('/invoices');
+
+        } catch (error) {
+            console.error("Error finding invoice:", error);
+            // Fallback: go to invoices list
+            navigate('/invoices');
+        }
     };
 
     return (
