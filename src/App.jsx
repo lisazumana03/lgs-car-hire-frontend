@@ -61,28 +61,34 @@ function App() {
           </>
         ) : (
           <>
-            <Header />
-            <main className="main-content">
-              <Routes>
-                <Route path={ROUTES.HOME} element={<Home />} />
-                <Route path={ROUTES.ABOUT} element={<About />} />
-                <Route path={ROUTES.CONTACT} element={<Contact />} />
-                <Route path={ROUTES.LOGIN} element={<LoginForm onLogin={handleLogin} />} />
-                <Route path={ROUTES.REGISTER} element={<RegistrationForm />} />
-                <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
+            <Routes>
+              <Route path={ROUTES.LOGIN} element={<LoginForm onLogin={handleLogin} />} />
 
-                {/* Protected routes - redirect to login if accessed without authentication */}
-                <Route path={ROUTES.CARS} element={<ProtectedRoute><CarList /></ProtectedRoute>} />
-                <Route path={ROUTES.LOCATIONS} element={<ProtectedRoute><LocationList /></ProtectedRoute>} />
-                <Route path={ROUTES.BOOKINGS} element={<ProtectedRoute><BookingComponent /></ProtectedRoute>} />
-                <Route path={ROUTES.MAKE_BOOKING} element={<ProtectedRoute><BookingForm user={currentUser} /></ProtectedRoute>} />
-                <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><Dashboard user={currentUser} /></ProtectedRoute>} />
-                <Route path={ROUTES.PROFILE} element={<ProtectedRoute><UserProfile user={currentUser} /></ProtectedRoute>} />
+              <Route path="*" element={
+                <>
+                  <Header />
+                  <main className="main-content">
+                    <Routes>
+                      <Route path={ROUTES.HOME} element={<Home />} />
+                      <Route path={ROUTES.ABOUT} element={<About />} />
+                      <Route path={ROUTES.CONTACT} element={<Contact />} />
+                      <Route path={ROUTES.REGISTER} element={<RegistrationForm />} />
+                      <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
 
-                <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-              </Routes>
-            </main>
-            <Footer />
+                      <Route path={ROUTES.CARS} element={<ProtectedRoute><CarList /></ProtectedRoute>} />
+                      <Route path={ROUTES.LOCATIONS} element={<ProtectedRoute><LocationList /></ProtectedRoute>} />
+                      <Route path={ROUTES.BOOKINGS} element={<ProtectedRoute><BookingComponent /></ProtectedRoute>} />
+                      <Route path={ROUTES.MAKE_BOOKING} element={<ProtectedRoute><BookingForm user={currentUser} /></ProtectedRoute>} />
+                      <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><Dashboard user={currentUser} /></ProtectedRoute>} />
+                      <Route path={ROUTES.PROFILE} element={<ProtectedRoute><UserProfile user={currentUser} /></ProtectedRoute>} />
+
+                      <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+                    </Routes>
+                  </main>
+                  <Footer />
+                </>
+              } />
+            </Routes>
           </>
         )}
       </div>
