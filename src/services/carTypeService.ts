@@ -10,7 +10,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getAuthToken } from './authService';
 import type { CarType, CarTypeRequest } from '../types';
 
-const API_URL = 'http://localhost:3045/api/car-type';
+const API_URL = 'http://localhost:3045/api/cartype';
 
 // Helper to add auth header
 const getConfig = (): AxiosRequestConfig => {

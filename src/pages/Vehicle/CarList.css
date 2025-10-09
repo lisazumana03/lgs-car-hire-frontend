@@ -360,6 +360,15 @@
   flex-shrink: 0;
 }
 
+/* Car Badges Section */
+.car-badges {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
 /* Car Badges */
 .badge {
   font-size: 0.7rem;

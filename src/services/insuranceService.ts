@@ -10,7 +10,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getAuthToken } from './authService';
 import type { Insurance, InsuranceRequest } from '../types';
 
-const API_URL = 'http://localhost:3046/api/insurance';
+const API_URL = 'http://localhost:3045/api/insurance';
 
 // Helper to add auth header
 const getConfig = (): AxiosRequestConfig => {

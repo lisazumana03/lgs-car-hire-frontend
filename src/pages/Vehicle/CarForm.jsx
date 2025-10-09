@@ -10,7 +10,7 @@ function CarForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    
+
     // Combined form data for both car and car type
     const [formData, setFormData] = useState({
         // Car fields
@@ -20,14 +20,14 @@ function CarForm() {
         availability: true,
         rentalPrice: "",
         imageUrl: "",
-        
+
         // Car Type fields (for this specific car)
         createNewType: true,
         typeName: "",
         fuelType: "Petrol",
         numberOfWheels: 4,
         numberOfSeats: 5,
-        
+
         // For linking existing type
         existingTypeId: null
     });

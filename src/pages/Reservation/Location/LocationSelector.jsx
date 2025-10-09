@@ -97,21 +97,23 @@ function LocationSelector() {
                 {/* Filters */}
                 <div className="filters-container">
                     <div className="filters-grid">
-                        <div className="search-container">
+                        <div className="search-box">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
                             <input
                                 type="text"
                                 placeholder="Search by name or city..."
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
-                                className="search-input"
                             />
                         </div>
                         <div className="filter-group">
-                            <select
-                                value={selectedProvince}
-                                onChange={e => setSelectedProvince(e.target.value)}
-                                className="filter-select"
-                            >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            <select value={selectedProvince} onChange={e => setSelectedProvince(e.target.value)}>
                                 <option value="all">All Provinces</option>
                                 {PROVINCES.map(prov => (
                                     <option key={prov} value={prov}>{prov}</option>
@@ -120,9 +122,13 @@ function LocationSelector() {
                         </div>
                     </div>
                     <div className="results-section">
-                        <span className="results-count">
-                            {filteredLocations.length} {filteredLocations.length === 1 ? "location" : "locations"} found
-                        </span>
+                        <div className="results-count">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            <span>{filteredLocations.length} {filteredLocations.length === 1 ? "location" : "locations"}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -141,7 +147,7 @@ function LocationSelector() {
                             : <span style={{ color: "#aaa" }}>None selected</span>}
                     </div>
                     {isSameLocation && (
-                        <div style={{ color: "red", marginTop: 8 }}>
+                        <div className="error-text">
                             Pick up and drop off locations must be different.
                         </div>
                     )}
@@ -167,20 +173,20 @@ function LocationSelector() {
                                     <p className="location-meta">{loc.provinceOrState || ""}, {loc.country || ""}</p>
                                     <p className="location-meta">Postal Code: {loc.postalCode || ""}</p>
                                 </div>
-                                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                                <div className="location-button-group">
                                     <button
                                         onClick={() => handleSelectPickup(loc)}
-                                        className="select-location-button"
+                                        className={`select-location-button ${pickupLocation && pickupLocation.locationID === loc.locationID ? 'selected' : ''}`}
                                         disabled={pickupLocation && pickupLocation.locationID === loc.locationID}
                                     >
-                                        {pickupLocation && pickupLocation.locationID === loc.locationID ? "Selected as Pickup" : "Select as Pickup"}
+                                        {pickupLocation && pickupLocation.locationID === loc.locationID ? "✓ Pickup" : "Select Pickup"}
                                     </button>
                                     <button
                                         onClick={() => handleSelectDropOff(loc)}
-                                        className="select-location-button"
+                                        className={`select-location-button ${dropOffLocation && dropOffLocation.locationID === loc.locationID ? 'selected' : ''}`}
                                         disabled={dropOffLocation && dropOffLocation.locationID === loc.locationID}
                                     >
-                                        {dropOffLocation && dropOffLocation.locationID === loc.locationID ? "Selected as Drop Off" : "Select as Drop Off"}
+                                        {dropOffLocation && dropOffLocation.locationID === loc.locationID ? "✓ Drop Off" : "Select Drop Off"}
                                     </button>
                                 </div>
                             </div>
@@ -189,30 +195,37 @@ function LocationSelector() {
                 )}
 
                 {/* Action Buttons */}
-                <div className="back-section" style={{ display: "flex", gap: 10, marginTop: 20 }}>
+                <div className="back-section">
                     <button
                         onClick={handleProceed}
-                        className="select-location-button"
+                        className="btn-proceed"
                         disabled={
                             !pickupLocation ||
                             !dropOffLocation ||
                             pickupLocation.locationID === dropOffLocation.locationID
                         }
                     >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                         Proceed to Booking
                     </button>
                     <button
                         onClick={handleReset}
-                        className="select-location-button"
-                        style={{ backgroundColor: "#ff9800" }}
+                        className="btn-reset"
                     >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4V9H4.58152M19.9381 11C19.446 7.05369 16.0796 4 12 4C8.64262 4 5.76829 6.06817 4.58152 9M4.58152 9H9M20 20V15H19.4185M19.4185 15C18.2317 17.9318 15.3574 20 12 20C7.92038 20 4.55399 16.9463 4.06189 13M19.4185 15H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                         Reset
                     </button>
                     <button
                         onClick={() => navigate('/booking-history')}
-                        className="select-location-button"
-                        style={{ backgroundColor: "#888" }}
+                        className="btn-back"
                     >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                         Back to Bookings
                     </button>
                 </div>

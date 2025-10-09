@@ -43,7 +43,7 @@ function CarCard({ car, onBook }) {
                     </div>
                 </div>
 
-                {/* Specifications and Badges Combined */}
+                {/* Specifications */}
                 <div className="car-specs">
                     <div className="spec-item">
                         <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
@@ -63,6 +63,10 @@ function CarCard({ car, onBook }) {
                         </svg>
                         {car.carTypeNumberOfSeats || '5'} Seats
                     </div>
+                </div>
+
+                {/* Badges */}
+                <div className="car-badges">
                     {car.insuranceID && (
                         <span className="badge badge-insurance">
                             Insurance
@@ -88,7 +92,7 @@ function CarCard({ car, onBook }) {
                         <p className="price-unit">per day</p>
                     </div>
                     <button
-                        onClick={() => onBook(car.carID)}
+                        onClick={() => onBook(car)}
                         disabled={!car.availability}
                         className={`book-button ${car.availability ? 'available' : 'unavailable'}`}
                     >
@@ -270,10 +274,21 @@ function CarView() {
                 ) : (
                     <div className="cars-grid">
                         {filteredCars.map(car => (
-                            <CarCard 
-                                key={car.carID} 
-                                car={car} 
-                                onBook={(carId) => navigate(`/make-booking?carId=${carId}`)}
+                            <CarCard
+                                key={car.carID}
+                                car={car}
+                                onBook={(selectedCar) => navigate('/make-booking', {
+                                    state: {
+                                        selectedCar: {
+                                            carID: selectedCar.carID,
+                                            brand: selectedCar.brand,
+                                            model: selectedCar.model,
+                                            year: selectedCar.year,
+                                            rentalPrice: selectedCar.rentalPrice,
+                                            imageUrl: selectedCar.imageUrl
+                                        }
+                                    }
+                                })}
                             />
                         ))}
                     </div>

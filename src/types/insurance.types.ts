@@ -1,24 +1,20 @@
 export interface Insurance {
-  id?: string;
-  type: string;
-  coverage: string;
-  price: number;
-  description?: string;
-  provider?: string;
-  validFrom?: string;
-  validTo?: string;
-  active?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  insuranceID?: number;
+  insuranceStartDate?: string;
+  insuranceCost?: number;
+  insuranceProvider?: string;
+  status?: string;
+  policyNumber?: number;
+  mechanic?: string;
+  carID?: number;
 }
 
 export interface InsuranceRequest {
-  type: string;
-  coverage: string;
-  price: number;
-  description?: string;
-  provider?: string;
-  validFrom?: string;
-  validTo?: string;
-  active?: boolean;
+  insuranceStartDate?: string;
+  insuranceCost: number;
+  insuranceProvider: string;
+  status?: string;
+  policyNumber?: number;
+  mechanic?: string;
+  carID?: number;
 }
