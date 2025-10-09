@@ -105,7 +105,7 @@ function LocationForm(){
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-grid">
-                            <div className="form-group">
+                            <div className="location-form-group">
                                 <label>Location Name <span className="required">*</span></label>
                                 <input
                                     type="text"
@@ -118,7 +118,7 @@ function LocationForm(){
                             </div>
 
                             <div className="form-row">
-                                <div className="form-group">
+                                <div className="location-form-group">
                                     <label>Street Number <span className="required">*</span></label>
                                     <input
                                         type="number"
@@ -129,7 +129,7 @@ function LocationForm(){
                                         required
                                     />
                                 </div>
-                                <div className="form-group">
+                                <div className="location-form-group">
                                     <label>Street Name <span className="required">*</span></label>
                                     <input
                                         type="text"
@@ -143,7 +143,7 @@ function LocationForm(){
                             </div>
 
                             <div className="form-row">
-                                <div className="form-group">
+                                <div className="location-form-group">
                                     <label>City/Town <span className="required">*</span></label>
                                     <input
                                         type="text"
@@ -154,7 +154,7 @@ function LocationForm(){
                                         required
                                     />
                                 </div>
-                                <div className="form-group">
+                                <div className="location-form-group">
                                     <label>Province <span className="required">*</span></label>
                                     <select
                                         name="provinceOrState"
@@ -171,7 +171,7 @@ function LocationForm(){
                             </div>
 
                             <div className="form-row">
-                                <div className="form-group">
+                                <div className="location-form-group">
                                     <label>Country <span className="required">*</span></label>
                                     <input
                                         type="text"
@@ -182,7 +182,7 @@ function LocationForm(){
                                         required
                                     />
                                 </div>
-                                <div className="form-group">
+                                <div className="location-form-group">
                                     <label>Postal Code <span className="required">*</span></label>
                                     <input
                                         type="text"

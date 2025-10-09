@@ -14,7 +14,7 @@ const PROVINCES = [
 
 function LocationCard({ location }) {
     return (
-        <div className="location-card">
+        <div className="location-list-location-card">
             <div className="card-header">
                 <h3 className="card-title">{location.locationName}</h3>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -145,7 +145,7 @@ function LocationList() {
                 </div>
             </div>
 
-            <div className="locations-grid">
+            <div className="location-list-locations-grid">
                 {filteredLocations.length === 0 ? (
                     <div className="no-results">
                         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

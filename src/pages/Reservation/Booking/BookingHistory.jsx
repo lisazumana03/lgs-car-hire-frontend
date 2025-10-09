@@ -188,7 +188,7 @@ function BookingHistory(){
                         </svg>
                         <p className="empty-state-text">No bookings found</p>
                         <p className="empty-state-subtext">Start your journey by making your first booking</p>
-                        <button onClick={() => navigate("/make-booking")} className="btn-primary">
+                        <button onClick={() => navigate("/make-booking")} className="booking-history-btn-primary">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path d="M12 4V20M20 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
@@ -196,9 +196,9 @@ function BookingHistory(){
                         </button>
                     </div>
                 ) : (
-                    <div className="bookings-grid">
+                    <div className="booking-history-bookings-grid">
                         {filteredBookings.map((booking, index) => (
-                            <div key={booking.id || booking.bookingId || index} className="booking-card">
+                            <div key={booking.id || booking.bookingId || index} className="booking-history-booking-card">
                                 <div className="booking-card-header">
                                     <h3 className="booking-id">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -285,7 +285,7 @@ function BookingHistory(){
 
                                 <div className="booking-actions">
                                     {booking.bookingStatus?.toLowerCase() !== 'cancelled' && !isBookingDatePassed(booking) && (
-                                        <button onClick={() => handleCancel(booking.id || booking.bookingId)} className="btn-cancel">
+                                        <button onClick={() => handleCancel(booking.id || booking.bookingId)} className="booking-history-btn-cancel">
                                             Cancel
                                         </button>
                                     )}
@@ -301,7 +301,7 @@ function BookingHistory(){
                 )}
 
                 <div className="bottom-actions">
-                    <button onClick={() => navigate("/make-booking")} className="btn-primary">
+                    <button onClick={() => navigate("/make-booking")} className="booking-history-btn-primary">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M12 4V20M20 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>

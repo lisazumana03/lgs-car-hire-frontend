@@ -108,24 +108,24 @@ function NewSupportTicket() {
     };
 
     return (
-        <div className="new-ticket-container">
-            <div className="new-ticket-header">
+        <div className="support-new-ticket-container">
+            <div className="support-new-ticket-header">
                 <h2>Create Support Ticket</h2>
-                <p className="header-description">
+                <p className="support-header-description">
                     Having an issue with your booking or need assistance? Submit a support ticket and our team will help you as soon as possible.
                 </p>
             </div>
 
             {message && (
-                <div className={`message message-${messageType}`}>
+                <div className={`support-ticket-message support-ticket-message-${messageType}`}>
                     {message}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="ticket-form">
-                <div className="form-group">
+            <form onSubmit={handleSubmit} className="support-ticket-form">
+                <div className="support-form-group">
                     <label htmlFor="subject">
-                        Subject <span className="required">*</span>
+                        Subject <span className="support-required">*</span>
                     </label>
                     <input
                         type="text"
@@ -136,12 +136,12 @@ function NewSupportTicket() {
                         placeholder="Brief description of your issue"
                         maxLength="255"
                         required
-                        className="form-input"
+                        className="support-form-input"
                     />
-                    <small className="form-hint">Maximum 255 characters</small>
+                    <small className="support-form-hint">Maximum 255 characters</small>
                 </div>
 
-                <div className="form-group">
+                <div className="support-form-group">
                     <label htmlFor="description">Description</label>
                     <textarea
                         id="description"
@@ -151,24 +151,24 @@ function NewSupportTicket() {
                         placeholder="Provide detailed information about your issue..."
                         rows="6"
                         maxLength="2000"
-                        className="form-textarea"
+                        className="support-form-textarea"
                     />
-                    <small className="form-hint">
+                    <small className="support-form-hint">
                         Maximum 2000 characters ({formData.description.length}/2000)
                     </small>
                 </div>
 
-                <div className="form-row">
-                    <div className="form-group">
+                <div className="support-form-row">
+                    <div className="support-form-group">
                         <label htmlFor="priority">
-                            Priority <span className="required">*</span>
+                            Priority <span className="support-required">*</span>
                         </label>
                         <select
                             id="priority"
                             name="priority"
                             value={formData.priority}
                             onChange={handleChange}
-                            className="form-select"
+                            className="support-form-select"
                             required
                         >
                             <option value="LOW">Low - General inquiry</option>
@@ -176,19 +176,19 @@ function NewSupportTicket() {
                             <option value="HIGH">High - Urgent issue</option>
                             <option value="CRITICAL">Critical - Emergency</option>
                         </select>
-                        <small className="form-hint">
+                        <small className="support-form-hint">
                             Select priority based on urgency
                         </small>
                     </div>
 
-                    <div className="form-group">
+                    <div className="support-form-group">
                         <label htmlFor="bookingId">Related Booking (Optional)</label>
                         <select
                             id="bookingId"
                             name="bookingId"
                             value={formData.bookingId}
                             onChange={handleChange}
-                            className="form-select"
+                            className="support-form-select"
                         >
                             <option value="">No related booking</option>
                             {bookings.map((booking) => (
@@ -197,13 +197,13 @@ function NewSupportTicket() {
                                 </option>
                             ))}
                         </select>
-                        <small className="form-hint">
+                        <small className="support-form-hint">
                             Link this ticket to a specific booking if applicable
                         </small>
                     </div>
                 </div>
 
-                <div className="info-box">
+                <div className="support-info-box">
                     <h4>What happens next?</h4>
                     <ul>
                         <li>Your ticket will be reviewed by our support team</li>
@@ -213,18 +213,18 @@ function NewSupportTicket() {
                     </ul>
                 </div>
 
-                <div className="form-actions">
+                <div className="support-form-actions">
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className="btn-cancel"
+                        className="support-btn-cancel"
                         disabled={loading}
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="btn-submit"
+                        className="support-btn-submit"
                         disabled={loading}
                     >
                         {loading ? "Creating..." : "Create Ticket"}

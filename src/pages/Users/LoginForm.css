@@ -129,13 +129,13 @@
   gap: 8px;
 }
 
-.form-label {
+.login-form-label {
   font-size: 0.9rem;
   font-weight: 600;
   color: #ffffff;
 }
 
-.form-input {
+.login-form-input {
   width: 100%;
   padding: 14px 16px;
   border: 1px solid #555;
@@ -148,11 +148,11 @@
   box-sizing: border-box;
 }
 
-.form-input::placeholder {
+.login-form-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.form-input:focus {
+.login-form-input:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
@@ -165,7 +165,7 @@
   align-items: center;
 }
 
-.password-field .form-input {
+.password-field .login-form-input {
   padding-right: 48px;
 }
 

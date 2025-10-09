@@ -86,7 +86,7 @@ function LoginForm({ onLogin }) {
           )}
 
           <div className="form-field">
-            <label htmlFor="email" className="form-label">
+            <label htmlFor="email" className="login-form-label">
               Email Address
             </label>
             <input
@@ -94,7 +94,7 @@ function LoginForm({ onLogin }) {
               placeholder="you@example.com"
               id="email"
               name="email"
-              className="form-input"
+              className="login-form-input"
               value={formData.email}
               onChange={handleChange}
               autoComplete="email"
@@ -104,7 +104,7 @@ function LoginForm({ onLogin }) {
           </div>
 
           <div className="form-field">
-            <label htmlFor="password" className="form-label">
+            <label htmlFor="password" className="login-form-label">
               Password
             </label>
             <div className="password-field">
@@ -113,7 +113,7 @@ function LoginForm({ onLogin }) {
                 placeholder="Enter your password"
                 id="password"
                 name="password"
-                className="form-input"
+                className="login-form-input"
                 value={formData.password}
                 onChange={handleChange}
                 autoComplete="current-password"

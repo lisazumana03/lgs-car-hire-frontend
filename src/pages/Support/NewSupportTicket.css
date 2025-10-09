@@ -1,18 +1,18 @@
 /* ==================== NEW SUPPORT TICKET PAGE ==================== */
 
-.new-ticket-container {
+.support-new-ticket-container {
     max-width: 900px;
     margin: 0 auto;
     padding: 2rem;
 }
 
-.new-ticket-header {
+.support-new-ticket-header {
     margin-bottom: 2.5rem;
     padding-bottom: 1.5rem;
     border-bottom: 2px solid rgba(255, 255, 255, 0.08);
 }
 
-.new-ticket-header h2 {
+.support-new-ticket-header h2 {
     font-size: 2.5rem;
     color: #ffffff;
     margin-bottom: 0.75rem;
@@ -20,13 +20,13 @@
     letter-spacing: -0.5px;
 }
 
-.header-description {
+.support-header-description {
     color: rgba(255, 255, 255, 0.6);
     font-size: 1.05rem;
     line-height: 1.5;
 }
 
-.ticket-form {
+.support-ticket-form {
     background-color: #3a3a3a;
     padding: 2rem;
     border-radius: 12px;
@@ -34,11 +34,11 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-.form-group {
+.support-form-group {
     margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.support-form-group label {
     display: block;
     font-weight: 600;
     color: #ffffff;
@@ -46,13 +46,13 @@
     font-size: 1rem;
 }
 
-.required {
+.support-required {
     color: #ef4444;
 }
 
-.form-input,
-.form-textarea,
-.form-select {
+.support-form-input,
+.support-form-textarea,
+.support-form-select {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid #555;
@@ -64,38 +64,38 @@
     transition: all 0.3s ease;
 }
 
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
+.support-form-input:focus,
+.support-form-textarea:focus,
+.support-form-select:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
-.form-select option {
+.support-form-select option {
     background-color: #2c2c2c;
     color: #ffffff;
 }
 
-.form-textarea {
+.support-form-textarea {
     resize: vertical;
     min-height: 150px;
 }
 
-.form-hint {
+.support-form-hint {
     display: block;
     margin-top: 0.25rem;
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.875rem;
 }
 
-.form-row {
+.support-form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
 
-.info-box {
+.support-info-box {
     background-color: rgba(0, 123, 255, 0.1);
     border-left: 4px solid #007bff;
     padding: 1.5rem;
@@ -104,23 +104,23 @@
     border: 1px solid rgba(0, 123, 255, 0.2);
 }
 
-.info-box h4 {
+.support-info-box h4 {
     margin-top: 0;
     margin-bottom: 1rem;
     color: #007bff;
 }
 
-.info-box ul {
+.support-info-box ul {
     margin: 0;
     padding-left: 1.5rem;
 }
 
-.info-box li {
+.support-info-box li {
     margin-bottom: 0.5rem;
     color: rgba(255, 255, 255, 0.7);
 }
 
-.form-actions {
+.support-form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
@@ -129,7 +129,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.btn-cancel {
+.support-btn-cancel {
     background-color: #6c757d;
     color: white;
     border: none;
@@ -141,12 +141,12 @@
     transition: all 0.3s ease;
 }
 
-.btn-cancel:hover:not(:disabled) {
+.support-btn-cancel:hover:not(:disabled) {
     background-color: #5a6268;
     transform: translateY(-2px);
 }
 
-.btn-submit {
+.support-btn-submit {
     background-color: #007bff;
     color: white;
     border: none;
@@ -158,32 +158,32 @@
     transition: all 0.3s ease;
 }
 
-.btn-submit:hover:not(:disabled) {
+.support-btn-submit:hover:not(:disabled) {
     background-color: #0056b3;
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
     transform: translateY(-2px);
 }
 
-.btn-cancel:disabled,
-.btn-submit:disabled {
+.support-btn-cancel:disabled,
+.support-btn-submit:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-.message {
+.support-ticket-message {
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
     font-weight: 500;
 }
 
-.message-success {
+.support-ticket-message-success {
     background-color: rgba(34, 197, 94, 0.15);
     color: #22c55e;
     border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
-.message-error {
+.support-ticket-message-error {
     background-color: rgba(239, 68, 68, 0.15);
     color: #ef4444;
     border: 1px solid rgba(239, 68, 68, 0.3);

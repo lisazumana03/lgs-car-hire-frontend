@@ -70,7 +70,7 @@ function CarSelection() {
 
     if (loading) {
         return (
-            <div className="loading-container">
+            <div className="car-selection-loading-container">
                 <div className="loading-spinner"></div>
                 <p className="loading-text">Loading available cars...</p>
             </div>
@@ -87,7 +87,7 @@ function CarSelection() {
                 </div>
 
                 {error && (
-                    <div className="error-message">
+                    <div className="car-selection-error-message">
                         {error}
                     </div>
                 )}
@@ -156,9 +156,9 @@ function CarSelection() {
                         <p className="no-results-subtext">Try adjusting your search or filters</p>
                     </div>
                 ) : (
-                    <div className="cars-grid">
+                    <div className="car-selection-cars-grid">
                         {filteredCars.map(car => (
-                            <div key={car.carID} className="car-card">
+                            <div key={car.carID} className="car-selection-car-card">
                                 {/* Car Image */}
                                 <div className="car-image-container">
                                     {car.imageUrl ? (

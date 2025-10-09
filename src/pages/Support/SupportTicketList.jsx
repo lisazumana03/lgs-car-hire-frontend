@@ -63,21 +63,21 @@ function SupportTicketList() {
 
     const getStatusClass = (status) => {
         switch (status?.toLowerCase()) {
-            case 'open': return 'status-open';
-            case 'in_progress': return 'status-in-progress';
-            case 'resolved': return 'status-resolved';
-            case 'closed': return 'status-closed';
-            default: return 'status-default';
+            case 'open': return 'support-ticket-status-open';
+            case 'in_progress': return 'support-ticket-status-in-progress';
+            case 'resolved': return 'support-ticket-status-resolved';
+            case 'closed': return 'support-ticket-status-closed';
+            default: return 'support-ticket-status-default';
         }
     };
 
     const getPriorityClass = (priority) => {
         switch (priority?.toLowerCase()) {
-            case 'critical': return 'priority-critical';
-            case 'high': return 'priority-high';
-            case 'medium': return 'priority-medium';
-            case 'low': return 'priority-low';
-            default: return 'priority-default';
+            case 'critical': return 'support-ticket-priority-critical';
+            case 'high': return 'support-ticket-priority-high';
+            case 'medium': return 'support-ticket-priority-medium';
+            case 'low': return 'support-ticket-priority-low';
+            default: return 'support-ticket-priority-default';
         }
     };
 
@@ -88,29 +88,29 @@ function SupportTicketList() {
     });
 
     if (loading) {
-        return <div className="loading-container">Loading support tickets...</div>;
+        return <div className="support-ticket-loading-container">Loading support tickets...</div>;
     }
 
     return (
         <div className="support-ticket-list-container">
-            <div className="support-header">
+            <div className="support-ticket-header">
                 <h2>Support Tickets</h2>
             </div>
 
             {message && (
-                <div className={`message message-${messageType}`}>
+                <div className={`support-ticket-message support-ticket-message-${messageType}`}>
                     {message}
                 </div>
             )}
 
-            <div className="ticket-filters-container">
-                <div className="ticket-filter-group">
+            <div className="support-ticket-filters-container">
+                <div className="support-ticket-filter-group">
                     <label htmlFor="statusFilter">Status:</label>
                     <select
                         id="statusFilter"
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="ticket-filter-select"
+                        className="support-ticket-filter-select"
                     >
                         <option value="all">All Statuses</option>
                         <option value="open">Open</option>
@@ -120,13 +120,13 @@ function SupportTicketList() {
                     </select>
                 </div>
 
-                <div className="ticket-filter-group">
+                <div className="support-ticket-filter-group">
                     <label htmlFor="priorityFilter">Priority:</label>
                     <select
                         id="priorityFilter"
                         value={priorityFilter}
                         onChange={(e) => setPriorityFilter(e.target.value)}
-                        className="ticket-filter-select"
+                        className="support-ticket-filter-select"
                     >
                         <option value="all">All Priorities</option>
                         <option value="critical">Critical</option>
@@ -136,67 +136,67 @@ function SupportTicketList() {
                     </select>
                 </div>
 
-                <button className="btn-primary btn-create" onClick={handleCreateNew}>
+                <button className="support-ticket-btn-primary support-ticket-btn-create" onClick={handleCreateNew}>
                     + Create New Ticket
                 </button>
             </div>
 
             {filteredTickets.length === 0 ? (
-                <div className="no-tickets">
+                <div className="support-ticket-no-tickets">
                     <p>No support tickets found.</p>
-                    <button className="btn-secondary" onClick={handleCreateNew}>
+                    <button className="support-ticket-btn-secondary" onClick={handleCreateNew}>
                         Create Your First Ticket
                     </button>
                 </div>
             ) : (
-                <div className="tickets-grid">
+                <div className="support-ticket-grid">
                     {filteredTickets.map((ticket) => (
-                        <div key={ticket.ticketID} className="ticket-card">
-                            <div className="ticket-header">
+                        <div key={ticket.ticketID} className="support-ticket-card">
+                            <div className="support-ticket-card-header">
                                 <h3>Ticket #{ticket.ticketID}</h3>
-                                <div className="ticket-badges">
-                                    <span className={`badge ${getStatusClass(ticket.status)}`}>
+                                <div className="support-ticket-badges">
+                                    <span className={`support-ticket-badge ${getStatusClass(ticket.status)}`}>
                                         {ticket.status}
                                     </span>
-                                    <span className={`badge ${getPriorityClass(ticket.priority)}`}>
+                                    <span className={`support-ticket-badge ${getPriorityClass(ticket.priority)}`}>
                                         {ticket.priority}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="ticket-content">
+                            <div className="support-ticket-content">
                                 <h4>{ticket.subject}</h4>
-                                <p className="ticket-description">
+                                <p className="support-ticket-description">
                                     {ticket.description?.length > 150
                                         ? `${ticket.description.substring(0, 150)}...`
                                         : ticket.description || "No description"}
                                 </p>
 
-                                <div className="ticket-meta">
-                                    <div className="meta-item">
+                                <div className="support-ticket-meta">
+                                    <div className="support-ticket-meta-item">
                                         <strong>Created:</strong> {formatDate(ticket.createdAt)}
                                     </div>
                                     {ticket.booking && (
-                                        <div className="meta-item">
+                                        <div className="support-ticket-meta-item">
                                             <strong>Booking:</strong> #{ticket.booking.bookingID}
                                         </div>
                                     )}
                                     {ticket.assignedTo && (
-                                        <div className="meta-item">
+                                        <div className="support-ticket-meta-item">
                                             <strong>Assigned to:</strong> {ticket.assignedTo.name}
                                         </div>
                                     )}
                                     {ticket.resolvedAt && (
-                                        <div className="meta-item">
+                                        <div className="support-ticket-meta-item">
                                             <strong>Resolved:</strong> {formatDate(ticket.resolvedAt)}
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="ticket-actions">
+                            <div className="support-ticket-actions">
                                 <button
-                                    className="btn-view"
+                                    className="support-ticket-btn-view"
                                     onClick={() => handleViewDetails(ticket.ticketID)}
                                 >
                                     View Details

@@ -284,7 +284,7 @@ function RegistrationForm() {
 
           <button
             type="submit"
-            className="btn-primary"
+            className="registration-btn-primary"
             disabled={isLoading}
             aria-busy={isLoading}
           >

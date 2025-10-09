@@ -16,12 +16,10 @@ function Dashboard({ user }) {
     const fetchDashboardData = async () => {
       try {
         if (userData?.userId) {
-          console.log('Current user ID:', userData.userId);
 
           // Fetch open tickets
           const ticketsResponse = await getTicketsByUser(userData.userId);
           const tickets = ticketsResponse.data || [];
-          console.log('Tickets:', tickets);
           const openCount = tickets.filter(ticket =>
             ticket.status?.toLowerCase() === 'open'
           ).length;
@@ -30,29 +28,21 @@ function Dashboard({ user }) {
           // Fetch bookings
           const bookingsResponse = await getAllBookings();
           const allBookings = bookingsResponse.data || [];
-          console.log('All bookings:', allBookings);
-          console.log('Sample booking structure:', allBookings[0]);
-          console.log('Sample booking keys:', allBookings[0] ? Object.keys(allBookings[0]) : 'No bookings');
 
           // Filter bookings for current user
           const userBookings = allBookings.filter(booking => {
-            console.log('Comparing booking userID:', booking.userID, 'with current user:', userData.userId);
             return booking.userID === userData.userId;
           });
-          console.log('User bookings:', userBookings);
 
           // Count active bookings (status is CONFIRMED or ACTIVE)
           const activeCount = userBookings.filter(booking => {
-            console.log('Booking status:', booking.bookingStatus);
             return booking.bookingStatus?.toUpperCase() === 'CONFIRMED' ||
                    booking.bookingStatus?.toUpperCase() === 'ACTIVE';
           }).length;
           setActiveBookingsCount(activeCount);
-          console.log('Active bookings count:', activeCount);
 
           // Total rentals is all bookings for this user
           setTotalRentalsCount(userBookings.length);
-          console.log('Total rentals count:', userBookings.length);
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);

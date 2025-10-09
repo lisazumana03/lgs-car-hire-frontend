@@ -92,7 +92,7 @@ function LocationSelector() {
                     <p>Select two different locations for your booking</p>
                 </div>
 
-                {error && <div className="error-message">{error}</div>}
+                {error && <div className="location-selector-error-message">{error}</div>}
 
                 {/* Filters */}
                 <div className="filters-container">
@@ -155,7 +155,7 @@ function LocationSelector() {
 
                 {/* Locations Grid */}
                 {loading ? (
-                    <div className="loading-container">
+                    <div className="location-selector-loading-container">
                         <div className="loading-spinner"></div>
                         <p>Loading locations...</p>
                     </div>
@@ -164,9 +164,9 @@ function LocationSelector() {
                         <p>No locations found for the selected province.</p>
                     </div>
                 ) : (
-                    <div className="locations-grid">
+                    <div className="location-selector-locations-grid">
                         {filteredLocations.map(loc => (
-                            <div key={loc.locationID || loc.id || Math.random()} className="location-card">
+                            <div key={loc.locationID || loc.id || Math.random()} className="location-selector-location-card">
                                 <div className="location-details">
                                     <h3 className="location-title">{loc.locationName || "No Name"}</h3>
                                     <p className="location-meta">{loc.streetName || ""}, {loc.cityOrTown || ""}</p>

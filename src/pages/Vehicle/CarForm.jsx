@@ -287,14 +287,14 @@ function CarForm() {
                             <h3 className="section-title">Step 1: Car Information</h3>
                             
                             <div className="form-grid">
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="brand">Brand *</label>
                                     <select
                                         id="brand"
                                         name="brand"
                                         value={formData.brand}
                                         onChange={handleInputChange}
-                                        className="form-select"
+                                        className="admin-car-form-select"
                                         required
                                     >
                                         <option value="">Select a brand</option>
@@ -304,7 +304,7 @@ function CarForm() {
                                     </select>
                                 </div>
 
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="model">Model *</label>
                                     <input
                                         type="text"
@@ -313,12 +313,12 @@ function CarForm() {
                                         value={formData.model}
                                         onChange={handleInputChange}
                                         placeholder="e.g., Corolla"
-                                        className="form-input"
+                                        className="admin-car-form-input"
                                         required
                                     />
                                 </div>
 
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="year">Year *</label>
                                     <input
                                         type="number"
@@ -328,12 +328,12 @@ function CarForm() {
                                         onChange={handleInputChange}
                                         min="1900"
                                         max={new Date().getFullYear() + 1}
-                                        className="form-input"
+                                        className="admin-car-form-input"
                                         required
                                     />
                                 </div>
 
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="rentalPrice">Rental Price (R/day) *</label>
                                     <input
                                         type="number"
@@ -344,13 +344,13 @@ function CarForm() {
                                         placeholder="e.g., 350"
                                         step="0.01"
                                         min="0"
-                                        className="form-input"
+                                        className="admin-car-form-input"
                                         required
                                     />
                                 </div>
                             </div>
 
-                            <div className="form-group">
+                            <div className="admin-car-form-group">
                                 <label htmlFor="imageUrl">Image URL</label>
                                 <input
                                     type="url"
@@ -359,7 +359,7 @@ function CarForm() {
                                     value={formData.imageUrl}
                                     onChange={handleInputChange}
                                     placeholder="https://example.com/car-image.jpg"
-                                    className="form-input"
+                                    className="admin-car-form-input"
                                 />
                             </div>
 
@@ -436,7 +436,7 @@ function CarForm() {
                             </div>
 
                             <div className="form-grid">
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="typeName">Type Name *</label>
                                     <input
                                         type="text"
@@ -445,19 +445,19 @@ function CarForm() {
                                         value={formData.typeName}
                                         onChange={handleInputChange}
                                         placeholder="e.g., SUV, Sedan, Sports"
-                                        className="form-input"
+                                        className="admin-car-form-input"
                                         required={formData.createNewType}
                                     />
                                 </div>
 
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="fuelType">Fuel Type *</label>
                                     <select
                                         id="fuelType"
                                         name="fuelType"
                                         value={formData.fuelType}
                                         onChange={handleInputChange}
-                                        className="form-select"
+                                        className="admin-car-form-select"
                                         required={formData.createNewType}
                                     >
                                         <option value="Petrol">Petrol</option>
@@ -469,7 +469,7 @@ function CarForm() {
                                     </select>
                                 </div>
 
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="numberOfSeats">Number of Seats *</label>
                                     <input
                                         type="number"
@@ -479,12 +479,12 @@ function CarForm() {
                                         onChange={handleInputChange}
                                         min="1"
                                         max="50"
-                                        className="form-input"
+                                        className="admin-car-form-input"
                                         required={formData.createNewType}
                                     />
                                 </div>
 
-                                <div className="form-group">
+                                <div className="admin-car-form-group">
                                     <label htmlFor="numberOfWheels">Number of Wheels *</label>
                                     <input
                                         type="number"
@@ -494,7 +494,7 @@ function CarForm() {
                                         onChange={handleInputChange}
                                         min="2"
                                         max="18"
-                                        className="form-input"
+                                        className="admin-car-form-input"
                                         required={formData.createNewType}
                                     />
                                 </div>

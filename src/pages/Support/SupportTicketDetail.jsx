@@ -57,34 +57,34 @@ function SupportTicketDetail() {
 
     const getStatusClass = (status) => {
         switch (status?.toLowerCase()) {
-            case 'open': return 'status-open';
-            case 'in_progress': return 'status-in-progress';
-            case 'resolved': return 'status-resolved';
-            case 'closed': return 'status-closed';
-            default: return 'status-default';
+            case 'open': return 'support-ticket-status-open';
+            case 'in_progress': return 'support-ticket-status-in-progress';
+            case 'resolved': return 'support-ticket-status-resolved';
+            case 'closed': return 'support-ticket-status-closed';
+            default: return 'support-ticket-status-default';
         }
     };
 
     const getPriorityClass = (priority) => {
         switch (priority?.toLowerCase()) {
-            case 'critical': return 'priority-critical';
-            case 'high': return 'priority-high';
-            case 'medium': return 'priority-medium';
-            case 'low': return 'priority-low';
-            default: return 'priority-default';
+            case 'critical': return 'support-ticket-priority-critical';
+            case 'high': return 'support-ticket-priority-high';
+            case 'medium': return 'support-ticket-priority-medium';
+            case 'low': return 'support-ticket-priority-low';
+            default: return 'support-ticket-priority-default';
         }
     };
 
     if (loading) {
-        return <div className="loading-container">Loading ticket details...</div>;
+        return <div className="support-loading-container">Loading ticket details...</div>;
     }
 
     if (!ticket) {
         return (
-            <div className="error-container">
+            <div className="support-error-container">
                 <h2>Ticket Not Found</h2>
                 <p>The support ticket you're looking for doesn't exist.</p>
-                <button className="btn-primary" onClick={handleBackToList}>
+                <button className="support-btn-primary" onClick={handleBackToList}>
                     Back to Support Tickets
                 </button>
             </div>
@@ -92,119 +92,119 @@ function SupportTicketDetail() {
     }
 
     return (
-        <div className="ticket-detail-container">
-            <div className="detail-header">
-                <button className="btn-back" onClick={handleBackToList}>
+        <div className="support-ticket-detail-container">
+            <div className="support-detail-header">
+                <button className="support-btn-back" onClick={handleBackToList}>
                     ← Back to All Tickets
                 </button>
                 <h2>Ticket #{ticket.ticketID}</h2>
             </div>
 
             {message && (
-                <div className={`message message-${messageType}`}>
+                <div className={`support-ticket-message support-ticket-message-${messageType}`}>
                     {message}
                 </div>
             )}
 
-            <div className="ticket-detail-card">
-                <div className="ticket-status-bar">
-                    <div className="status-badges">
-                        <span className={`badge ${getStatusClass(ticket.status)}`}>
+            <div className="support-ticket-detail-card">
+                <div className="support-ticket-status-bar">
+                    <div className="support-status-badges">
+                        <span className={`support-ticket-badge ${getStatusClass(ticket.status)}`}>
                             {ticket.status}
                         </span>
-                        <span className={`badge ${getPriorityClass(ticket.priority)}`}>
+                        <span className={`support-ticket-badge ${getPriorityClass(ticket.priority)}`}>
                             {ticket.priority} Priority
                         </span>
                     </div>
                 </div>
 
-                <div className="ticket-subject">
+                <div className="support-ticket-subject">
                     <h3>{ticket.subject}</h3>
                 </div>
 
-                <div className="ticket-section">
+                <div className="support-ticket-section">
                     <h4>Description</h4>
-                    <p className="ticket-description">
+                    <p className="support-ticket-description">
                         {ticket.description || "No description provided"}
                     </p>
                 </div>
 
-                <div className="ticket-info-grid">
-                    <div className="info-section">
+                <div className="support-ticket-info-grid">
+                    <div className="support-info-section">
                         <h4>Ticket Information</h4>
-                        <div className="info-item">
-                            <span className="info-label">Created:</span>
-                            <span className="info-value">{formatDate(ticket.createdAt)}</span>
+                        <div className="support-info-item">
+                            <span className="support-info-label">Created:</span>
+                            <span className="support-info-value">{formatDate(ticket.createdAt)}</span>
                         </div>
-                        <div className="info-item">
-                            <span className="info-label">Last Updated:</span>
-                            <span className="info-value">{formatDate(ticket.updatedAt)}</span>
+                        <div className="support-info-item">
+                            <span className="support-info-label">Last Updated:</span>
+                            <span className="support-info-value">{formatDate(ticket.updatedAt)}</span>
                         </div>
                         {ticket.resolvedAt && (
-                            <div className="info-item">
-                                <span className="info-label">Resolved:</span>
-                                <span className="info-value">{formatDate(ticket.resolvedAt)}</span>
+                            <div className="support-info-item">
+                                <span className="support-info-label">Resolved:</span>
+                                <span className="support-info-value">{formatDate(ticket.resolvedAt)}</span>
                             </div>
                         )}
                     </div>
 
-                    <div className="info-section">
+                    <div className="support-info-section">
                         <h4>User Information</h4>
                         {ticket.user && (
                             <>
-                                <div className="info-item">
-                                    <span className="info-label">Name:</span>
-                                    <span className="info-value">{ticket.user.name}</span>
+                                <div className="support-info-item">
+                                    <span className="support-info-label">Name:</span>
+                                    <span className="support-info-value">{ticket.user.name}</span>
                                 </div>
-                                <div className="info-item">
-                                    <span className="info-label">Email:</span>
-                                    <span className="info-value">{ticket.user.email}</span>
+                                <div className="support-info-item">
+                                    <span className="support-info-label">Email:</span>
+                                    <span className="support-info-value">{ticket.user.email}</span>
                                 </div>
-                                <div className="info-item">
-                                    <span className="info-label">Phone:</span>
-                                    <span className="info-value">{ticket.user.phoneNumber || "N/A"}</span>
+                                <div className="support-info-item">
+                                    <span className="support-info-label">Phone:</span>
+                                    <span className="support-info-value">{ticket.user.phoneNumber || "N/A"}</span>
                                 </div>
                             </>
                         )}
                     </div>
 
                     {ticket.booking && (
-                        <div className="info-section">
+                        <div className="support-info-section">
                             <h4>Related Booking</h4>
-                            <div className="info-item">
-                                <span className="info-label">Booking ID:</span>
-                                <span className="info-value">#{ticket.booking.bookingID}</span>
+                            <div className="support-info-item">
+                                <span className="support-info-label">Booking ID:</span>
+                                <span className="support-info-value">#{ticket.booking.bookingID}</span>
                             </div>
-                            <div className="info-item">
-                                <span className="info-label">Status:</span>
-                                <span className="info-value">{ticket.booking.bookingStatus}</span>
+                            <div className="support-info-item">
+                                <span className="support-info-label">Status:</span>
+                                <span className="support-info-value">{ticket.booking.bookingStatus}</span>
                             </div>
                             {ticket.booking.startDate && (
-                                <div className="info-item">
-                                    <span className="info-label">Start Date:</span>
-                                    <span className="info-value">{formatDate(ticket.booking.startDate)}</span>
+                                <div className="support-info-item">
+                                    <span className="support-info-label">Start Date:</span>
+                                    <span className="support-info-value">{formatDate(ticket.booking.startDate)}</span>
                                 </div>
                             )}
                         </div>
                     )}
 
                     {ticket.assignedTo && (
-                        <div className="info-section">
+                        <div className="support-info-section">
                             <h4>Assigned To</h4>
-                            <div className="info-item">
-                                <span className="info-label">Staff Name:</span>
-                                <span className="info-value">{ticket.assignedTo.name}</span>
+                            <div className="support-info-item">
+                                <span className="support-info-label">Staff Name:</span>
+                                <span className="support-info-value">{ticket.assignedTo.name}</span>
                             </div>
-                            <div className="info-item">
-                                <span className="info-label">Email:</span>
-                                <span className="info-value">{ticket.assignedTo.email}</span>
+                            <div className="support-info-item">
+                                <span className="support-info-label">Email:</span>
+                                <span className="support-info-value">{ticket.assignedTo.email}</span>
                             </div>
                         </div>
                     )}
                 </div>
 
                 {ticket.status === 'RESOLVED' && (
-                    <div className="resolved-notice">
+                    <div className="support-resolved-notice">
                         <h4>✓ Ticket Resolved</h4>
                         <p>
                             This ticket has been marked as resolved. If you're still experiencing issues,
@@ -214,7 +214,7 @@ function SupportTicketDetail() {
                 )}
 
                 {ticket.status === 'IN_PROGRESS' && (
-                    <div className="progress-notice">
+                    <div className="support-progress-notice">
                         <h4>⏳ In Progress</h4>
                         <p>
                             Our support team is currently working on your issue.

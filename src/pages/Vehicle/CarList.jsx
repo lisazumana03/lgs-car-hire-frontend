@@ -12,7 +12,7 @@ function CarCard({ car, onBook }) {
     const [imageError, setImageError] = useState(false);
 
     return (
-        <div className="car-card">
+        <div className="car-list-car-card">
             {/* Car Image */}
             <div className="car-image-container">
                 {car.imageUrl && !imageError ? (
@@ -160,9 +160,9 @@ function CarView() {
 
     if (loading) {
         return (
-            <div className="loading-container">
-                <div className="loading-spinner"></div>
-                <p className="loading-text">Loading cars...</p>
+            <div className="car-list-loading-container">
+                <div className="car-list-loading-spinner"></div>
+                <p className="car-list-loading-text">Loading cars...</p>
             </div>
         );
     }
@@ -171,16 +171,16 @@ function CarView() {
         <div className="car-list-container">
             <div className="car-list-wrapper">
                 {error && (
-                    <div className="error-message">
+                    <div className="car-list-error-message">
                         {error}
                     </div>
                 )}
 
                 {/* Search/Filter Section */}
-                <div className="filters-container">
-                    <div className="filters-grid">
+                <div className="car-list-filters-container">
+                    <div className="car-list-filters-grid">
                         {/* Search Bar */}
-                        <div className="search-box">
+                        <div className="car-list-search-box">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
@@ -193,7 +193,7 @@ function CarView() {
                         </div>
 
                         {/* Brand Filter */}
-                        <div className="filter-group">
+                        <div className="car-list-filter-group">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M5 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V7C2 6.46957 2.21071 5.96086 2.58579 5.58579C2.96086 5.21071 3.46957 5 4 5H9L11 8H20C20.5304 8 21.0391 8.21071 21.4142 8.58579C21.7893 8.96086 22 9.46957 22 10V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 <circle cx="7" cy="19" r="2" stroke="currentColor" strokeWidth="2"/>
@@ -211,7 +211,7 @@ function CarView() {
                         </div>
 
                         {/* Type Filter */}
-                        <div className="filter-group">
+                        <div className="car-list-filter-group">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 <path d="M6 10H6.01M10 14H18M6 14H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -228,7 +228,7 @@ function CarView() {
                         </div>
 
                         {/* Price Sort */}
-                        <div className="filter-group">
+                        <div className="car-list-filter-group">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3 6H21M7 12H17M10 18H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
