@@ -19,6 +19,10 @@ export interface AuthResponse {
   email: string;
   name: string;
   role: string;
+  idNumber?: number;
+  dateOfBirth?: string;
+  phoneNumber?: string;
+  licenseNumber?: string;
 }
 
 export interface UserData {
@@ -26,6 +30,10 @@ export interface UserData {
   email: string;
   name: string;
   role: string;
+  idNumber?: number;
+  dateOfBirth?: string;
+  phoneNumber?: string;
+  licenseNumber?: string;
 }
 
 export interface User {

@@ -76,11 +76,11 @@ export const login = async (email: string, password: string): Promise<AuthRespon
       password,
     });
 
-    const { token, userId, email: userEmail, name, role } = response.data;
+    const { token, userId, email: userEmail, name, role, idNumber, dateOfBirth, phoneNumber, licenseNumber } = response.data;
 
     // Store token and user data
     setAuthToken(token);
-    setUserData({ userId, email: userEmail, name, role });
+    setUserData({ userId, email: userEmail, name, role, idNumber, dateOfBirth, phoneNumber, licenseNumber });
 
     return response.data;
   } catch (error) {
@@ -94,11 +94,11 @@ export const signup = async (userData: SignupRequest): Promise<AuthResponse> => 
   try {
     const response: AxiosResponse<AuthResponse> = await axios.post(`${API_URL}/signup`, userData);
 
-    const { token, userId, email, name, role } = response.data;
+    const { token, userId, email, name, role, idNumber, dateOfBirth, phoneNumber, licenseNumber } = response.data;
 
     // Store token and user data
     setAuthToken(token);
-    setUserData({ userId, email, name, role });
+    setUserData({ userId, email, name, role, idNumber, dateOfBirth, phoneNumber, licenseNumber });
 
     return response.data;
   } catch (error) {
@@ -112,11 +112,11 @@ export const signupAdmin = async (userData: SignupRequest): Promise<AuthResponse
   try {
     const response: AxiosResponse<AuthResponse> = await axios.post(`${API_URL}/signup/admin`, userData);
 
-    const { token, userId, email, name, role } = response.data;
+    const { token, userId, email, name, role, idNumber, dateOfBirth, phoneNumber, licenseNumber } = response.data;
 
     // Store token and user data
     setAuthToken(token);
-    setUserData({ userId, email, name, role });
+    setUserData({ userId, email, name, role, idNumber, dateOfBirth, phoneNumber, licenseNumber });
 
     return response.data;
   } catch (error) {

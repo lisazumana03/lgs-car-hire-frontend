@@ -18,7 +18,9 @@ export const useAuth = () => {
     setLoading(true);
     try {
       setAuthenticated(true);
-      setCurrentUser(userData);
+      
+      const updatedUser = getUserData();
+      setCurrentUser(updatedUser || userData);
     } finally {
       setLoading(false);
     }
