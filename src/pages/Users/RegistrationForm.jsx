@@ -1,7 +1,7 @@
-import Button from './Button.jsx';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signup } from '../../services/authService.js';
+import Button from '../../components/ui/Button';
+import { signup } from '../../services/authService';
 
 function RegistrationForm() {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../assets/styling/home.css";
+import "../styles/home.css";
 import homeImage from "../assets/samuel-hagger-qoZSYNBvIxg-unsplash.jpg";
 
 function About() {

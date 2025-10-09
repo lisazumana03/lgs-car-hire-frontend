@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
-import "./assets/styling/home.css";
-import homeImage from "./assets/samuel-hagger-qoZSYNBvIxg-unsplash.jpg"
+import "../styles/home.css";
+import homeImage from "../assets/samuel-hagger-qoZSYNBvIxg-unsplash.jpg";
 
 export default function Contact(){
     return(

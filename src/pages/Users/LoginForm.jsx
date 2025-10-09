@@ -1,7 +1,6 @@
-import Button from './Button.jsx';
 import { useState } from 'react';
-import LoginButton from './LoginButton.jsx';
-import { login } from '../../services/authService.js';
+import LoginButton from '../../components/ui/LoginButton';
+import { login } from '../../services/authService';
 function LoginForm({ onLogin }) {
   const [formData, setFormData] = useState({
     email: '',
