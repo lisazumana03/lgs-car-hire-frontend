@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginButton from '../../components/ui/LoginButton';
 import { login } from '../../services/authService';
+import './LoginForm.css';
 
 function LoginForm({ onLogin }) {
   const navigate = useNavigate();

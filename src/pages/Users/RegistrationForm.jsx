@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import { signup } from '../../services/authService';
+import './LoginForm.css';
+import './RegistrationForm.css';
 
 function RegistrationForm() {
   const navigate = useNavigate();
