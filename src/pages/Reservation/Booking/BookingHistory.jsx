@@ -5,14 +5,19 @@ Date: 13/08/2025
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllBookings, deleteBooking, cancel } from "../../../services/bookingService";
+import { getUserData } from "../../../services/authService";
 import "./BookingHistory.css";
 
 function BookingHistory(){
     const navigate = useNavigate();
+    const userData = getUserData();
+    const isAdmin = userData?.role?.toLowerCase() === 'admin';
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         fetchBookings();
@@ -83,6 +88,31 @@ function BookingHistory(){
         }
     };
 
+    const isBookingDatePassed = (booking) => {
+        if (!booking.startDate) return false;
+        const bookingDate = new Date(booking.startDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return bookingDate < today;
+    };
+
+    const filteredBookings = bookings.filter(booking => {
+        const matchesStatus = statusFilter === "all" || booking.bookingStatus?.toLowerCase() === statusFilter.toLowerCase();
+
+        const carInfo = booking.cars?.[0];
+        const carName = typeof carInfo === 'object'
+            ? `${carInfo.brand || ''} ${carInfo.model || ''}`.trim()
+            : carInfo || '';
+
+        const matchesSearch = searchTerm === "" ||
+            carName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            booking.pickupLocation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            booking.dropOffLocation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (booking.id || booking.bookingId)?.toString().includes(searchTerm);
+
+        return matchesStatus && matchesSearch;
+    });
+
     return(
         <div className="booking-history-container">
             <div className="booking-history-wrapper">
@@ -104,12 +134,54 @@ function BookingHistory(){
                     </div>
                 )}
 
+                <div className="filter-bar">
+                    <div className="search-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search by car, location, or booking ID..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                        {searchTerm && (
+                            <button onClick={() => setSearchTerm("")} className="clear-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="filter-group">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M3 4C3 3.44772 3.44772 3 4 3H20C20.5523 3 21 3.44772 21 4V6.58579C21 6.851 20.8946 7.10536 20.7071 7.29289L14.2929 13.7071C14.1054 13.8946 14 14.149 14 14.4142V17L10 21V14.4142C10 14.149 9.89464 13.8946 9.70711 13.7071L3.29289 7.29289C3.10536 7.10536 3 6.851 3 6.58579V4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="filter-select"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div className="results-count">
+                        {filteredBookings.length} {filteredBookings.length === 1 ? 'result' : 'results'}
+                    </div>
+                </div>
+
                 {loading ? (
                     <div className="loading-state">
                         <div className="loading-spinner"></div>
                         <p className="loading-text">Loading bookings...</p>
                     </div>
-                ) : bookings.length === 0 ? (
+                ) : filteredBookings.length === 0 ? (
                     <div className="empty-state">
                         <svg className="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -125,7 +197,7 @@ function BookingHistory(){
                     </div>
                 ) : (
                     <div className="bookings-grid">
-                        {bookings.map((booking, index) => (
+                        {filteredBookings.map((booking, index) => (
                             <div key={booking.id || booking.bookingId || index} className="booking-card">
                                 <div className="booking-card-header">
                                     <h3 className="booking-id">
@@ -212,14 +284,16 @@ function BookingHistory(){
                                 </div>
 
                                 <div className="booking-actions">
-                                    {booking.bookingStatus?.toLowerCase() !== 'cancelled' && (
+                                    {booking.bookingStatus?.toLowerCase() !== 'cancelled' && !isBookingDatePassed(booking) && (
                                         <button onClick={() => handleCancel(booking.id || booking.bookingId)} className="btn-cancel">
                                             Cancel
                                         </button>
                                     )}
-                                    <button onClick={() => handleDelete(booking.id || booking.bookingId)} className="btn-delete">
-                                        Delete
-                                    </button>
+                                    {isAdmin && (
+                                        <button onClick={() => handleDelete(booking.id || booking.bookingId)} className="btn-delete">
+                                            Delete
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

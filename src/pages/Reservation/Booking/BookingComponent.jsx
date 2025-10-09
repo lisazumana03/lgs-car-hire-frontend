@@ -3,10 +3,13 @@ Lisakhanya Zumana (230864821)
 Date: 31/08/2025
  */
 import { Link, useNavigate } from "react-router-dom";
+import { getUserData } from "../../../services/authService";
 import "./BookingComponent.css";
 
 export default function BookingComponent(){
     const navigate = useNavigate();
+    const userData = getUserData();
+    const isAdmin = userData?.role?.toLowerCase() === 'admin';
 
     const bookingOptions = [
         {
@@ -55,6 +58,7 @@ export default function BookingComponent(){
             description: 'Admin access to view, modify, and manage all bookings across the system.',
             path: '/booking-list',
             variant: 'info',
+            adminOnly: true,
             icon: (
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -64,10 +68,13 @@ export default function BookingComponent(){
         }
     ];
 
+    // Filter options based on user role
+    const visibleOptions = bookingOptions.filter(option => !option.adminOnly || isAdmin);
+
     return (
         <div className="booking-management-container">
             <div className="booking-options-grid">
-                {bookingOptions.map((option) => (
+                {visibleOptions.map((option) => (
                     <div key={option.id} className={`booking-option-card ${option.variant}`}>
                         <div className="booking-card-header">
                             <div className="booking-card-icon">

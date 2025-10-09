@@ -11,6 +11,7 @@ const AppSidebar = ({ onLogout }) => {
   const menuItems = [
     { path: ROUTES.DASHBOARD, icon: '🏠', title: 'Dashboard' },
     { path: ROUTES.BOOKINGS, icon: '📅', title: 'Bookings' },
+    { path: ROUTES.BOOKING_LIST, icon: '📋', title: 'Manage Bookings', adminOnly: true },
     { path: ROUTES.CARS, icon: '🚗', title: 'Cars' },
     { path: ROUTES.LOCATIONS, icon: '📍', title: 'Locations' },
     { path: ROUTES.REGISTER_LOCATION, icon: '📌', title: 'Add Location', adminOnly: true },

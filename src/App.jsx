@@ -49,7 +49,7 @@ function App() {
                 <Route path={ROUTES.BOOKINGS} element={<BookingComponent />} />
                 <Route path={ROUTES.MAKE_BOOKING} element={<BookingForm user={currentUser} />} />
                 <Route path={ROUTES.BOOKING_HISTORY} element={<BookingHistory />} />
-                <Route path={ROUTES.BOOKING_LIST} element={<BookingList />} />
+                <Route path={ROUTES.BOOKING_LIST} element={<AdminRoute><BookingList /></AdminRoute>} />
                 <Route path={ROUTES.CARS} element={<CarList />} />
                 <Route path={ROUTES.REGISTER_CAR} element={<AdminRoute><CarForm /></AdminRoute>} />
                 <Route path={ROUTES.SELECT_CAR} element={<CarSelection />} />

@@ -5,6 +5,8 @@
   margin: 0 auto;
   padding: 32px 24px;
   min-height: 100vh;
+  display: flex;
+  align-items: center;
 }
 
 /* Booking Options Grid */
@@ -13,6 +15,13 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
   animation: fadeIn 0.5s ease 0.2s both;
+  width: 100%;
+  margin-left: 80px;
+}
+
+/* Limit width when there are 3 or fewer cards (normal user view) */
+.booking-options-grid:has(.booking-option-card:nth-child(3):last-child) {
+  max-width: 900px;
 }
 
 @keyframes fadeIn {
