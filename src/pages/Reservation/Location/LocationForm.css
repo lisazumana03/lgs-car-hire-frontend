@@ -1,7 +1,7 @@
 /* ==================== LOCATION FORM PAGE ==================== */
 
 .location-form-container {
-  max-width: 800px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 32px 24px;
   min-height: 100vh;
@@ -9,9 +9,9 @@
 
 /* Form Card */
 .form-card {
-  background: var(--bg-card, #3a3a3a);
+  background: #3a3a3a;
   border-radius: 12px;
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   animation: slideDown 0.4s ease;
 }
@@ -30,13 +30,13 @@
 .form-card-header {
   padding: 32px 32px 24px;
   background: linear-gradient(to right, rgba(0, 123, 255, 0.08), rgba(0, 123, 255, 0.02));
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .form-card-header h1 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--text-primary, #ffffff);
+  color: #ffffff;
   margin: 0 0 8px 0;
   display: flex;
   align-items: center;
@@ -49,7 +49,7 @@
 
 .form-card-header p {
   font-size: 0.95rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  color: rgba(255, 255, 255, 0.7);
   margin: 0;
 }
 
@@ -101,26 +101,24 @@
 .form-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 28px;
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  display: contents;
 }
 
 /* Form Groups */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .form-group label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-primary, #ffffff);
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -132,18 +130,20 @@
 
 .form-group input,
 .form-group select {
-  padding: 12px 16px;
-  background: var(--input-bg, #2c2c2c);
-  border: 1px solid var(--input-border, #555);
+  padding: 14px 16px;
+  background: #2c2c2c;
+  border: 1px solid #555;
   border-radius: 8px;
-  color: var(--text-primary, #ffffff);
+  color: #ffffff;
   font-size: 0.95rem;
   font-family: inherit;
   transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group input::placeholder {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.4));
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .form-group input:focus,
@@ -168,7 +168,7 @@
   gap: 12px;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .btn {
@@ -201,9 +201,9 @@
 }
 
 .btn-secondary {
-  background: var(--input-bg, #2c2c2c);
-  border: 1px solid var(--input-border, #555);
-  color: var(--text-primary, #ffffff);
+  background: #2c2c2c;
+  border: 1px solid #555;
+  color: #ffffff;
 }
 
 .btn-secondary:hover {

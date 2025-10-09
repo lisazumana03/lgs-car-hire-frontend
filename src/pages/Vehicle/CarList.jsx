@@ -43,7 +43,7 @@ function CarCard({ car, onBook }) {
                     </div>
                 </div>
 
-                {/* Specifications */}
+                {/* Specifications and Badges Combined */}
                 <div className="car-specs">
                     <div className="spec-item">
                         <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
@@ -63,13 +63,9 @@ function CarCard({ car, onBook }) {
                         </svg>
                         {car.carTypeNumberOfSeats || '5'} Seats
                     </div>
-                </div>
-
-                {/* Badges */}
-                <div className="car-badges">
                     {car.insuranceID && (
                         <span className="badge badge-insurance">
-                            Insurance Included
+                            Insurance
                         </span>
                     )}
                     {car.availability ? (
@@ -177,77 +173,90 @@ function CarView() {
                 )}
 
                 {/* Search/Filter Section */}
-                <div className="controls-section">
-                    {/* Search and Filter Section */}
-                    <div className="filters-container">
-                        <div className="filters-grid">
-                            {/* Search Bar */}
-                            <div className="search-container">
-                                <input
-                                    type="text"
-                                    placeholder="Search by brand or model..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="search-input"
-                                />
-                            </div>
-
-                            {/* Brand Filter */}
-                            <div className="filter-group">
-                                <select
-                                    value={selectedBrand}
-                                    onChange={(e) => setSelectedBrand(e.target.value)}
-                                    className="filter-select"
-                                >
-                                    <option value="all">All Brands</option>
-                                    {brands.map(brand => (
-                                        <option key={brand} value={brand}>{brand}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Type Filter */}
-                            <div className="filter-group">
-                                <select
-                                    value={selectedType}
-                                    onChange={(e) => setSelectedType(e.target.value)}
-                                    className="filter-select"
-                                >
-                                    <option value="all">All Types</option>
-                                    {types.map(type => (
-                                        <option key={type} value={type}>{type}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Price Sort */}
-                            <div className="filter-group">
-                                <select
-                                    value={priceSort}
-                                    onChange={(e) => setPriceSort(e.target.value)}
-                                    className="filter-select"
-                                >
-                                    <option value="none">Sort by Price</option>
-                                    <option value="low-high">Price: Low to High</option>
-                                    <option value="high-low">Price: High to Low</option>
-                                </select>
-                            </div>
+                <div className="filters-container">
+                    <div className="filters-grid">
+                        {/* Search Bar */}
+                        <div className="search-box">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <input
+                                type="text"
+                                placeholder="Search by brand or model..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
 
-                        {/* Available Only Toggle */}
-                        <div className="toggle-section">
-                            <label className="toggle-label">
-                                <input
-                                    type="checkbox"
-                                    checked={showOnlyAvailable}
-                                    onChange={(e) => setShowOnlyAvailable(e.target.checked)}
-                                    className="toggle-checkbox"
-                                />
-                                <span className="toggle-text">Show available cars only</span>
-                            </label>
-                            <span className="results-count">
-                                {filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'} found
-                            </span>
+                        {/* Brand Filter */}
+                        <div className="filter-group">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V7C2 6.46957 2.21071 5.96086 2.58579 5.58579C2.96086 5.21071 3.46957 5 4 5H9L11 8H20C20.5304 8 21.0391 8.21071 21.4142 8.58579C21.7893 8.96086 22 9.46957 22 10V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <circle cx="7" cy="19" r="2" stroke="currentColor" strokeWidth="2"/>
+                                <circle cx="17" cy="19" r="2" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            <select
+                                value={selectedBrand}
+                                onChange={(e) => setSelectedBrand(e.target.value)}
+                            >
+                                <option value="all">All Brands</option>
+                                {brands.map(brand => (
+                                    <option key={brand} value={brand}>{brand}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Type Filter */}
+                        <div className="filter-group">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M6 10H6.01M10 14H18M6 14H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <select
+                                value={selectedType}
+                                onChange={(e) => setSelectedType(e.target.value)}
+                            >
+                                <option value="all">All Types</option>
+                                {types.map(type => (
+                                    <option key={type} value={type}>{type}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Price Sort */}
+                        <div className="filter-group">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H21M7 12H17M10 18H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <select
+                                value={priceSort}
+                                onChange={(e) => setPriceSort(e.target.value)}
+                            >
+                                <option value="none">Sort by Price</option>
+                                <option value="low-high">Price: Low to High</option>
+                                <option value="high-low">Price: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Available Only Toggle */}
+                    <div className="toggle-section">
+                        <label className="toggle-label">
+                            <input
+                                type="checkbox"
+                                checked={showOnlyAvailable}
+                                onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                                className="toggle-checkbox"
+                            />
+                            <span className="toggle-text">Show available cars only</span>
+                        </label>
+                        <div className="results-count">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V7C2 6.46957 2.21071 5.96086 2.58579 5.58579C2.96086 5.21071 3.46957 5 4 5H9L11 8H20C20.5304 8 21.0391 8.21071 21.4142 8.58579C21.7893 8.96086 22 9.46957 22 10V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <circle cx="7" cy="19" r="2" stroke="currentColor" strokeWidth="2"/>
+                                <circle cx="17" cy="19" r="2" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            <span>{filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'}</span>
                         </div>
                     </div>
                 </div>
