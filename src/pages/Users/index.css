@@ -169,6 +169,33 @@ body {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Registration container - wider for more fields */
+.registration-container {
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #555 #2c2c2c;
+}
+
+.registration-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.registration-container::-webkit-scrollbar-track {
+  background: #2c2c2c;
+  border-radius: 4px;
+}
+
+.registration-container::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.registration-container::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

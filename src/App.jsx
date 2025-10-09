@@ -62,7 +62,9 @@ function App() {
         ) : (
           <>
             <Routes>
+
               <Route path={ROUTES.LOGIN} element={<LoginForm onLogin={handleLogin} />} />
+              <Route path={ROUTES.REGISTER} element={<RegistrationForm />} />
 
               <Route path="*" element={
                 <>
@@ -72,7 +74,6 @@ function App() {
                       <Route path={ROUTES.HOME} element={<Home />} />
                       <Route path={ROUTES.ABOUT} element={<About />} />
                       <Route path={ROUTES.CONTACT} element={<Contact />} />
-                      <Route path={ROUTES.REGISTER} element={<RegistrationForm />} />
                       <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
 
                       <Route path={ROUTES.CARS} element={<ProtectedRoute><CarList /></ProtectedRoute>} />
