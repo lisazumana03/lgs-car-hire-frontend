@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllNotifications } from '../../scripts/index.js';
+import { getAllNotifications } from '../../services/notificationService.js';
 import '../../assets/styling/Notification.css';
 
 function NotificationsPage() {
@@ -23,8 +23,9 @@ function NotificationsPage() {
     try {
       if (!silent) setLoading(true);
       setError(null);
-      
-      const data = await getAllNotifications();
+
+      const response = await getAllNotifications();
+      const data = response.data;
       
       // Sort by date (newest first) and limit to latest 10
       const sortedData = data

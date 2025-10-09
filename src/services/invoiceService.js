@@ -4,14 +4,27 @@
  */
 
 import axios from "axios";
+import { getAuthToken } from "./authService.js";
 
 const API_URL = "http://localhost:3045/api";
+
+// Helper to add auth header
+const getConfig = () => {
+  const token = getAuthToken();
+  return token
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : {};
+};
 
 
 const invoiceService = {
     create: async (invoiceData) => {
         try {
-            const response = await axios.post(`${API_URL}/invoice/create`, invoiceData);
+            const response = await axios.post(`${API_URL}/invoice/create`, invoiceData, getConfig());
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Invoice creation failed');
@@ -20,7 +33,7 @@ const invoiceService = {
 
     read: async (invoiceId) => {
         try {
-            const response = await axios.get(`${API_URL}/invoice/read/${invoiceId}`);
+            const response = await axios.get(`${API_URL}/invoice/read/${invoiceId}`, getConfig());
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to fetch invoice');
@@ -29,7 +42,7 @@ const invoiceService = {
 
     update: async (invoiceData) => {
         try {
-            const response = await axios.put(`${API_URL}/invoice/update`, invoiceData);
+            const response = await axios.put(`${API_URL}/invoice/update`, invoiceData, getConfig());
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to update invoice');
@@ -38,7 +51,7 @@ const invoiceService = {
 
     delete: async (invoiceId) => {
         try {
-            const response = await axios.delete(`${API_URL}/invoice/delete/${invoiceId}`);
+            const response = await axios.delete(`${API_URL}/invoice/delete/${invoiceId}`, getConfig());
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to delete invoice');
@@ -47,7 +60,7 @@ const invoiceService = {
 
     getUserInvoices: async (userId) => {
         try {
-            const response = await axios.get(`${API_URL}/invoices/user/${userId}`);
+            const response = await axios.get(`${API_URL}/invoices/user/${userId}`, getConfig());
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Failed to fetch user invoices');

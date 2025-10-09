@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createNotification, getAllNotifications, updateNotification, deleteNotification } from '../../scripts/notificationApi.js';
+import { createNotification, getAllNotifications, updateNotification, deleteNotification } from '../../services/notificationService.js';
 import '../../assets/styling/Notification.css';
 
 function Message() {
@@ -23,8 +23,8 @@ function Message() {
 
   const fetchNotifications = async () => {
     try {
-      const data = await getAllNotifications();
-      setNotifications(data);
+      const response = await getAllNotifications();
+      setNotifications(response.data);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
       setResult({ success: false, error: 'Failed to fetch notifications' });
@@ -52,8 +52,8 @@ function Message() {
       } else {
         response = await createNotification(notificationData);
       }
-      
-      setResult({ success: true, data: response });
+
+      setResult({ success: true, data: response.data });
       setFormData({ message: '', status: 'PENDING', userId: 1, userName: 'Test User' });
       
       // Refresh the list if in view mode

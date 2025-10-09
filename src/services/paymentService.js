@@ -4,8 +4,21 @@
  */
 
 import axios from "axios";
+import { getAuthToken } from "./authService.js";
 
 const API_URL = "http://localhost:3045/api";
+
+// Helper to add auth header
+const getConfig = () => {
+  const token = getAuthToken();
+  return token
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : {};
+};
 
 const paymentService = {
   // Verify payment with backend (after Paystack success)
@@ -16,7 +29,7 @@ const paymentService = {
         bookingId,
         amount,
         paymentMethod: "PAYSTACK",
-      });
+      }, getConfig());
       return response.data;
     } catch (error) {
       throw new Error(
@@ -27,7 +40,7 @@ const paymentService = {
 
   read: async (paymentId) => {
     try {
-      const response = await axios.get(`${API_URL}/payments/${paymentId}`);
+      const response = await axios.get(`${API_URL}/payments/${paymentId}`, getConfig());
       return response.data;
     } catch (error) {
       throw new Error(
@@ -40,7 +53,8 @@ const paymentService = {
     try {
       const response = await axios.put(
         `${API_URL}/payments/update`,
-        paymentData
+        paymentData,
+        getConfig()
       );
       return response.data;
     } catch (error) {
@@ -53,7 +67,8 @@ const paymentService = {
   delete: async (paymentId) => {
     try {
       const response = await axios.delete(
-        `${API_URL}/payments/delete/${paymentId}`
+        `${API_URL}/payments/delete/${paymentId}`,
+        getConfig()
       );
       return response.data;
     } catch (error) {
@@ -65,7 +80,7 @@ const paymentService = {
 
   getUserPayments: async (userId) => {
     try {
-      const response = await axios.get(`${API_URL}/payments/user/${userId}`);
+      const response = await axios.get(`${API_URL}/payments/user/${userId}`, getConfig());
       return response.data;
     } catch (error) {
       throw new Error(
