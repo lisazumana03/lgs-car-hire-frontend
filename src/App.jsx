@@ -8,6 +8,7 @@ import { useAuth } from './hooks';
 // Components
 import { AppSidebar, Header, Footer } from './components/Layout';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import AdminRoute from './components/Auth/AdminRoute';
 
 // Pages
 import Home from './pages/Home';
@@ -50,11 +51,11 @@ function App() {
                 <Route path={ROUTES.BOOKING_HISTORY} element={<BookingHistory />} />
                 <Route path={ROUTES.BOOKING_LIST} element={<BookingList />} />
                 <Route path={ROUTES.CARS} element={<CarList />} />
-                <Route path={ROUTES.REGISTER_CAR} element={<CarForm />} />
+                <Route path={ROUTES.REGISTER_CAR} element={<AdminRoute><CarForm /></AdminRoute>} />
                 <Route path={ROUTES.SELECT_CAR} element={<CarSelection />} />
                 <Route path={ROUTES.LOCATIONS} element={<LocationList />} />
                 <Route path={ROUTES.CHOOSE_LOCATION} element={<LocationSelector />} />
-                <Route path={ROUTES.REGISTER_LOCATION} element={<LocationForm />} />
+                <Route path={ROUTES.REGISTER_LOCATION} element={<AdminRoute><LocationForm /></AdminRoute>} />
                 <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
               </Routes>
             </main>
