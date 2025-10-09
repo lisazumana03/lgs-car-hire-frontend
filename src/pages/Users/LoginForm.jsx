@@ -1,7 +1,7 @@
 import Button from './Button.jsx';
 import { useState } from 'react';
 import LoginButton from './LoginButton.jsx';
-import { loginUser } from '../../scripts/index.js';
+import { login } from '../../services/authService.js';
 function LoginForm({ onLogin }) {
   const [formData, setFormData] = useState({
     email: '',
@@ -19,18 +19,19 @@ function LoginForm({ onLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('Logging in...');
-    
+
     try {
-      const userData = await loginUser(formData.email, formData.password);
+      const userData = await login(formData.email, formData.password);
       setMessage('Login successful! Redirecting...');
       console.log('Login response:', userData);
-      
+
       // Call onLogin to update parent state and redirect
       setTimeout(() => {
         onLogin(userData);
       }, 1000);
     } catch (error) {
-      setMessage(`Login failed: ${error.message}`);
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      setMessage(`Login failed: ${errorMessage}`);
       console.error('Login error:', error);
     }
   };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import Contact from "./Contact.jsx";
@@ -35,34 +35,35 @@ import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
 import UserProfile from "./pages/Users/UserProfile.jsx";
 import CarForm from "./pages/Vehicle/CarForm.jsx";
 import CarList from "./pages/Vehicle/CarList.jsx";
-import { getUserProfile } from "./scripts";
+import { isAuthenticated, getUserData, logout } from "./services/authService.js";
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
+    const [authenticated, setAuthenticated] = useState(isAuthenticated());
+    const [currentUser, setCurrentUser] = useState(getUserData());
+
+    useEffect(() => {
+        const checkAuth = () => {
+            setAuthenticated(isAuthenticated());
+            setCurrentUser(getUserData());
+        };
+        checkAuth();
+    }, []);
 
     const handleLogin = async (userData) => {
-        setIsAuthenticated(true);
+        setAuthenticated(true);
         setCurrentUser(userData);
-        if (userData.id) {
-            try {
-                const fullProfile = await getUserProfile(userData.id);
-                setCurrentUser(fullProfile);
-            } catch (error) {
-                // Keep the basic user data if profile fetch fails
-            }
-        }
     };
 
     const handleLogout = () => {
-        setIsAuthenticated(false);
+        logout();
+        setAuthenticated(false);
         setCurrentUser(null);
     };
 
     return (
         <Router>
-            <div className={`app ${isAuthenticated ? 'authenticated' : 'unauthenticated'}`}>
-                {isAuthenticated ? (
+            <div className={`app ${authenticated ? 'authenticated' : 'unauthenticated'}`}>
+                {authenticated ? (
                     <>
                         <Sidebar onLogout={handleLogout} />
                         <main className="main-content">

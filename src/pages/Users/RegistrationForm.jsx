@@ -1,7 +1,7 @@
 import Button from './Button.jsx';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../../scripts/index.js';
+import { signup } from '../../services/authService.js';
 
 function RegistrationForm() {
   const navigate = useNavigate();
@@ -45,16 +45,20 @@ function RegistrationForm() {
         licenseNumber: formData.licenseNumber
       };
 
-      const data = await registerUser(userData);
-      setMessage('Account created successfully! Redirecting to login...');
+      const data = await signup(userData);
+      setMessage('Account created successfully! Redirecting...');
       console.log('Registration response:', data);
-      
-      // Redirect to login after 2 seconds
+
       setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+        window.location.href = '/dashboard';
+      }, 1000);
     } catch (error) {
-      setMessage(`Registration failed: ${error.message}`);
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      if (error.response?.status === 409) {
+        setMessage('Email already exists. Please use a different email.');
+      } else {
+        setMessage(`Registration failed: ${errorMessage}`);
+      }
       console.error('Registration error:', error);
     }
   };
