@@ -13,6 +13,9 @@ export * from './insurance.types';
 // Location types
 export * from './location.types';
 
+// Support types
+export * from './support.types';
+
 // Common API response wrapper
 export interface ApiResponse<T> {
   data: T;

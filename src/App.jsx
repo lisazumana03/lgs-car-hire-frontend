@@ -29,6 +29,9 @@ import LocationList from './pages/Reservation/Location/LocationList';
 import LocationSelector from './pages/Reservation/Location/LocationSelector';
 import CarForm from './pages/Vehicle/CarForm';
 import CarList from './pages/Vehicle/CarList';
+import SupportTicketList from './pages/Support/SupportTicketList';
+import NewSupportTicket from './pages/Support/NewSupportTicket';
+import SupportTicketDetail from './pages/Support/SupportTicketDetail';
 
 // Constants
 import { ROUTES } from './constants';
@@ -56,6 +59,9 @@ function App() {
                 <Route path={ROUTES.LOCATIONS} element={<LocationList />} />
                 <Route path={ROUTES.CHOOSE_LOCATION} element={<LocationSelector />} />
                 <Route path={ROUTES.REGISTER_LOCATION} element={<AdminRoute><LocationForm /></AdminRoute>} />
+                <Route path={ROUTES.SUPPORT} element={<SupportTicketList />} />
+                <Route path={ROUTES.SUPPORT_NEW} element={<NewSupportTicket />} />
+                <Route path="/support/:ticketId" element={<SupportTicketDetail />} />
                 <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
               </Routes>
             </main>

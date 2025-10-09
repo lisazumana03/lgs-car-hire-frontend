@@ -1,9 +1,69 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getTicketsByUser } from '../../services/supportService';
+import { getAllBookings } from '../../services/bookingService';
+import { getUserData } from '../../services/authService';
 import './Dashboard.css';
 
 function Dashboard({ user }) {
   const navigate = useNavigate();
+  const userData = getUserData();
+  const [openTicketsCount, setOpenTicketsCount] = useState(0);
+  const [activeBookingsCount, setActiveBookingsCount] = useState(0);
+  const [totalRentalsCount, setTotalRentalsCount] = useState(0);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        if (userData?.userId) {
+          console.log('Current user ID:', userData.userId);
+
+          // Fetch open tickets
+          const ticketsResponse = await getTicketsByUser(userData.userId);
+          const tickets = ticketsResponse.data || [];
+          console.log('Tickets:', tickets);
+          const openCount = tickets.filter(ticket =>
+            ticket.status?.toLowerCase() === 'open'
+          ).length;
+          setOpenTicketsCount(openCount);
+
+          // Fetch bookings
+          const bookingsResponse = await getAllBookings();
+          const allBookings = bookingsResponse.data || [];
+          console.log('All bookings:', allBookings);
+          console.log('Sample booking structure:', allBookings[0]);
+          console.log('Sample booking keys:', allBookings[0] ? Object.keys(allBookings[0]) : 'No bookings');
+
+          // Filter bookings for current user
+          const userBookings = allBookings.filter(booking => {
+            console.log('Comparing booking userID:', booking.userID, 'with current user:', userData.userId);
+            return booking.userID === userData.userId;
+          });
+          console.log('User bookings:', userBookings);
+
+          // Count active bookings (status is CONFIRMED or ACTIVE)
+          const activeCount = userBookings.filter(booking => {
+            console.log('Booking status:', booking.bookingStatus);
+            return booking.bookingStatus?.toUpperCase() === 'CONFIRMED' ||
+                   booking.bookingStatus?.toUpperCase() === 'ACTIVE';
+          }).length;
+          setActiveBookingsCount(activeCount);
+          console.log('Active bookings count:', activeCount);
+
+          // Total rentals is all bookings for this user
+          setTotalRentalsCount(userBookings.length);
+          console.log('Total rentals count:', userBookings.length);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setOpenTicketsCount(0);
+        setActiveBookingsCount(0);
+        setTotalRentalsCount(0);
+      }
+    };
+
+    fetchDashboardData();
+  }, [userData?.userId]);
 
   const quickActions = [
     {
@@ -56,18 +116,18 @@ function Dashboard({ user }) {
   const stats = [
     {
       label: 'Active Bookings',
-      value: '0',
+      value: activeBookingsCount.toString(),
       description: 'Current rentals'
     },
     {
       label: 'Total Rentals',
-      value: '0',
+      value: totalRentalsCount.toString(),
       description: 'All time'
     },
     {
-      label: 'Available Cars',
-      value: '15',
-      description: 'Ready to book'
+      label: 'Open Tickets',
+      value: openTicketsCount.toString(),
+      description: 'Support requests'
     },
     {
       label: 'Notifications',

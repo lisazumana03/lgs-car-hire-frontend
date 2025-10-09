@@ -14,6 +14,7 @@ const AppSidebar = ({ onLogout }) => {
     { path: ROUTES.BOOKING_LIST, icon: '📋', title: 'Manage Bookings', adminOnly: true },
     { path: ROUTES.CARS, icon: '🚗', title: 'Cars' },
     { path: ROUTES.LOCATIONS, icon: '📍', title: 'Locations' },
+    { path: ROUTES.SUPPORT, icon: '💬', title: 'Support Tickets' },
     { path: ROUTES.REGISTER_LOCATION, icon: '📌', title: 'Add Location', adminOnly: true },
     { path: ROUTES.REGISTER_CAR, icon: '➕', title: 'Add Car', adminOnly: true },
     { path: ROUTES.PROFILE, icon: '👤', title: 'Profile' },

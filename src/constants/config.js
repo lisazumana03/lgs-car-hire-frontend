@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   BOOKINGS: '/bookings',
   LOCATIONS: '/locations',
   INSURANCE: '/insurance',
+  SUPPORT: '/support',
 };
 
 export const APP_NAME = "LG'S CAR HIRE";
@@ -42,4 +43,7 @@ export const ROUTES = {
   CHOOSE_LOCATION: '/choose-location',
   REGISTER_LOCATION: '/register-location',
   ADMIN: '/admin',
+  SUPPORT: '/support',
+  SUPPORT_NEW: '/support/new',
+  SUPPORT_DETAIL: '/support/:ticketId',
 };
