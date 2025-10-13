@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentUserNotifications } from '../../services/notificationService';
 import '../../assets/styling/Notification.css';
-
+//The notifications page displays the latest notifications for the logged-in user.
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +63,7 @@ function NotificationsPage() {
     }
   };
 
-  const getStatusColor = (status) => {
+  const  getStatusColor = (status) => {
     switch (status?.toUpperCase()) {
       case 'BOOKED':
       case 'COMPLETED':
@@ -108,7 +108,7 @@ function NotificationsPage() {
         <div className="notifications-header">
           <h1>Latest Notifications</h1>
           <button onClick={handleRefresh} className="refresh-btn" disabled>
-            🔄 Refreshing...
+            Refreshing...
           </button>
         </div>
         <div className="loading-container">
@@ -147,7 +147,7 @@ function NotificationsPage() {
             Showing latest {notifications.length} notifications
           </span>
           <button onClick={handleRefresh} className="refresh-btn">
-            🔄 Refresh
+            Refresh
           </button>
           {lastFetch && (
             <span className="last-updated">

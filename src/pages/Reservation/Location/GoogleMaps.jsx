@@ -289,7 +289,7 @@ export default function GoogleMaps({
             <div style={{ padding: '20px', backgroundColor: '#1a1a1a', borderRadius: '12px' }}>
                 <div style={{ marginBottom: '30px' }}>
                     <AddressInput
-                        label="📍 Pickup Location"
+                        label=" Pickup Location"
                         placeholder="Enter pickup address (e.g., Sandton City, Johannesburg)"
                         value={pickupAddress}
                         onChange={setPickupAddress}
@@ -297,7 +297,7 @@ export default function GoogleMaps({
                     />
                     
                     <AddressInput
-                        label="🎯 Drop-off Location"
+                        label=" Drop-off Location"
                         placeholder="Enter drop-off address (e.g., OR Tambo Airport)"
                         value={dropoffAddress}
                         onChange={setDropoffAddress}
