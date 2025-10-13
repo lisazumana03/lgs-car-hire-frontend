@@ -49,3 +49,14 @@ export const updateCarAvailability = (carId, available) => {
     params: { available },
   });
 };
+
+export const uploadCarImage = (carId, imageFile) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+
+  return axios.post(`${API_URL}/${carId}/upload-image`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
