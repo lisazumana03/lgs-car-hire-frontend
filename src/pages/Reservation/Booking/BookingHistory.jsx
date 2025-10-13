@@ -4,7 +4,7 @@ Date: 13/08/2025
  */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { cancel, deleteBooking, getAllBookings } from "../../../services/bookingService";
+import { getAllBookings } from "../../../services/bookingService";
 import "./BookingHistory.css"; // (Create this CSS file for custom styles)
 
 function BookingHistory(){
@@ -32,40 +32,6 @@ function BookingHistory(){
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this booking?")) {
-            try {
-                await deleteBooking(id);
-                setMessage("Booking deleted successfully");
-                setMessageType("success");
-                fetchBookings();
-            } catch (error) {
-                console.error("Error deleting booking:", error);
-                setMessage("Error deleting booking");
-                setMessageType("error");
-            }
-        }
-    };
-
-    const handleCancel = async (id) => {
-        if (window.confirm("Are you sure you want to cancel this booking?")) {
-            try {
-                await cancel(id);
-                setMessage("Booking cancelled successfully");
-                setMessageType("success");
-                fetchBookings();
-            } catch (error) {
-                console.error("Error cancelling booking:", error);
-                setMessage("Error cancelling booking");
-                setMessageType("error");
-            }
-        }
-    };
-
-    const handleEdit = (booking) => {
-        navigate("/make-booking", { state: { booking } });
-    };
-
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         return new Date(dateString).toLocaleString();
@@ -85,8 +51,8 @@ function BookingHistory(){
         <div className="booking-history min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white p-8">
             <div className="max-w-6xl mx-auto">
                 <h2 className="text-4xl font-bold mb-6 text-center">Booking History</h2>
-                <p className="text-xl text-center mb-8">Here you can view and manage your bookings.</p>
-                
+                <p className="text-xl text-center mb-8">Here you can view your bookings.</p>
+
                 {message && (
                     <div className={`mb-6 p-4 rounded-lg text-center ${
                         messageType === 'success' 
@@ -157,28 +123,7 @@ function BookingHistory(){
                                             : "N/A"}
                                     </p>
                                 </div>
-                                <div className="flex gap-2 mt-4">
-                                    <button
-                                        onClick={() => handleEdit(booking)}
-                                        className="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(booking.bookingID || booking.id || booking.bookingId)}
-                                        className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition"
-                                    >
-                                        Delete
-                                    </button>
-                                    {booking.bookingStatus?.toLowerCase() !== 'cancelled' && (
-                                        <button
-                                            onClick={() => handleCancel(booking.bookingID || booking.id || booking.bookingId)}
-                                            className="flex-1 bg-orange-600 text-white px-3 py-2 rounded text-sm hover:bg-orange-700 transition"
-                                        >
-                                            Cancel
-                                        </button>
-                                    )}
-                                </div>
+                                {/* Removed Edit, Delete, Cancel buttons */}
                             </div>
                         ))}
                     </div>
@@ -206,3 +151,4 @@ function BookingHistory(){
 }
 
 export default BookingHistory;
+
