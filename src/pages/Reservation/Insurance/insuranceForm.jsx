@@ -4,132 +4,190 @@ Sibulele Nohamba
 Date: 28/08/2025
  */
 
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
+import Header from "../Common/Header";
+import Navigation from "../Common/Navigation";
+import Footer from "../Common/Footer";
+
+import "../../assets/styling/Global.css";
+import "../../assets/styling/Dashboard.css";
+import "../../assets/styling/Sidebar.css";
+
 import {
+  getInsuranceById,
   createInsurance,
-  readInsurance,
   updateInsurance,
-  deleteInsurance,
-  cancelInsurance,
-} from "../../../services/insuranceService";
+} from "../../services/insuranceService";
 
-function InsuranceForm() {
+export default function InsuranceForm() {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
-    insuranceID: "",
-    insuranceStartDate: "",
-    insuranceCost: "",
-    insuranceProvider: "",
-    status: "",
+    providerName: "",
     policyNumber: "",
-    mechanic: "",
-    carId: "",
+    startDate: "",
+    endDate: "",
+    premium: "",
+    brokerName: "",
+    brokerPhone: "",
+    brokerEmail: "",
   });
-  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
 
-  const msg = (m) => {
-    setMessage(m);
-    setTimeout(() => setMessage(""), 3000);
-  };
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      try {
+        const d = await getInsuranceById(id);
+        setForm({
+          providerName: d.providerName ?? d.company ?? "",
+          policyNumber: d.policyNumber ?? "",
+          startDate: (d.startDate ?? "").slice(0, 10),
+          endDate: (d.endDate ?? "").slice(0, 10),
+          premium: d.premium?.toString?.() ?? "",
+          brokerName: d.brokerName ?? d.insuranceBroker ?? "",
+          brokerPhone: d.brokerPhone ?? "",
+          brokerEmail: d.brokerEmail ?? "",
+        });
+      } catch (e) {
+        setErr(e.message || "Failed to load policy");
+      }
+    })();
+  }, [id, isEdit]);
 
-  const handleChange = (e) => {
+  function onChange(e) {
     const { name, value } = e.target;
-    setForm((p) => ({ ...p, [name]: value }));
-  };
+    setForm((f) => ({ ...f, [name]: value }));
+  }
 
-  const onCreate = async (e) => {
+  async function onSubmit(e) {
     e.preventDefault();
-    try {
-      await createInsurance(form);
-      msg("Insurance created successfully");
-      setForm({
-        insuranceID: "",
-        insuranceStartDate: "",
-        insuranceCost: "",
-        insuranceProvider: "",
-        status: "",
-        policyNumber: "",
-        mechanic: "",
-        carId: "",
-      });
-    } catch {
-      msg("Insurance creation failed");
-    }
-  };
+    setSaving(true);
+    setErr("");
 
-  const onRead = async () => {
-    if (!form.insuranceID) return msg("Please enter the correct insurance ID to read");
-    try {
-      const { data } = await readInsurance(form.insuranceID);
-      const date = data.insuranceStartDate ? String(data.insuranceStartDate).slice(0, 10) : "";
-      setForm({
-        insuranceID: data.insuranceID ?? "",
-        insuranceStartDate: date,
-        insuranceCost: data.insuranceCost ?? "",
-        insuranceProvider: data.insuranceProvider ?? "",
-        status: data.status ?? "",
-        policyNumber: data.policyNumber ?? "",
-        mechanic: data.mechanic ?? "",
-        carId: data.carId ?? data.car?.carId ?? "",
-      });
-      msg("Read loaded");
-    } catch {
-      msg("Read failed");
-    }
-  };
+    const payload = {
+      ...form,
+      premium: form.premium ? Number(form.premium) : 0,
+    };
 
-  const onUpdate = async () => {
     try {
-      await updateInsurance(form);
-      msg("Insurance updated");
-    } catch {
-      msg("Insurance update failed");
+      if (isEdit) await updateInsurance(id, payload);
+      else await createInsurance(payload);
+      navigate("/insurance");
+    } catch (e) {
+      setErr(e.message || "Save failed");
+    } finally {
+      setSaving(false);
     }
-  };
-
-  const onDelete = async () => {
-    if (!form.insuranceID) return msg("Please enter insurance ID to delete");
-    try {
-      await deleteInsurance(form.insuranceID);
-      msg("Insurance deleted");
-    } catch {
-      msg("Delete failed");
-    }
-  };
-
-  const onCancel = async () => {
-    if (!form.insuranceID) return msg("Please enter insurance ID to cancel");
-    try {
-      await cancelInsurance(form.insuranceID);
-      msg("Insurance cancelled");
-    } catch {
-      msg("Insurance cancellation failed");
-    }
-  };
+  }
 
   return (
-    <form onSubmit={onCreate}>
-      <h2>Insurance</h2>
+    <>
+      <Header />
+      <Navigation />
+      <main className="main-content">
+        <div className="dashboard-container">
+          <h1>{isEdit ? "Edit Insurance" : "New Insurance"}</h1>
 
-      <input name="insuranceID" value={form.insuranceID} onChange={handleChange} placeholder="Insurance ID" />
-      <input type="date" name="insuranceStartDate" value={form.insuranceStartDate} onChange={handleChange} />
-      <input type="number" name="insuranceCost" value={form.insuranceCost} onChange={handleChange} placeholder="Cost" />
-      <input name="insuranceProvider" value={form.insuranceProvider} onChange={handleChange} placeholder="Provider" />
-      <input name="status" value={form.status} onChange={handleChange} placeholder="Status" />
-      <input type="number" name="policyNumber" value={form.policyNumber} onChange={handleChange} placeholder="Policy Number" />
-      <input name="mechanic" value={form.mechanic} onChange={handleChange} placeholder="Mechanic" />
-      <input type="number" name="carId" value={form.carId} onChange={handleChange} placeholder="Car ID" />
+          <div className="quick-actions">
+            {err ? <div className="notice error">{err}</div> : null}
 
-      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-        <button type="submit">Create</button>
-        <button type="button" onClick={onRead}>Read</button>
-        <button type="button" onClick={onUpdate}>Update</button>
-        <button type="button" onClick={onDelete}>Delete</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
-      </div>
+            <form onSubmit={onSubmit} className="form-group">
+              <label>Provider</label>
+              <input
+                className="input"
+                name="providerName"
+                value={form.providerName}
+                onChange={onChange}
+                placeholder="ABC Insurance"
+              />
 
-      {message && <p>{message}</p>}
-    </form>
+              <label>Policy Number</label>
+              <input
+                className="input"
+                name="policyNumber"
+                value={form.policyNumber}
+                onChange={onChange}
+                placeholder="123-456-789"
+              />
+
+              <label>Start Date</label>
+              <input
+                type="date"
+                className="input"
+                name="startDate"
+                value={form.startDate}
+                onChange={onChange}
+              />
+
+              <label>End Date</label>
+              <input
+                type="date"
+                className="input"
+                name="endDate"
+                value={form.endDate}
+                onChange={onChange}
+              />
+
+              <label>Premium (R)</label>
+              <input
+                className="input"
+                name="premium"
+                value={form.premium}
+                onChange={onChange}
+                placeholder="899.00"
+              />
+
+              <label>Broker Name</label>
+              <input
+                className="input"
+                name="brokerName"
+                value={form.brokerName}
+                onChange={onChange}
+                placeholder="Thabo M."
+              />
+
+              <label>Broker Phone</label>
+              <input
+                className="input"
+                name="brokerPhone"
+                value={form.brokerPhone}
+                onChange={onChange}
+                placeholder="+27 82 123 4567"
+              />
+
+              <label>Broker Email</label>
+              <input
+                className="input"
+                name="brokerEmail"
+                value={form.brokerEmail}
+                onChange={onChange}
+                placeholder="broker@example.com"
+              />
+
+              <div className="form-actions" style={{ marginTop: 16 }}>
+                <button className="submit-btn" type="submit" disabled={saving}>
+                  {saving ? "Saving..." : "Save"}
+                </button>
+                <button
+                  className="action-btn"
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  style={{ marginLeft: 10 }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }
-
-export default InsuranceForm;
