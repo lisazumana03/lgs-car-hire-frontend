@@ -76,6 +76,8 @@ function App() {
                                 <Route path="/cars" element={<CarList />} />
                                 <Route path="/register-car" element={<CarForm />} />
                                 <Route path="/select-car" element={<CarSelection />} />
+                                <Route path="/maintenance/:id/edit" element={<MaintenanceForm />} />
+                                <Route path="/insurance/:id/edit" element={<InsuranceForm />} />
                                 <Route path="/notifications" element={<NotificationsPage />} />
                                 <Route path="/notification-test" element={<Message />} />
                                 <Route path="/payment" element={<PaymentForm />} />
