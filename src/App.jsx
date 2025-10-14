@@ -27,6 +27,7 @@ import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
 import SupportComponent from './pages/Reservation/Support/supportComponent.jsx';
 import SupportForm from "./pages/Reservation/Support/supportForm.jsx";
 import SupportList from "./pages/Reservation/Support/supportList.jsx";
+import SupportEditList from "./pages/Reservation/Support/supportEditList.jsx";
 import Dashboard from "./pages/Users/Dashboard.jsx";
 import LoginForm from "./pages/Users/LoginForm.jsx";
 import Message from "./pages/Users/Message.jsx";
@@ -92,8 +93,9 @@ function App() {
                                 <Route path="/edit-reviews" element={<ReviewEditList/>} />
                                 <Route path="/review-list" element={<ReviewList/>} />
                                 <Route path="/support" element={<SupportComponent/>} />
-                                <Route path="/support-form" element={<SupportForm/>} />
+                                <Route path="/support-form" element={<SupportForm user={currentUser} />} />
                                 <Route path="/support-list" element={<SupportList/>} />
+                                <Route path="/support-edit-list" element={<SupportEditList/>} />
                                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
                             </Routes>
                         </main>
