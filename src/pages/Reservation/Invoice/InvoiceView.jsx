@@ -1,8 +1,3 @@
-/**
- * Sanele Zondi (221602011)
- * InvoiceView.jsx
- */
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import invoiceService from '../../../services/invoiceService';
@@ -37,7 +32,6 @@ const InvoiceView = () => {
 
     const handleDownload = async () => {
         try {
-            console.log('Downloading invoice:', id);
             const blob = await invoiceService.downloadInvoice(id);
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -60,7 +54,8 @@ Subtotal: R${invoice.subTotal?.toFixed(2) || '0.00'}
 Tax: R${invoice.taxAmount?.toFixed(2) || '0.00'}
 Total: R${invoice.totalAmount?.toFixed(2) || '0.00'}
 Status: ${invoice.status}
-        `.trim();
+Car: ${invoice.carModel || 'Vehicle'}
+            `.trim();
 
             const blob = new Blob([invoiceText], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);
@@ -103,20 +98,15 @@ Status: ${invoice.status}
         );
     }
 
-    // For InvoiceView, we need the full entity data, not just DTO
-    // So we'll use the existing entity structure
-    const rentalDays = invoice.booking && invoice.booking.startDate && invoice.booking.endDate ?
-        Math.ceil((new Date(invoice.booking.endDate) - new Date(invoice.booking.startDate)) / (1000 * 60 * 60 * 24)) || 1 :
+    // Calculate rental days based on issue date and due date (since we don't have booking dates)
+    const rentalDays = invoice.issueDate && invoice.dueDate ?
+        Math.ceil((new Date(invoice.dueDate) - new Date(invoice.issueDate)) / (1000 * 60 * 60 * 24)) || 1 :
         1;
 
-    const dailyRate = invoice.booking ?
-        (invoice.subTotal / rentalDays).toFixed(2) :
-        invoice.subTotal.toFixed(2);
+    const dailyRate = rentalDays > 0 ? (invoice.subTotal / rentalDays).toFixed(2) : invoice.subTotal.toFixed(2);
 
-    // Get car model safely - using both DTO and entity approaches
-    const carModel = invoice.carModel && invoice.carModel !== "Unknown" ?
-        invoice.carModel :
-        (invoice.booking?.cars?.[0]?.model || 'Vehicle');
+    // Use the carModel from the DTO
+    const carModel = invoice.carModel && invoice.carModel !== "Unknown" ? invoice.carModel : 'Vehicle';
 
     return (
         <div className="form">
@@ -181,17 +171,17 @@ Status: ${invoice.status}
                     </div>
                 </div>
 
-                {/* Client Information */}
+                {/* Client Information - Simplified since we don't have user data in DTO */}
                 <div style={{ marginBottom: '30px' }}>
                     <h3 style={{ color: '#007bff', marginBottom: '15px' }}>Bill To:</h3>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        {invoice.booking?.user?.name || 'Customer Name'}
+                        Customer
                     </p>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        {invoice.booking?.user?.email || 'customer@email.com'}
+                        customer@email.com
                     </p>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        {invoice.booking?.pickupLocation?.address || 'Pickup Location'}
+                        Pickup Location
                     </p>
                 </div>
 
@@ -263,11 +253,6 @@ Status: ${invoice.status}
                     <strong style={{ color: invoice.status === 'PAID' ? '#155724' : '#856404' }}>
                         {invoice.status === 'PAID' ? 'PAID' : 'PENDING PAYMENT'}
                     </strong>
-                    {invoice.status === 'PAID' && invoice.payment?.paymentDate && (
-                        <p style={{ margin: '5px 0 0 0', color: '#155724' }}>
-                            Paid on {new Date(invoice.payment.paymentDate).toLocaleDateString()}
-                        </p>
-                    )}
                 </div>
 
                 {/* Footer */}
@@ -278,7 +263,7 @@ Status: ${invoice.status}
                     color: '#666'
                 }}>
                     <p>Thank you for your business!</p>
-                    <p>Payment is due by {new Date(invoice.dueDate).toLocaleDateString()}</p>
+                    <p>Deposit due date is due by {new Date(invoice.dueDate).toLocaleDateString()}</p>
                 </div>
             </div>
         </div>
