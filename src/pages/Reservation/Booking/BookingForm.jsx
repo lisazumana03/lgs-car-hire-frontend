@@ -24,6 +24,8 @@ export default function BookingForm() {
 
     const editingBooking = location.state?.booking;
 
+    const [userId, setUserId] = useState(null);
+
     const [form, setForm] = useState({
         cars: [selectedCar?.carID || ""],
         bookingDateAndTime: getCurrentDateTime(),
