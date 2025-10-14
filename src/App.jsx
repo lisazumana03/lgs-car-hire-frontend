@@ -107,7 +107,6 @@ function App() {
                             <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
                             <Route path="/register" element={<RegistrationForm />} />
                             <Route path="/make-booking" element={<BookingForm />} />
-                            <Route path="/bookings" element={<BookingList />} />
                             <Route path="/register-car" element={<CarForm />} />
                             <Route path="/cars" element={<CarList />} />
                             <Route path="/admin" element={<AdminDashboard/>} />

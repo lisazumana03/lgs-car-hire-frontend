@@ -2,7 +2,7 @@
 Lisakhanya Zumana (230864821)
 Date: 31/08/2025
  */
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function BookingComponent(){
     const navigate = useNavigate();
@@ -47,7 +47,7 @@ export default function BookingComponent(){
                     <h3>Manage All Bookings</h3>
                     <p>Admin view to manage all bookings in the system.</p>
                     <Link
-                        to="/booking-history"
+                        to="/booking-list"
                         className="booking-btn tertiary"
                     >
                         Manage Bookings
