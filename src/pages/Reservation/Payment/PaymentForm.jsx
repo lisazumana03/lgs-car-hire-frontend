@@ -14,10 +14,9 @@ const PaymentForm = () => {
     const [loading, setLoading] = useState(!bookingFromState);
     const [message, setMessage] = useState('');
 
-    const publicKey = "pk_test_449cd792d931e2771ebbe28763ec288c46bc3a10"; // Paystack test public key
-    const customerEmail = "test@example.com"; // Test email for development
+    const publicKey = "pk_test_449cd792d931e2771ebbe28763ec288c46bc3a10";
+    const customerEmail = "test@example.com";
 
-    // Fetch bookings if no booking was passed via state
     useEffect(() => {
         if (!bookingFromState) {
             fetchBookings();
@@ -29,12 +28,108 @@ const PaymentForm = () => {
             const response = await getAllBookings();
             setBookings(response.data || []);
         } catch (error) {
-            console.error('Failed to fetch bookings:', error);
             setMessage('Failed to load bookings');
             setBookings([]);
         } finally {
             setLoading(false);
         }
+    };
+
+    const createInvoice = async (paymentId) => {
+        try {
+            const invoiceRes = await fetch("http://localhost:3045/api/invoice/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    paymentId: paymentId
+                }),
+            });
+
+            if (invoiceRes.ok) {
+                const invoiceData = await invoiceRes.json();
+                // Wait for processing
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                navigate(`/invoice/${invoiceData.invoiceID}`);
+            } else {
+                await redirectToInvoice(paymentId);
+            }
+        } catch (error) {
+            await redirectToInvoice(paymentId);
+        }
+    };
+
+    const redirectToInvoice = async (paymentId) => {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const invoiceRes = await fetch(`http://localhost:3045/api/invoice/payment/${paymentId}`);
+            if (invoiceRes.ok) {
+                const invoices = await invoiceRes.json();
+                if (invoices.length > 0) {
+                    navigate(`/invoice/${invoices[0].invoiceID}`);
+                    return;
+                }
+            }
+
+            const userId = localStorage.getItem('userId') || '1';
+            const userInvoicesRes = await fetch(`http://localhost:3045/api/invoice/user/${userId}`);
+            if (userInvoicesRes.ok) {
+                const userInvoices = await userInvoicesRes.json();
+                if (userInvoices.length > 0) {
+                    navigate(`/invoice/${userInvoices[userInvoices.length - 1].invoiceID}`);
+                    return;
+                }
+            }
+
+            navigate('/invoices');
+        } catch (error) {
+            navigate('/invoices');
+        }
+    };
+
+    const componentProps = {
+        email: customerEmail,
+        amount: (selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500) * 100,
+        publicKey,
+        text: `Pay R${selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500}`,
+        currency: "ZAR",
+        metadata: {
+            custom_fields: [
+                {
+                    display_name: "Booking ID",
+                    variable_name: "booking_id",
+                    value: selectedBooking?.bookingID || selectedBooking?.id,
+                },
+            ],
+        },
+        onSuccess: async (response) => {
+            const paymentAmount = selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500;
+            const bookingId = selectedBooking?.bookingID || selectedBooking?.id;
+
+            try {
+                const paymentRes = await fetch("http://localhost:3045/api/payment/create-payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        bookingId: parseInt(bookingId),
+                        amount: paymentAmount,
+                        paymentMethod: "PAYSTACK"
+                    }),
+                });
+
+                if (paymentRes.ok) {
+                    const paymentData = await paymentRes.json();
+                    await createInvoice(paymentData.paymentID);
+                } else {
+                    navigate('/invoices');
+                }
+            } catch (err) {
+                navigate('/invoices');
+            }
+        },
+        onClose: () => {
+            setMessage("Payment cancelled.");
+        },
     };
 
     if (loading) {
@@ -54,73 +149,6 @@ const PaymentForm = () => {
             </div>
         );
     }
-
-    // Debug: Log the booking data to see what we're working with
-    console.log("Selected booking data:", selectedBooking);
-    console.log("Total amount:", selectedBooking?.totalAmount);
-    console.log("Car rental price:", selectedBooking?.car?.rentalPrice);
-
-    const componentProps = {
-        email: customerEmail,
-        amount: (selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500) * 100, // Paystack uses cents (kobo)
-        publicKey,
-        text: `Pay R${selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500}`,
-        currency: "ZAR", // Add currency
-        metadata: {
-            custom_fields: [
-                {
-                    display_name: "Booking ID",
-                    variable_name: "booking_id",
-                    value: selectedBooking?.bookingID || selectedBooking?.id,
-                },
-            ],
-        },
-        callback: (response) => {
-            console.log("Payment callback:", response);
-            // Handle the callback manually since we can't use localhost
-        },
-        onSuccess: async (response) => {
-            console.log("Payment success:", response);
-
-            // Calculate the correct amount
-            const paymentAmount = selectedBooking?.totalAmount || selectedBooking?.car?.rentalPrice || 500;
-            const bookingId = selectedBooking?.bookingID || selectedBooking?.id;
-
-            console.log("Payment verification data:", {
-                amount: paymentAmount,
-                bookingId: bookingId,
-                reference: response.reference,
-                paymentMethod: "PAYSTACK"
-            });
-
-            // Send to backend for verification
-            try {
-                const res = await fetch("http://localhost:3045/api/payments/verify", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        amount: paymentAmount,
-                        bookingId: bookingId,
-                        reference: response.reference,
-                        paymentMethod: "PAYSTACK"
-                    }),
-                });
-
-                const data = await res.json();
-                console.log("Backend verification:", data);
-
-                navigate('/payment/confirmation', {
-                    state: { payment: data, booking: selectedBooking }
-                });
-            } catch (err) {
-                console.error("Verification failed:", err);
-                setMessage("Payment could not be verified.");
-            }
-        },
-        onClose: () => {
-            setMessage("Payment cancelled.");
-        },
-    };
 
     return (
         <div className="payment-container">
@@ -149,35 +177,34 @@ const PaymentForm = () => {
                     </div>
                 )}
 
-            {selectedBooking && (
-                <>
-                    <div className="booking-details">
-                        <h3>Booking Details</h3>
-                        <div className="booking-info">
-                            <p><strong>Booking ID:</strong> <span>#{selectedBooking.bookingID || selectedBooking.id}</span></p>
-                            <p><strong>Car:</strong> <span>{selectedBooking.car?.brand} {selectedBooking.car?.model} ({selectedBooking.car?.year})</span></p>
-                            <p><strong>Rental Period:</strong> <span>{selectedBooking.startDate} to {selectedBooking.endDate}</span></p>
-                            <p><strong>Amount:</strong> <span className="booking-amount">R{selectedBooking.totalAmount || selectedBooking.car?.rentalPrice || 500}</span></p>
-                            {selectedBooking.car?.rentalPrice && selectedBooking.totalAmount && selectedBooking.totalAmount !== selectedBooking.car.rentalPrice && (
-                                <p className="booking-calculation">
-                                    (R{selectedBooking.car.rentalPrice}/day × {Math.ceil((new Date(selectedBooking.endDate) - new Date(selectedBooking.startDate)) / (1000 * 60 * 60 * 24))} days)
-                                </p>
-                            )}
+                {selectedBooking && (
+                    <>
+                        <div className="booking-details">
+                            <h3>Booking Details</h3>
+                            <div className="booking-info">
+                                <p><strong>Booking ID:</strong> <span>#{selectedBooking.bookingID || selectedBooking.id}</span></p>
+                                <p><strong>Car:</strong> <span>{selectedBooking.car?.brand} {selectedBooking.car?.model} ({selectedBooking.car?.year})</span></p>
+                                <p><strong>Rental Period:</strong> <span>{selectedBooking.startDate} to {selectedBooking.endDate}</span></p>
+                                <p><strong>Amount:</strong> <span className="booking-amount">R{selectedBooking.totalAmount || selectedBooking.car?.rentalPrice || 500}</span></p>
+                                {selectedBooking.car?.rentalPrice && selectedBooking.totalAmount && selectedBooking.totalAmount !== selectedBooking.car.rentalPrice && (
+                                    <p className="booking-calculation">
+                                        (R{selectedBooking.car.rentalPrice}/day × {Math.ceil((new Date(selectedBooking.endDate) - new Date(selectedBooking.startDate)) / (1000 * 60 * 60 * 24))} days)
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    {message && (
-                        <div className={`payment-message ${message.includes('error') || message.includes('Error') ? 'error' : 'success'}`}>
-                            {message}
+                        {message && (
+                            <div className={`payment-message ${message.includes('error') || message.includes('Error') ? 'error' : 'success'}`}>
+                                {message}
+                            </div>
+                        )}
+
+                        <div className="payment-button-container">
+                            <PaystackButton {...componentProps} className="payment-button" />
                         </div>
-                    )}
-
-                    {/* Paystack button */}
-                    <div className="payment-button-container">
-                        <PaystackButton {...componentProps} className="payment-button" />
-                    </div>
-                </>
-            )}
+                    </>
+                )}
             </div>
         </div>
     );

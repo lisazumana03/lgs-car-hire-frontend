@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { create, updateCar } from "../../services/carService.js";
+import { create, updateCar, uploadCarImage } from "../../services/carService.js";
 import { createCarType, getAllCarTypes } from "../../services/carTypeService.js";
 import "./AdminCarForm.css";
 
@@ -10,7 +10,9 @@ function CarForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+
     // Combined form data for both car and car type
     const [formData, setFormData] = useState({
         // Car fields
@@ -19,15 +21,14 @@ function CarForm() {
         year: new Date().getFullYear(),
         availability: true,
         rentalPrice: "",
-        imageUrl: "",
-        
+
         // Car Type fields (for this specific car)
         createNewType: true,
         typeName: "",
         fuelType: "Petrol",
         numberOfWheels: 4,
         numberOfSeats: 5,
-        
+
         // For linking existing type
         existingTypeId: null
     });
@@ -74,6 +75,33 @@ function CarForm() {
         }));
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                setError("Please select a valid image file");
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                setError("Image size must be less than 5MB");
+                return;
+            }
+
+            setImageFile(file);
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            setError("");
+        }
+    };
+
     const applyTypeTemplate = (template) => {
         setFormData(prev => ({
             ...prev,
@@ -112,7 +140,7 @@ function CarForm() {
 
     const handleStep1Submit = async (e) => {
         e.preventDefault();
-        
+
         const validationError = validateCarInfo();
         if (validationError) {
             setError(validationError);
@@ -129,17 +157,28 @@ function CarForm() {
                 brand: formData.brand,
                 year: parseInt(formData.year),
                 availability: formData.availability,
-                rentalPrice: parseFloat(formData.rentalPrice),
-                imageUrl: formData.imageUrl || null
+                rentalPrice: parseFloat(formData.rentalPrice)
             };
 
             const carResponse = await create(carData);
             const createdCar = carResponse.data;
             setCreatedCarId(createdCar.carID);
-            
+
+            // Upload image if provided
+            if (imageFile) {
+                try {
+                    await uploadCarImage(createdCar.carID, imageFile);
+                } catch (imgErr) {
+                    console.error("Failed to upload image:", imgErr);
+                    setError("Car created but image upload failed. You can upload it later.");
+                }
+            }
+
             // Move to step 2
             setStep(2);
-            setError("");
+            if (!imageFile) {
+                setError("");
+            }
         } catch (err) {
             setError(err.response?.data?.message || "Failed to create car. Please try again.");
         } finally {
@@ -195,7 +234,7 @@ function CarForm() {
             }
 
             setSuccess(`Successfully added ${formData.brand} ${formData.model} with its type configuration!`);
-            
+
             // Reset form
             setFormData({
                 model: "",
@@ -203,7 +242,6 @@ function CarForm() {
                 year: new Date().getFullYear(),
                 availability: true,
                 rentalPrice: "",
-                imageUrl: "",
                 createNewType: true,
                 typeName: "",
                 fuelType: "Petrol",
@@ -211,12 +249,14 @@ function CarForm() {
                 numberOfSeats: 5,
                 existingTypeId: null
             });
+            setImageFile(null);
+            setImagePreview(null);
             setStep(1);
             setCreatedCarId(null);
-            
+
             // Refresh car types list
             fetchExistingCarTypes();
-            
+
             setTimeout(() => setSuccess(""), 7000);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to create car type. Please try again.");
@@ -228,7 +268,7 @@ function CarForm() {
     const handleSkipType = async () => {
         // Skip creating type and just finish with the car
         setSuccess(`Successfully added ${formData.brand} ${formData.model} without type configuration!`);
-        
+
         // Reset form
         setFormData({
             model: "",
@@ -236,7 +276,6 @@ function CarForm() {
             year: new Date().getFullYear(),
             availability: true,
             rentalPrice: "",
-            imageUrl: "",
             createNewType: true,
             typeName: "",
             fuelType: "Petrol",
@@ -244,9 +283,11 @@ function CarForm() {
             numberOfSeats: 5,
             existingTypeId: null
         });
+        setImageFile(null);
+        setImagePreview(null);
         setStep(1);
         setCreatedCarId(null);
-        
+
         setTimeout(() => setSuccess(""), 7000);
     };
 
@@ -351,16 +392,33 @@ function CarForm() {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="imageUrl">Image URL</label>
+                                <label htmlFor="carImage">Car Image (Optional)</label>
                                 <input
-                                    type="url"
-                                    id="imageUrl"
-                                    name="imageUrl"
-                                    value={formData.imageUrl}
-                                    onChange={handleInputChange}
-                                    placeholder="https://example.com/car-image.jpg"
+                                    type="file"
+                                    id="carImage"
+                                    name="carImage"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
                                     className="form-input"
                                 />
+                                <small style={{ color: '#666', fontSize: '0.875rem' }}>
+                                    Maximum file size: 5MB. Accepted formats: JPG, PNG, GIF, WEBP
+                                </small>
+                                {imagePreview && (
+                                    <div style={{ marginTop: '10px' }}>
+                                        <p style={{ marginBottom: '8px', fontWeight: '500' }}>Preview:</p>
+                                        <img
+                                            src={imagePreview}
+                                            alt="Car preview"
+                                            style={{
+                                                maxWidth: '300px',
+                                                maxHeight: '200px',
+                                                borderRadius: '8px',
+                                                border: '1px solid #ddd'
+                                            }}
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group checkbox-group">
@@ -387,20 +445,23 @@ function CarForm() {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setFormData({
-                                    model: "",
-                                    brand: "",
-                                    year: new Date().getFullYear(),
-                                    availability: true,
-                                    rentalPrice: "",
-                                    imageUrl: "",
-                                    createNewType: true,
-                                    typeName: "",
-                                    fuelType: "Petrol",
-                                    numberOfWheels: 4,
-                                    numberOfSeats: 5,
-                                    existingTypeId: null
-                                })}
+                                onClick={() => {
+                                    setFormData({
+                                        model: "",
+                                        brand: "",
+                                        year: new Date().getFullYear(),
+                                        availability: true,
+                                        rentalPrice: "",
+                                        createNewType: true,
+                                        typeName: "",
+                                        fuelType: "Petrol",
+                                        numberOfWheels: 4,
+                                        numberOfSeats: 5,
+                                        existingTypeId: null
+                                    });
+                                    setImageFile(null);
+                                    setImagePreview(null);
+                                }}
                                 className="btn btn-secondary"
                             >
                                 Clear Form

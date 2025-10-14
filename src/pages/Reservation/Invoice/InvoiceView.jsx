@@ -1,12 +1,6 @@
-/**
- * Sanele Zondi (221602011)
- * invoiceService.js
- */
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import invoiceService from '../../../services/invoiceService';
-
 
 const InvoiceView = () => {
     const { id } = useParams();
@@ -23,7 +17,6 @@ const InvoiceView = () => {
             } catch (err) {
                 setError('Failed to fetch invoice');
                 console.error('Error fetching invoice:', err);
-                // Invoice not found
                 setInvoice(null);
             } finally {
                 setLoading(false);
@@ -35,6 +28,45 @@ const InvoiceView = () => {
 
     const handlePrint = () => {
         window.print();
+    };
+
+    const handleDownload = async () => {
+        try {
+            const blob = await invoiceService.downloadInvoice(id);
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `invoice-${id}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Download failed:', err);
+            setError('Failed to download invoice: ' + err.message);
+
+            // Fallback: Create a simple text download
+            const invoiceText = `
+INVOICE #${invoice.invoiceID}
+Date: ${new Date(invoice.issueDate).toLocaleDateString()}
+Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}
+Subtotal: R${invoice.subTotal?.toFixed(2) || '0.00'}
+Tax: R${invoice.taxAmount?.toFixed(2) || '0.00'}
+Total: R${invoice.totalAmount?.toFixed(2) || '0.00'}
+Status: ${invoice.status}
+Car: ${invoice.carModel || 'Vehicle'}
+            `.trim();
+
+            const blob = new Blob([invoiceText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `invoice-${id}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        }
     };
 
     if (loading) {
@@ -66,22 +98,26 @@ const InvoiceView = () => {
         );
     }
 
-    // Safety check for rental duration calculation
-    const rentalDays = invoice.booking && invoice.booking.startDate && invoice.booking.endDate ?
-        Math.ceil((new Date(invoice.booking.endDate) - new Date(invoice.booking.startDate)) / (1000 * 60 * 60 * 24)) || 1 :
+    // Calculate rental days based on issue date and due date (since we don't have booking dates)
+    const rentalDays = invoice.issueDate && invoice.dueDate ?
+        Math.ceil((new Date(invoice.dueDate) - new Date(invoice.issueDate)) / (1000 * 60 * 60 * 24)) || 1 :
         1;
 
-    // Safety check for daily rate calculation
-    const dailyRate = invoice.booking ?
-        (invoice.subTotal / rentalDays).toFixed(2) :
-        invoice.subTotal.toFixed(2);
+    const dailyRate = rentalDays > 0 ? (invoice.subTotal / rentalDays).toFixed(2) : invoice.subTotal.toFixed(2);
 
-    // Get car model safely
-    const carModel = invoice.booking?.cars?.[0]?.model || 'Vehicle';
+    // Use the carModel from the DTO
+    const carModel = invoice.carModel && invoice.carModel !== "Unknown" ? invoice.carModel : 'Vehicle';
 
     return (
         <div className="form">
             <div style={{ textAlign: 'right', marginBottom: '20px' }}>
+                <button
+                    onClick={handleDownload}
+                    className="submit-btn"
+                    style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#28a745' }}
+                >
+                    Download Invoice
+                </button>
                 <button
                     onClick={handlePrint}
                     className="submit-btn"
@@ -135,17 +171,17 @@ const InvoiceView = () => {
                     </div>
                 </div>
 
-                {/* Client Information */}
+                {/* Client Information - Simplified since we don't have user data in DTO */}
                 <div style={{ marginBottom: '30px' }}>
                     <h3 style={{ color: '#007bff', marginBottom: '15px' }}>Bill To:</h3>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        {invoice.booking?.user?.name || 'Customer Name'}
+                        Customer
                     </p>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        {invoice.booking?.user?.email || 'customer@email.com'}
+                        customer@email.com
                     </p>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        {invoice.booking?.pickupLocation || 'Pickup Location'}
+                        Pickup Location
                     </p>
                 </div>
 
@@ -172,7 +208,7 @@ const InvoiceView = () => {
                                 R{dailyRate}
                             </td>
                             <td style={{ padding: '12px', textAlign: 'right' }}>
-                                R{invoice.subTotal.toFixed(2)}
+                                R{invoice.subTotal?.toFixed(2) || '0.00'}
                             </td>
                         </tr>
                         </tbody>
@@ -182,7 +218,7 @@ const InvoiceView = () => {
                                 Subtotal:
                             </td>
                             <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>
-                                R{invoice.subTotal.toFixed(2)}
+                                R{invoice.subTotal?.toFixed(2) || '0.00'}
                             </td>
                         </tr>
                         <tr>
@@ -190,7 +226,7 @@ const InvoiceView = () => {
                                 Tax (15%):
                             </td>
                             <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>
-                                R{invoice.taxAmount.toFixed(2)}
+                                R{invoice.taxAmount?.toFixed(2) || '0.00'}
                             </td>
                         </tr>
                         <tr>
@@ -198,7 +234,7 @@ const InvoiceView = () => {
                                 Total:
                             </td>
                             <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', fontSize: '1.1em', color: '#007bff' }}>
-                                R{invoice.totalAmount.toFixed(2)}
+                                R{invoice.totalAmount?.toFixed(2) || '0.00'}
                             </td>
                         </tr>
                         </tfoot>
@@ -217,11 +253,6 @@ const InvoiceView = () => {
                     <strong style={{ color: invoice.status === 'PAID' ? '#155724' : '#856404' }}>
                         {invoice.status === 'PAID' ? 'PAID' : 'PENDING PAYMENT'}
                     </strong>
-                    {invoice.status === 'PAID' && invoice.payment?.paymentDate && (
-                        <p style={{ margin: '5px 0 0 0', color: '#155724' }}>
-                            Paid on {new Date(invoice.payment.paymentDate).toLocaleDateString()}
-                        </p>
-                    )}
                 </div>
 
                 {/* Footer */}
@@ -232,7 +263,7 @@ const InvoiceView = () => {
                     color: '#666'
                 }}>
                     <p>Thank you for your business!</p>
-                    <p>Payment is due by {new Date(invoice.dueDate).toLocaleDateString()}</p>
+                    <p>Deposit due date is due by {new Date(invoice.dueDate).toLocaleDateString()}</p>
                 </div>
             </div>
         </div>
