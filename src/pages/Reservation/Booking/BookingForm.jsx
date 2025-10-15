@@ -41,6 +41,31 @@ export default function BookingForm() {
     const [loading, setLoading] = useState(false);
     const [carsLoading, setCarsLoading] = useState(true);
 
+    // Get user ID when component mounts
+    useEffect(() => {
+        // Try to get user from session/localStorage
+        const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                const currentUserId = user.id || user.userID || user.userId || user.ID;
+
+                console.log('Current user:', user);
+                console.log('User ID extracted:', currentUserId);
+
+                setUserId(currentUserId);
+            } catch (error) {
+                console.error('Error parsing user from storage:', error);
+                setMessage('Please login to make a booking');
+                setMessageType('error');
+            }
+        } else {
+            console.warn('No user found in storage');
+            setMessage('Please login to make a booking');
+            setMessageType('error');
+        }
+    }, []);
 
     // Fetch available cars on component mount
     useEffect(() => {
