@@ -139,27 +139,24 @@ export default function BookingForm() {
 
         // Prepare payload with correct structure
         const payload = {
-            ...form,
-            cars: selectedCar ? [{ carID: selectedCar.carID }] :
-                (editingBooking?.cars ? editingBooking.cars.map(car => ({ carID: car.carID })) : []),
-            pickupLocation: selectedPickupLocation
-                ? { locationID: selectedPickupLocation.locationID }
-                : (editingBooking?.pickupLocation ? { locationID: editingBooking.pickupLocation.locationID } : null),
-            dropOffLocation: selectedDropOffLocation
-                ? { locationID: selectedDropOffLocation.locationID }
-                : (editingBooking?.dropOffLocation ? { locationID: editingBooking.dropOffLocation.locationID } : null),
-            bookingID: editingBooking?.bookingID // for update
+            user: {
+                userId: userId  // Include the user with userId
+            },
+            bookingDateAndTime: form.bookingDateAndTime,
+            startDate: form.startDate,
+            endDate: form.endDate,
+            bookingStatus: form.bookingStatus,
+            cars: selectedCar ? [{ carID: selectedCar.carID }] : [],
+            pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
+            dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
         };
 
+        console.log('Submitting booking with payload:', payload);
+
         try {
-            let response;
-            if (editingBooking) {
-                response = await update(payload);
-                setMessage("Booking updated successfully!");
-            } else {
-                response = await create(payload);
-                setMessage("Booking created successfully!");
-            }
+            const response = await create(payload);
+            console.log("Booking created:", response.data);
+            setMessage("Booking created successfully!");
             setMessageType("success");
             setForm({
                 cars: [""],
@@ -170,17 +167,17 @@ export default function BookingForm() {
                 dropOffLocation: [""],
                 bookingStatus: "PENDING"
             });
-            
+
             const calculateTotalAmount = () => {
                 if (!selectedCar?.rentalPrice || !form.startDate || !form.endDate) {
                     return selectedCar?.rentalPrice || 500;
                 }
-                
+
                 const startDate = new Date(form.startDate);
                 const endDate = new Date(form.endDate);
                 const timeDiff = endDate.getTime() - startDate.getTime();
                 const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                
+
                 return (selectedCar.rentalPrice * Math.max(1, daysDiff));
             };
 
@@ -220,6 +217,29 @@ export default function BookingForm() {
         <div className="form-group">
             <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
                 <h2 style={{}}>Make a Booking</h2>
+
+                {/* User Status Indicator */}
+                {userId ? (
+                    <div className="mb-4 p-3 bg-green-900/30 border border-green-500 rounded-lg">
+                        <p className="text-green-400 text-sm">
+                            ✓ Logged in (User ID: {userId})
+                        </p>
+                    </div>
+                ) : (
+                    <div className="mb-4 p-3 bg-red-900/30 border border-red-500 rounded-lg">
+                        <p className="text-red-400 text-sm">
+                            ⚠ Please login to make a booking
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/login')}
+                            className="mt-2 text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                            Go to Login
+                        </button>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="form">
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Selected Car *</label>
@@ -390,8 +410,16 @@ export default function BookingForm() {
 
                     <div style={{display: "flex", marginTop: "20px", gap: "10px"}}>
                         <button type="submit"
-                                style={{backgroundColor: "#00ca09"}}
-                                className="submit-btn">Submit</button>
+                                disabled={!userId}
+                                style={{
+                                    backgroundColor: userId ? "#00ca09" : "#666",
+                                    cursor: userId ? "pointer" : "not-allowed",
+                                    opacity: userId ? 1 : 0.6
+                                }}
+                                className="submit-btn"
+                                title={!userId ? "Please login to submit booking" : "Submit booking"}>
+                            Submit
+                        </button>
                         <button type="reset"
                                 style={{backgroundColor: "#003ffa"}}
                                 className="submit-btn" onClick={() => setForm({
