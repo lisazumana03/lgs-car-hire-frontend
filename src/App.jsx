@@ -27,7 +27,6 @@ import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
 import SupportComponent from './pages/Reservation/Support/supportComponent.jsx';
 import SupportForm from "./pages/Reservation/Support/supportForm.jsx";
 import SupportList from "./pages/Reservation/Support/supportList.jsx";
-import SupportEditList from "./pages/Reservation/Support/supportEditList.jsx";
 import Dashboard from "./pages/Users/Dashboard.jsx";
 import LoginForm from "./pages/Users/LoginForm.jsx";
 import Message from "./pages/Users/Message.jsx";
@@ -51,6 +50,7 @@ function App() {
                 setCurrentUser(fullProfile);
             } catch (error) {
                 // Keep the basic user data if profile fetch fails
+                console.error("Failed to fetch full user profile:", error);
             }
         }
     };
@@ -77,8 +77,6 @@ function App() {
                                 <Route path="/cars" element={<CarList />} />
                                 <Route path="/register-car" element={<CarForm />} />
                                 <Route path="/select-car" element={<CarSelection />} />
-                                <Route path="/maintenance/:id/edit" element={<MaintenanceForm />} />
-                                <Route path="/insurance/:id/edit" element={<InsuranceForm />} />
                                 <Route path="/notifications" element={<NotificationsPage />} />
                                 <Route path="/notification-test" element={<Message />} />
                                 <Route path="/payment" element={<PaymentForm />} />
@@ -93,9 +91,8 @@ function App() {
                                 <Route path="/edit-reviews" element={<ReviewEditList/>} />
                                 <Route path="/review-list" element={<ReviewList/>} />
                                 <Route path="/support" element={<SupportComponent/>} />
-                                <Route path="/support-form" element={<SupportForm user={currentUser} />} />
+                                <Route path="/support-form" element={<SupportForm/>} />
                                 <Route path="/support-list" element={<SupportList/>} />
-                                <Route path="/support-edit-list" element={<SupportEditList/>} />
                                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
                             </Routes>
                         </main>
@@ -111,6 +108,7 @@ function App() {
                             <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
                             <Route path="/register" element={<RegistrationForm />} />
                             <Route path="/make-booking" element={<BookingForm />} />
+                            <Route path="/bookings" element={<BookingList />} />
                             <Route path="/register-car" element={<CarForm />} />
                             <Route path="/cars" element={<CarList />} />
                             <Route path="/admin" element={<AdminDashboard/>} />

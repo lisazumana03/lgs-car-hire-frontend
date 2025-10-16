@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { getAllNotifications } from '../../scripts/index.js';
+import { getCurrentUserNotifications } from '../../services/notificationService';
 import '../../assets/styling/Notification.css';
-
+//The notifications page displays the latest notifications for the logged-in user.
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastFetch, setLastFetch] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    // Get current user from session
+    const userStr = sessionStorage.getItem("user") || localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Error parsing user from session:", error);
+      }
+    }
+
     fetchNotifications();
     
     // Set up auto-refresh every 30 seconds
@@ -24,7 +36,7 @@ function NotificationsPage() {
       if (!silent) setLoading(true);
       setError(null);
       
-      const data = await getAllNotifications();
+      const data = await getCurrentUserNotifications();
       
       // Sort by date (newest first) and limit to latest 10
       const sortedData = data
@@ -51,7 +63,7 @@ function NotificationsPage() {
     }
   };
 
-  const getStatusColor = (status) => {
+  const  getStatusColor = (status) => {
     switch (status?.toUpperCase()) {
       case 'BOOKED':
       case 'COMPLETED':
@@ -96,7 +108,7 @@ function NotificationsPage() {
         <div className="notifications-header">
           <h1>Latest Notifications</h1>
           <button onClick={handleRefresh} className="refresh-btn" disabled>
-            🔄 Refreshing...
+            Refreshing...
           </button>
         </div>
         <div className="loading-container">
@@ -111,12 +123,31 @@ function NotificationsPage() {
     <div className="notifications-container">
       <div className="notifications-header">
         <h1>Latest Notifications</h1>
+        {currentUser && (
+          <div className="user-info-banner" style={{ 
+            padding: '15px', 
+            backgroundColor: 'transparent', 
+            borderRadius: '8px', 
+            marginBottom: '15px',
+            border: '1px solid #555'
+          }}>
+            <p className="user-info" style={{ margin: 0, color: 'white' }}>
+              <strong>Logged in as:</strong> {currentUser.name || currentUser.email} 
+              {currentUser.role && <span className="user-role"> ({currentUser.role})</span>}
+              <span className="user-id" style={{ color: 'white', fontWeight: 'bold' }}> | User ID: {
+                console.log("Current user object:", currentUser) ||
+                console.log("User properties:", Object.keys(currentUser)) ||
+                (currentUser.id || currentUser.userID || currentUser.userId || currentUser.ID || 'N/A')
+              }</span>
+            </p>
+          </div>
+        )}
         <div className="header-actions">
           <span className="notification-count">
             Showing latest {notifications.length} notifications
           </span>
           <button onClick={handleRefresh} className="refresh-btn">
-            🔄 Refresh
+            Refresh
           </button>
           {lastFetch && (
             <span className="last-updated">

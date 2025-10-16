@@ -36,8 +36,8 @@ function CarForm() {
     // Popular car brands
     const carBrands = [
         "Toyota", "Honda", "BMW", "Mercedes-Benz", "Audi", "Volkswagen",
-        "Ford", "Chevrolet", "Nissan", "Hyundai", "Mazda", "Kia",
-        "Tesla", "Porsche", "Lexus", "Jeep", "Bentley", "Ferrari"
+        "Ford", "Lamborghini", "Nissan", "Hyundai", "Mazda", "Kia",
+        "Tesla", "Porsche", "Lexus", "Jeep", "Bentley", "Ferrari",
     ];
 
     // Car type templates

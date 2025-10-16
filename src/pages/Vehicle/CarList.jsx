@@ -11,13 +11,42 @@ Updated to support imageUrl from backend
 function CarCard({ car, onBook }) {
     const [imageError, setImageError] = useState(false);
 
+    // Check for different image formats from backend
+    const getCarImage = () => {
+        // Option 1: Check for data URL (Primedrive style - base64 embedded)
+        if (car.imageUrl && car.imageUrl.startsWith('data:')) {
+            return car.imageUrl;
+        }
+        
+        // Option 2: Check for base64 image
+        if (car.imageBase64) {
+            return car.imageBase64;
+        }
+        
+        // Option 3: Check for regular image URL
+        if (car.imageUrl) {
+            return car.imageUrl;
+        }
+        
+        // Option 4: Try to fetch image from backend endpoint
+        // Backend endpoint: GET /api/car/{id}/image
+        // If no image exists, onError will show placeholder
+        if (car.carID) {
+            return `http://localhost:3045/api/car/${car.carID}/image`;
+        }
+        
+        return null;
+    };
+
+    const carImageSrc = getCarImage();
+
     return (
         <div className="car-card">
             {/* Car Image */}
             <div className="car-image-container">
-                {car.imageUrl && !imageError ? (
+                {carImageSrc && !imageError ? (
                     <img 
-                        src={car.imageUrl} 
+                        src={carImageSrc} 
                         alt={`${car.brand} ${car.model}`}
                         className="car-image"
                         onError={() => setImageError(true)}

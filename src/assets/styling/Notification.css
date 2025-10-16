@@ -386,6 +386,19 @@
   min-height: 100px;
 }
 
+/* Readonly Field Styling */
+.readonly-field {
+  background-color: #1a1a1a !important;
+  color: #888 !important;
+  cursor: not-allowed !important;
+  border-color: #444 !important;
+}
+
+.readonly-field:focus {
+  border-color: #444 !important;
+  box-shadow: none !important;
+}
+
 .form-actions {
   display: flex;
   gap: 15px;

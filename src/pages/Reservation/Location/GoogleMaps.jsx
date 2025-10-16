@@ -1,18 +1,27 @@
+/*
+Lisakhanya Zumana (230864821)
+Date: 06/01/2025
+Google Maps Component for Location Selection with Directions
+*/
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Wrapper, Status } from '@googlemaps/react-wrapper';
+
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
 // Map component with directions
-function MapWithDirections({
-                               pickupLocation,
-                               dropoffLocation,
-                               onPickupSelect,
-                               onDropoffSelect
-                           }) {
+function MapWithDirections({ 
+    pickupLocation, 
+    dropoffLocation, 
+    onPickupSelect, 
+    onDropoffSelect 
+}) {
     const ref = useRef(null);
     const [map, setMap] = useState(null);
     const [pickupMarker, setPickupMarker] = useState(null);
     const [dropoffMarker, setDropoffMarker] = useState(null);
     const [directionsRenderer, setDirectionsRenderer] = useState(null);
+
     // Initialize map
     useEffect(() => {
         if (ref.current && !map) {
@@ -24,16 +33,17 @@ function MapWithDirections({
                 fullscreenControl: true,
                 zoomControl: true,
             });
-
+            
             const renderer = new window.google.maps.DirectionsRenderer({
                 map: googleMap,
                 suppressMarkers: false, // Show default markers
             });
-
+            
             setMap(googleMap);
             setDirectionsRenderer(renderer);
         }
     }, [ref, map]);
+
     // Update pickup marker
     useEffect(() => {
         if (map && pickupLocation) {
@@ -41,6 +51,7 @@ function MapWithDirections({
             if (pickupMarker) {
                 pickupMarker.setMap(null);
             }
+
             // Create new pickup marker
             const marker = new window.google.maps.Marker({
                 position: pickupLocation,
@@ -49,10 +60,12 @@ function MapWithDirections({
                 label: 'P',
                 animation: window.google.maps.Animation.DROP,
             });
+
             setPickupMarker(marker);
             map.panTo(pickupLocation);
         }
-    }, [map, pickupLocation]);
+    }, [map, pickupLocation, pickupMarker]);
+
     // Update dropoff marker
     useEffect(() => {
         if (map && dropoffLocation) {
@@ -60,6 +73,7 @@ function MapWithDirections({
             if (dropoffMarker) {
                 dropoffMarker.setMap(null);
             }
+
             // Create new dropoff marker
             const marker = new window.google.maps.Marker({
                 position: dropoffLocation,
@@ -68,13 +82,16 @@ function MapWithDirections({
                 label: 'D',
                 animation: window.google.maps.Animation.DROP,
             });
+
             setDropoffMarker(marker);
         }
-    }, [map, dropoffLocation]);
+    }, [map, dropoffLocation, dropoffMarker]);
+
     // Calculate and display directions
     useEffect(() => {
         if (map && directionsRenderer && pickupLocation && dropoffLocation) {
             const directionsService = new window.google.maps.DirectionsService();
+
             directionsService.route(
                 {
                     origin: pickupLocation,
@@ -84,7 +101,7 @@ function MapWithDirections({
                 (result, status) => {
                     if (status === 'OK') {
                         directionsRenderer.setDirections(result);
-
+                        
                         // Hide our custom markers when showing directions
                         if (pickupMarker) pickupMarker.setMap(null);
                         if (dropoffMarker) dropoffMarker.setMap(null);
@@ -98,29 +115,34 @@ function MapWithDirections({
             directionsRenderer.setDirections({ routes: [] });
         }
     }, [map, directionsRenderer, pickupLocation, dropoffLocation, pickupMarker, dropoffMarker]);
+
     return <div ref={ref} style={{ height: '500px', width: '100%', borderRadius: '8px' }} />;
 }
+
 // Address input component with autocomplete
-function AddressInput({
-                          label,
-                          placeholder,
-                          value,
-                          onChange,
-                          onLocationSelect
-                      }) {
+function AddressInput({ 
+    label, 
+    placeholder, 
+    value, 
+    onChange, 
+    onLocationSelect 
+}) {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const autocompleteService = useRef(null);
     const geocoder = useRef(null);
+
     useEffect(() => {
         if (window.google && window.google.maps) {
             autocompleteService.current = new window.google.maps.places.AutocompleteService();
             geocoder.current = new window.google.maps.Geocoder();
         }
     }, []);
+
     const handleInputChange = (e) => {
         const newValue = e.target.value;
         onChange(newValue);
+
         if (newValue.length > 2 && autocompleteService.current) {
             autocompleteService.current.getPlacePredictions(
                 {
@@ -139,10 +161,12 @@ function AddressInput({
             setShowSuggestions(false);
         }
     };
+
     const handleSuggestionClick = (suggestion) => {
         onChange(suggestion.description);
         setShowSuggestions(false);
         setSuggestions([]);
+
         // Geocode the address to get coordinates
         if (geocoder.current) {
             geocoder.current.geocode(
@@ -159,11 +183,12 @@ function AddressInput({
             );
         }
     };
+
     return (
         <div style={{ position: 'relative', marginBottom: '20px' }}>
-            <label style={{
-                display: 'block',
-                marginBottom: '8px',
+            <label style={{ 
+                display: 'block', 
+                marginBottom: '8px', 
                 fontWeight: '600',
                 color: '#007bff'
             }}>
@@ -228,32 +253,37 @@ function AddressInput({
         </div>
     );
 }
+
 // Main Google Maps component
-export default function GoogleMaps({
-                                       onPickupSelect,
-                                       onDropoffSelect,
-                                       initialPickup = '',
-                                       initialDropoff = ''
-                                   }) {
+export default function GoogleMaps({ 
+    onPickupSelect, 
+    onDropoffSelect,
+    initialPickup = '',
+    initialDropoff = ''
+}) {
     const [pickupAddress, setPickupAddress] = useState(initialPickup);
     const [dropoffAddress, setDropoffAddress] = useState(initialDropoff);
     const [pickupLocation, setPickupLocation] = useState(null);
     const [dropoffLocation, setDropoffLocation] = useState(null);
+
     const handlePickupLocationSelect = (location, address) => {
         setPickupLocation(location);
         if (address) setPickupAddress(address);
         if (onPickupSelect) onPickupSelect(location, address || pickupAddress);
     };
+
     const handleDropoffLocationSelect = (location, address) => {
         setDropoffLocation(location);
         if (address) setDropoffAddress(address);
         if (onDropoffSelect) onDropoffSelect(location, address || dropoffAddress);
     };
+
     const render = (status) => {
         if (status === Status.LOADING) return <h3>Loading Maps...</h3>;
         if (status === Status.FAILURE) return <h3>Error loading maps</h3>;
         return null;
     };
+
     return (
         <Wrapper apiKey={GOOGLE_MAPS_API_KEY} render={render} libraries={['places']}>
             <div style={{ padding: '20px', backgroundColor: '#1a1a1a', borderRadius: '12px' }}>
@@ -265,37 +295,28 @@ export default function GoogleMaps({
                         onChange={setPickupAddress}
                         onLocationSelect={handlePickupLocationSelect}
                     />
-
+                    
                     <AddressInput
                         label=" Drop-off Location"
                         placeholder="Enter drop-off address (e.g., OR Tambo Airport)"
                         value={dropoffAddress}
                         onChange={setDropoffAddress}
-
-
-
-
-
-
-
-                        Expand Down
-
-
-
                         onLocationSelect={handleDropoffLocationSelect}
                     />
                 </div>
+
                 <MapWithDirections
                     pickupLocation={pickupLocation}
                     dropoffLocation={dropoffLocation}
                     onPickupSelect={handlePickupLocationSelect}
                     onDropoffSelect={handleDropoffLocationSelect}
                 />
+
                 {pickupLocation && dropoffLocation && (
-                    <div style={{
-                        marginTop: '20px',
-                        padding: '15px',
-                        backgroundColor: '#2c2c2c',
+                    <div style={{ 
+                        marginTop: '20px', 
+                        padding: '15px', 
+                        backgroundColor: '#2c2c2c', 
                         borderRadius: '8px',
                         border: '2px solid #28a745'
                     }}>

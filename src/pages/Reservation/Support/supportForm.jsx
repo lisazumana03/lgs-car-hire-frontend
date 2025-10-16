@@ -1,117 +1,148 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import * as supportService from '../../../services/supportService';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { create } from "../../../services/supportService";
 
-// SupportForm - create a new support ticket with subject, description and the current user's id
-export default function SupportForm({ user: propUser }) {
-	const navigate = useNavigate();
-	const [user, setUser] = useState(propUser || null);
-	const [form, setForm] = useState({ subject: '', description: '' });
-	const [submitting, setSubmitting] = useState(false);
-	const [error, setError] = useState(null);
+function SupportTicketForm({ user }) {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ 
+    subject: "", 
+    message: "",
+    userId: user?.id || '',
+    userName: user?.name || ''
+  });
 
-	// Try to locate the logged-in user from multiple places if not provided as prop
-	useEffect(() => {
-		if (propUser) return;
-		try {
-			// Common patterns: localStorage 'user' key, window global, or an injected __USER__
-			const fromStorage = (() => {
-				try {
-					const raw = localStorage.getItem('user');
-					return raw ? JSON.parse(raw) : null;
-				} catch (e) {
-					return null;
-				}
-			})();
-			if (fromStorage) {
-				setUser(fromStorage);
-				return;
-			}
-			if (window && window.__USER__) {
-				setUser(window.__USER__);
-				return;
-			}
-		} catch (e) {
-			// ignore
-		}
-	}, [propUser]);
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        userId: user.id || '',
+        userName: user.name || ''
+      }));
+    }
+  }, [user]);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setForm((f) => ({ ...f, [name]: value }));
-	};
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-	const getUserId = () => {
-		if (!user) return null;
-		return user.userId || user.id || user.userID || null;
-	};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await create(form); // call your backend service
+      alert("Support ticket submitted successfully!");
+      navigate("/"); // go back to home (or change as needed)
+    } catch (err) {
+      console.error("Error submitting ticket:", err);
+      alert("Failed to submit ticket.");
+    }
+  };
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setError(null);
-		const userId = getUserId();
-		if (!userId) {
-			setError('Unable to determine current user. Please login first.');
-			return;
-		}
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 via-white to-blue-200 p-4">
+      <div className="w-full max-w-md backdrop-blur-lg bg-white/70 rounded-2xl shadow-2xl p-10 border border-blue-300 relative">
+        {/* Icon */}
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+          <svg
+            width="32"
+            height="32"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="white"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 20l9-5-9-5-9 5 9 5z"
+            />
+          </svg>
+        </div>
 
-		const payload = {
-			subject: form.subject,
-			description: form.description,
-			user: { userId },
-		};
+        <h3 className="text-3xl font-extrabold text-green-700 mb-4 text-center drop-shadow">
+          Submit a Support Ticket
+        </h3>
+        
+        {/* User Information Display */}
+        {user && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <h4 className="text-lg font-semibold text-blue-800 mb-2">User Information</h4>
+            <div className="text-sm text-blue-700">
+              <p><strong>Name:</strong> {user.name || 'Not available'}</p>
+              <p><strong>User ID:</strong> {user.id || 'Not available'}</p>
+              <p><strong>Email:</strong> {user.email || 'Not available'}</p>
+            </div>
+          </div>
+        )}
 
-		try {
-			setSubmitting(true);
-			await supportService.create(payload);
-			// redirect to support list after success
-			navigate('/support-list');
-		} catch (err) {
-			setError(err?.response?.data?.message || err.message || 'Failed to create ticket.');
-		} finally {
-			setSubmitting(false);
-		}
-	};
+        {/* FORM */}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-6">
+            <label
+              htmlFor="subject"
+              className="block text-green-700 font-bold mb-2"
+            >
+              Subject
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              value={form.subject}
+              onChange={handleChange}
+              placeholder="Enter subject"
+              className="w-full border border-green-400 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-200 placeholder:text-green-400 placeholder:font-semibold bg-white/80 shadow-sm text-gray-900"
+              required
+            />
+          </div>
 
-	return (
-		<div style={{ maxWidth: 720, margin: '1.5rem auto', padding: 20, background: 'linear-gradient(180deg,#0f172a, #001)', borderRadius: 8 }}>
-			<h2 style={{ color: '#FBBF24', marginBottom: '1rem' }}>Create Support Ticket</h2>
+          <div className="mb-8">
+            <label
+              htmlFor="message"
+              className="block text-green-700 font-bold mb-2"
+            >
+              Describe your issue
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              value={form.message}
+              onChange={handleChange}
+              placeholder="Describe your issue..."
+              className="w-full border border-green-400 rounded-xl px-5 py-3 resize-none focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-200 placeholder:text-green-400 placeholder:font-semibold bg-white/80 shadow-sm text-gray-900"
+              rows={4}
+              required
+            />
+          </div>
 
-			{user && (getUserId() || user.fullName || user.name) ? (
-				<label style={{ display: 'block', color: '#FBBF24', fontWeight: '600', marginBottom: '0.75rem' }}>
-					User ID: <span style={{ color: '#F1F5F9', fontWeight: '500' }}>{getUserId() || 'N/A'}</span>
-					{user.fullName || user.name ? (
-						<span style={{ marginLeft: 12 }}><span style={{ color: '#FBBF24', fontWeight: '600' }}>Name:</span> <span style={{ color: '#F1F5F9' }}>{user.fullName || user.name}</span></span>
-					) : null}
-				</label>
-			) : (
-				<div style={{ marginBottom: '0.5rem', color: '#f87171' }}>Not logged in or user not available</div>
-			)}
+          <div className="flex flex-col sm:flex-row gap-4 mt-2">
+            <button
+              type="submit"
+              className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-700 text-white px-8 py-3 rounded-xl shadow-lg hover:scale-105 hover:from-green-600 hover:to-green-800 transition-all duration-300 font-bold tracking-wide"
+            >
+              Submit Ticket
+            </button>
 
-			<form onSubmit={handleSubmit}>
-				<label htmlFor="subject" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#FBBF24' }}>Subject *</label>
-				<input id="subject" name="subject" value={form.subject} onChange={handleChange} required
-					style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #334155', background: '#0b1220', color: '#e2e8f0', marginBottom: '1rem' }} />
+            <button
+              type="reset"
+              className="w-full sm:w-auto bg-gradient-to-r from-orange-400 to-orange-600 text-white px-8 py-3 rounded-xl shadow-lg hover:scale-105 hover:from-orange-500 hover:to-orange-700 transition-all duration-300 font-bold tracking-wide"
+              onClick={() => setForm({ subject: "", message: "" })}
+            >
+              Reset
+            </button>
 
-				<label htmlFor="description" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#FBBF24' }}>Description *</label>
-				<textarea id="description" name="description" value={form.description} onChange={handleChange} required rows={6}
-					style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #334155', background: '#0b1220', color: '#e2e8f0', marginBottom: '1rem' }} />
-
-				{error && <div style={{ color: '#f87171', marginBottom: '0.75rem' }}>{error}</div>}
-
-				<div style={{ display: 'flex', gap: 12 }}>
-					<button type="submit" disabled={submitting}
-						style={{ background: '#06b6d4', color: '#042', padding: '8px 16px', borderRadius: 6, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer' }}>
-						{submitting ? 'Submitting...' : 'Submit Ticket'}
-					</button>
-
-					<button type="button" onClick={() => navigate('/support-list')}
-						style={{ background: 'transparent', color: '#F1F5F9', padding: '8px 16px', borderRadius: 6, border: '1px solid #334155', cursor: 'pointer' }}>
-						Cancel
-					</button>
-				</div>
-			</form>
-		</div>
-	);
+            <button
+              type="button"
+              className="w-full sm:w-auto bg-gradient-to-r from-gray-300 to-blue-200 text-blue-700 px-8 py-3 rounded-xl shadow-lg hover:scale-105 hover:from-blue-100 hover:to-blue-300 transition-all duration-300 font-bold tracking-wide"
+              onClick={() => navigate(-1)}
+            >
+              Back
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
+export default SupportTicketForm;

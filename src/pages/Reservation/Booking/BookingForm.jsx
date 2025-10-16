@@ -5,7 +5,7 @@ Date: 05/06/2025
 
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { create, update } from "../../../services/bookingService";
+import { create } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
 
 const getCurrentDateTime = () => {
@@ -22,10 +22,7 @@ export default function BookingForm() {
     const selectedPickupLocation = location.state?.selectedPickupLocation;
     const selectedDropOffLocation = location.state?.selectedDropOffLocation;
 
-    const editingBooking = location.state?.booking;
-
     const [userId, setUserId] = useState(null);
-
     const [form, setForm] = useState({
         cars: [selectedCar?.carID || ""],
         bookingDateAndTime: getCurrentDateTime(),
@@ -45,15 +42,15 @@ export default function BookingForm() {
     useEffect(() => {
         // Try to get user from session/localStorage
         const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
-
+        
         if (userStr) {
             try {
                 const user = JSON.parse(userStr);
                 const currentUserId = user.id || user.userID || user.userId || user.ID;
-
+                
                 console.log('Current user:', user);
                 console.log('User ID extracted:', currentUserId);
-
+                
                 setUserId(currentUserId);
             } catch (error) {
                 console.error('Error parsing user from storage:', error);
@@ -66,6 +63,7 @@ export default function BookingForm() {
             setMessageType('error');
         }
     }, []);
+
 
     // Fetch available cars on component mount
     useEffect(() => {
@@ -95,21 +93,6 @@ export default function BookingForm() {
         }));
     }, [selectedPickupLocation, selectedDropOffLocation]);
 
-    // Prefill form if editing an existing booking
-    useEffect(() => {
-        if (editingBooking) {
-            setForm({
-                cars: editingBooking.cars ? editingBooking.cars.map(car => car.carID || car) : [""],
-                bookingDateAndTime: editingBooking.bookingDateAndTime || getCurrentDateTime(),
-                startDate: editingBooking.startDate || "",
-                endDate: editingBooking.endDate || "",
-                pickupLocation: editingBooking.pickupLocation?.locationID || editingBooking.pickupLocation || "",
-                dropOffLocation: editingBooking.dropOffLocation?.locationID || editingBooking.dropOffLocation || "",
-                bookingStatus: editingBooking.bookingStatus || "PENDING"
-            });
-        }
-    }, [editingBooking]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === "cars") {
@@ -126,6 +109,14 @@ export default function BookingForm() {
 
     const handleSubmit = async (error) => {
         error.preventDefault();
+        
+        // Check if user is logged in
+        if (!userId) {
+            setMessage("Please login to make a booking");
+            setMessageType("error");
+            return;
+        }
+        
         if (!isStartDateValid) {
             setMessage("Start date/time must be after or equal to booking date/time.");
             setMessageType("error");
@@ -137,7 +128,7 @@ export default function BookingForm() {
             return;
         }
 
-        // Prepare payload with correct structure
+        // Prepare payload with correct structure including user
         const payload = {
             user: {
                 userId: userId  // Include the user with userId
@@ -150,7 +141,7 @@ export default function BookingForm() {
             pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
             dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
         };
-
+        
         console.log('Submitting booking with payload:', payload);
 
         try {
@@ -167,17 +158,17 @@ export default function BookingForm() {
                 dropOffLocation: [""],
                 bookingStatus: "PENDING"
             });
-
+            
             const calculateTotalAmount = () => {
                 if (!selectedCar?.rentalPrice || !form.startDate || !form.endDate) {
                     return selectedCar?.rentalPrice || 500;
                 }
-
+                
                 const startDate = new Date(form.startDate);
                 const endDate = new Date(form.endDate);
                 const timeDiff = endDate.getTime() - startDate.getTime();
                 const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
+                
                 return (selectedCar.rentalPrice * Math.max(1, daysDiff));
             };
 
@@ -217,7 +208,7 @@ export default function BookingForm() {
         <div className="form-group">
             <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
                 <h2 style={{}}>Make a Booking</h2>
-
+                
                 {/* User Status Indicator */}
                 {userId ? (
                     <div className="mb-4 p-3 bg-green-900/30 border border-green-500 rounded-lg">
@@ -239,7 +230,7 @@ export default function BookingForm() {
                         </button>
                     </div>
                 )}
-
+                
                 <form onSubmit={handleSubmit} className="form">
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Selected Car *</label>
