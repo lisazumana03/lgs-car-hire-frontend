@@ -1,10 +1,11 @@
 /*
 Lisakhanya Zumana
 230864821
+Updated: 2025-10-16 - Fixed import to match updated location service
  */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { create } from "../../../services/location.service";
+import { createLocation } from "../../../services/location.service";
 
 function LocationForm(){
     const navigate  = useNavigate();
@@ -28,7 +29,7 @@ function LocationForm(){
         e.preventDefault();
         const payload = { ...form, streetNumber: Number(form.streetNumber) };
         try {
-            await create(payload);
+            await createLocation(payload);
             setMessage("Location created successfully!");
             setForm({
                 locationName: "",

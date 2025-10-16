@@ -173,7 +173,12 @@ function CarView() {
                             <CarCard
                                 key={car.carID}
                                 car={car}
-                                onBook={(carId) => navigate(`/make-booking?carId=${carId}`)}
+                                onBook={(carId) => {
+                                    const selectedCar = filteredCars.find(c => c.carID === carId);
+                                    navigate('/make-booking', {
+                                        state: { selectedCar }
+                                    });
+                                }}
                                 showDetails={false}
                             />
                         ))}

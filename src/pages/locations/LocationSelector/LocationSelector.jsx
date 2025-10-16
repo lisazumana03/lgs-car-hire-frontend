@@ -22,17 +22,17 @@ function LocationSelector() {
 
     useEffect(() => {
         getAllLocations()
-            .then(res => {
-                if (!Array.isArray(res.data)) {
+            .then(data => {
+                if (!Array.isArray(data)) {
                     setError("Backend did not return a list of locations. Check your backend controller return type.");
                     setLocations([]);
                 } else {
-                    setLocations(res.data);
+                    setLocations(data);
                 }
                 setLoading(false);
             })
             .catch((err) => {
-                setError("Failed to load locations. " + (err?.response?.data?.message || err.message));
+                setError("Failed to load locations. " + err.message);
                 setLoading(false);
             });
     }, []);

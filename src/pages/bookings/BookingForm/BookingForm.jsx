@@ -1,11 +1,15 @@
 /*
 Lisakhanya Zumana
 230864821
- */
+Updated: 2025-10-16 - Styled to match multi-step registration template
+*/
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { create, update } from "../../../services/booking.service";
+import { create, calculateRentalDays, calculateBookingTotals } from "../../../services/booking.service";
 import { getAvailableCars } from "../../../services/car.service";
+import { getAllInsurance } from "../../../services/insurance.service";
+import { BookingStatus, CoverageTypeDisplay, CoverageTypeDescription } from "../../../constants/enums";
+import './BookingFormStyled.css';
 
 const getCurrentDateTime = () => {
     const now = new Date();
@@ -17,42 +21,34 @@ export default function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const selectedCar = location.state?.selectedCar;
-
     const selectedPickupLocation = location.state?.selectedPickupLocation;
     const selectedDropOffLocation = location.state?.selectedDropOffLocation;
 
-    const editingBooking = location.state?.booking;
-
     const [userId, setUserId] = useState(null);
-
+    const [formActive, setFormActive] = useState(false);
     const [form, setForm] = useState({
-        cars: [selectedCar?.carID || ""],
         bookingDateAndTime: getCurrentDateTime(),
         startDate: "",
         endDate: "",
-        pickupLocation: selectedPickupLocation ? selectedPickupLocation.locationID : "",
-        dropOffLocation: selectedDropOffLocation ? selectedDropOffLocation.locationID : "",
-        bookingStatus: "PENDING"
+        insurance: null,
+        bookingStatus: BookingStatus.PENDING
     });
+
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
-    const [cars, setCars] = useState([]);
+    const [insurances, setInsurances] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [carsLoading, setCarsLoading] = useState(true);
+    const [insurancesLoading, setInsurancesLoading] = useState(true);
+    const [calculatedCosts, setCalculatedCosts] = useState(null);
+    const [selectedInsurance, setSelectedInsurance] = useState(null);
 
     // Get user ID when component mounts
     useEffect(() => {
-        // Try to get user from session/localStorage
         const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
-
         if (userStr) {
             try {
                 const user = JSON.parse(userStr);
                 const currentUserId = user.id || user.userID || user.userId || user.ID;
-
-                console.log('Current user:', user);
-                console.log('User ID extracted:', currentUserId);
-
                 setUserId(currentUserId);
             } catch (error) {
                 console.error('Error parsing user from storage:', error);
@@ -60,391 +56,339 @@ export default function BookingForm() {
                 setMessageType('error');
             }
         } else {
-            console.warn('No user found in storage');
             setMessage('Please login to make a booking');
             setMessageType('error');
         }
     }, []);
 
-    // Fetch available cars on component mount
+    // Fetch insurances
     useEffect(() => {
-        const fetchCars = async () => {
+        const fetchInsurances = async () => {
             try {
-                setCarsLoading(true);
-                const response = await getAvailableCars();
-                setCars(response.data || []);
+                setInsurancesLoading(true);
+                const insurancesResponse = await getAllInsurance();
+                setInsurances(insurancesResponse || []);
             } catch (error) {
-                console.error("Error fetching cars:", error);
-                setMessage("Failed to load available cars. Please try again.");
-                setMessageType("error");
+                console.error("Error fetching insurances:", error);
             } finally {
-                setCarsLoading(false);
+                setInsurancesLoading(false);
             }
         };
-
-        fetchCars();
+        fetchInsurances();
     }, []);
 
-    // Update form state if locations change (e.g., after navigation)
+    // Calculate costs when dates or insurance change
     useEffect(() => {
-        setForm(prev => ({
-            ...prev,
-            pickupLocation: selectedPickupLocation ? selectedPickupLocation.locationID : "",
-            dropOffLocation: selectedDropOffLocation ? selectedDropOffLocation.locationID : ""
-        }));
-    }, [selectedPickupLocation, selectedDropOffLocation]);
-
-    // Prefill form if editing an existing booking
-    useEffect(() => {
-        if (editingBooking) {
-            setForm({
-                cars: editingBooking.cars ? editingBooking.cars.map(car => car.carID || car) : [""],
-                bookingDateAndTime: editingBooking.bookingDateAndTime || getCurrentDateTime(),
-                startDate: editingBooking.startDate || "",
-                endDate: editingBooking.endDate || "",
-                pickupLocation: editingBooking.pickupLocation?.locationID || editingBooking.pickupLocation || "",
-                dropOffLocation: editingBooking.dropOffLocation?.locationID || editingBooking.dropOffLocation || "",
-                bookingStatus: editingBooking.bookingStatus || "PENDING"
-            });
+        if (selectedCar && form.startDate && form.endDate) {
+            const rentalDays = calculateRentalDays(form.startDate, form.endDate);
+            const insuranceCost = selectedInsurance ? selectedInsurance.insuranceCost * rentalDays : 0;
+            const costs = calculateBookingTotals(selectedCar.rentalPrice, rentalDays, insuranceCost);
+            setCalculatedCosts(costs);
+        } else {
+            setCalculatedCosts(null);
         }
-    }, [editingBooking]);
+    }, [selectedCar, form.startDate, form.endDate, selectedInsurance]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === "cars") {
-            setForm((prev) => ({ ...prev, cars: [value] }));
-        } else if (name === "bookingStatus") {
-            setForm((prev) => ({ ...prev, bookingStatus: value.toUpperCase() }));
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleInsuranceSelect = (insuranceId) => {
+        if (insuranceId === "none" || !insuranceId) {
+            setSelectedInsurance(null);
+            setForm((prev) => ({ ...prev, insurance: null }));
         } else {
-            setForm((prev) => ({ ...prev, [name]: value }));
+            const insurance = insurances.find(ins => ins.insuranceID === parseInt(insuranceId));
+            setSelectedInsurance(insurance);
+            setForm((prev) => ({ ...prev, insurance: { insuranceID: insurance.insuranceID } }));
         }
     };
 
-    const isStartDateValid = !form.startDate || form.startDate >= form.bookingDateAndTime;
-    const isEndDateValid = !form.endDate || form.endDate > form.startDate;
+    const isFirstStepValid = () => {
+        return form.startDate && form.endDate && selectedCar && selectedPickupLocation && selectedDropOffLocation;
+    };
 
-    const handleSubmit = async (error) => {
-        error.preventDefault();
-        if (!isStartDateValid) {
-            setMessage("Start date/time must be after or equal to booking date/time.");
+    const handleNext = (e) => {
+        e.preventDefault();
+        if (isFirstStepValid()) {
+            setFormActive(true);
+        } else {
+            setMessage("Please complete all required fields before proceeding.");
             setMessageType("error");
-            return;
         }
-        if (!isEndDateValid) {
-            setMessage("End date/time must be after start date/time.");
-            setMessageType("error");
-            return;
-        }
+    };
 
-        // Prepare payload with correct structure
+    const handleBack = () => {
+        setFormActive(false);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage("");
+
         const payload = {
-            user: {
-                userId: userId  // Include the user with userId
-            },
+            user: { userId: userId },
+            car: { carID: selectedCar.carID },
             bookingDateAndTime: form.bookingDateAndTime,
             startDate: form.startDate,
             endDate: form.endDate,
+            pickupLocation: { locationID: selectedPickupLocation.locationID },
+            dropOffLocation: { locationID: selectedDropOffLocation.locationID },
+            insurance: form.insurance,
             bookingStatus: form.bookingStatus,
-            cars: selectedCar ? [{ carID: selectedCar.carID }] : [],
-            pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
-            dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
+            ...calculatedCosts
         };
-
-        console.log('Submitting booking with payload:', payload);
 
         try {
             const response = await create(payload);
-            console.log("Booking created:", response.data);
             setMessage("Booking created successfully!");
             setMessageType("success");
-            setForm({
-                cars: [""],
-                bookingDateAndTime: "",
-                startDate: "",
-                endDate: "",
-                pickupLocation: [""],
-                dropOffLocation: [""],
-                bookingStatus: "PENDING"
-            });
-
-            const calculateTotalAmount = () => {
-                if (!selectedCar?.rentalPrice || !form.startDate || !form.endDate) {
-                    return selectedCar?.rentalPrice || 500;
-                }
-
-                const startDate = new Date(form.startDate);
-                const endDate = new Date(form.endDate);
-                const timeDiff = endDate.getTime() - startDate.getTime();
-                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-                return (selectedCar.rentalPrice * Math.max(1, daysDiff));
-            };
 
             setTimeout(() => {
                 navigate("/payment", {
-                    state: { 
+                    state: {
                         booking: {
-                            bookingID: response.data?.bookingID,
-                            bookingDateAndTime: form.bookingDateAndTime,
-                            startDate: form.startDate,
-                            endDate: form.endDate,
-                            bookingStatus: "pending",
+                            ...response,
                             car: selectedCar,
-                            totalAmount: calculateTotalAmount()
+                            pickupLocation: selectedPickupLocation,
+                            dropOffLocation: selectedDropOffLocation,
+                            insurance: selectedInsurance
                         }
                     }
                 });
             }, 2000);
         } catch (err) {
             console.error("Error creating booking:", err);
-            let errorMessage = "Error creating booking.";
-
-            if (err.response?.status === 404) {
-                errorMessage = "Booking endpoint not found. Please check if the backend is running correctly.";
-            } else if (err.response?.status === 500) {
-                errorMessage = "Server error. Please try again later.";
-            } else if (err.response?.data?.message) {
-                errorMessage = err.response.data.message;
-            } else if (err.message) {
-                errorMessage = err.message;
-            }
-            setMessage(errorMessage);
+            setMessage(err.message || "Error creating booking.");
+            setMessageType("error");
+        } finally {
+            setLoading(false);
         }
     };
 
+    const handleReset = () => {
+        setForm({
+            bookingDateAndTime: getCurrentDateTime(),
+            startDate: "",
+            endDate: "",
+            insurance: null,
+            bookingStatus: BookingStatus.PENDING
+        });
+        setSelectedInsurance(null);
+        setMessage("");
+        setFormActive(false);
+    };
+
     return (
-        <div className="form-group">
-            <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
-                <h2 style={{}}>Make a Booking</h2>
+        <div className="booking-form-wrapper">
+            <div className="booking-container">
+                <header>Make a Booking</header>
 
-                {/* User Status Indicator */}
-                {userId ? (
-                    <div className="mb-4 p-3 bg-green-900/30 border border-green-500 rounded-lg">
-                        <p className="text-green-400 text-sm">
-                            ✓ Logged in (User ID: {userId})
-                        </p>
-                    </div>
-                ) : (
-                    <div className="mb-4 p-3 bg-red-900/30 border border-red-500 rounded-lg">
-                        <p className="text-red-400 text-sm">
-                            ⚠ Please login to make a booking
-                        </p>
-                        <button
-                            type="button"
-                            onClick={() => navigate('/login')}
-                            className="mt-2 text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            Go to Login
-                        </button>
-                    </div>
-                )}
+                <form className={formActive ? 'secActive' : ''} onSubmit={formActive ? handleSubmit : handleNext}>
+                    {/* STEP 1: Booking Details */}
+                    <div className="form-step first">
+                        <div className="details">
+                            <div className="fields">
+                                {/* Selected Car */}
+                                <div className="input-field full-width">
+                                    <label>Selected Car *</label>
+                                    {selectedCar ? (
+                                        <div className="selected-item-display">
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div>
+                                                    <h3>{selectedCar.brand} {selectedCar.model}</h3>
+                                                    <p style={{ margin: '5px 0', color: '#666' }}>{selectedCar.year}</p>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <p style={{ fontSize: '20px', fontWeight: '600', color: '#4070f4', margin: '0' }}>
+                                                        R{selectedCar.rentalPrice}
+                                                    </p>
+                                                    <p style={{ fontSize: '13px', color: '#888', margin: '0' }}>per day</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={() => navigate('/select-car')} className="button-back">
+                                            Choose a Car
+                                        </button>
+                                    )}
+                                </div>
 
-                <form onSubmit={handleSubmit} className="form">
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Selected Car *</label>
-                        {selectedCar ? (
-                            <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-white">
-                                            {selectedCar.brand} {selectedCar.model}
-                                        </h3>
-                                        <p className="text-gray-300">
-                                            {selectedCar.year} • R{selectedCar.rentalPrice}/day
-                                        </p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate('/select-car')}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                                    >
-                                        Choose Different Car
-                                    </button>
+                                {/* Booking Date & Time */}
+                                <div className="input-field">
+                                    <label>Booking Date & Time *</label>
+                                    <input
+                                        type="datetime-local"
+                                        name="bookingDateAndTime"
+                                        value={form.bookingDateAndTime}
+                                        onChange={handleChange}
+                                        readOnly
+                                        required
+                                    />
+                                </div>
+
+                                {/* Start Date & Time */}
+                                <div className="input-field">
+                                    <label>Start Date & Time *</label>
+                                    <input
+                                        type="datetime-local"
+                                        name="startDate"
+                                        value={form.startDate}
+                                        onChange={handleChange}
+                                        min={form.bookingDateAndTime}
+                                        required
+                                    />
+                                </div>
+
+                                {/* End Date & Time */}
+                                <div className="input-field">
+                                    <label>End Date & Time *</label>
+                                    <input
+                                        type="datetime-local"
+                                        name="endDate"
+                                        value={form.endDate}
+                                        onChange={handleChange}
+                                        min={form.startDate || form.bookingDateAndTime}
+                                        required
+                                    />
+                                </div>
+
+                                {/* Pick-up Location */}
+                                <div className="input-field full-width">
+                                    <label>Pick-up Location *</label>
+                                    {selectedPickupLocation ? (
+                                        <div className="selected-item-display">
+                                            <h3>{selectedPickupLocation.locationName}</h3>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={() => navigate('/choose-location', { state: { ...location.state, locationType: 'pickup' } })} className="button-back">
+                                            Choose Pick-up Location
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Drop-off Location */}
+                                <div className="input-field full-width">
+                                    <label>Drop-off Location *</label>
+                                    {selectedDropOffLocation ? (
+                                        <div className="selected-item-display">
+                                            <h3>{selectedDropOffLocation.locationName}</h3>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={() => navigate('/choose-location', { state: { ...location.state, locationType: 'dropoff' } })} className="button-back">
+                                            Choose Drop-off Location
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-                        ) : (
-                            <div className="space-y-2">
-                                <p className="text-gray-300">No car selected</p>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/select-car')}
-                                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-                                >
-                                    Choose a Car
-                                </button>
-                            </div>
-                        )}
-                    </div>
 
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Booking Date & Time *</label>
-                        <input
-                            type="datetime-local"
-                            name="bookingDateAndTime"
-                            value={form.bookingDateAndTime}
-                            onChange={handleChange}
-                            readOnly
-                            required
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Start Date & Time *</label>
-                        <input
-                            type="datetime-local"
-                            name="startDate"
-                            value={form.startDate}
-                            onChange={handleChange}
-                            required
-                            min={form.bookingDateAndTime}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
-                        />
-                        {!isStartDateValid && (
-                            <div className="text-red-400 text-sm mt-1">Start date/time must be after or equal to booking date/time.</div>
-                        )}
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">End Date & Time *</label>
-                        <input
-                            type="datetime-local"
-                            name="endDate"
-                            value={form.endDate}
-                            onChange={handleChange}
-                            required
-                            min={form.startDate || form.bookingDateAndTime}
-                            className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
-                        />
-                        {!isEndDateValid && (
-                            <div className="text-red-400 text-sm mt-1">End date/time must be after start date/time.</div>
-                        )}
-                    </div>
-
-                    {/* Show selected pickup location */}
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Pick-up Location *</label>
-                        {selectedPickupLocation ? (
-                            <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
-                                <h3 className="text-lg font-semibold text-white">{selectedPickupLocation.locationName}</h3>
-                                <p className="text-gray-300">{selectedPickupLocation.streetNumber}, {selectedPickupLocation.streetName}, {selectedPickupLocation.cityOrTown}</p>
-                                <p className="text-gray-300">{selectedPickupLocation.provinceOrState}, {selectedPickupLocation.country}</p>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/choose-location', {
-                                        state: {
-                                            selectedCar,
-                                            selectedPickupLocation,
-                                            selectedDropOffLocation
-                                        }
-                                    })}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
-                                >
-                                    Choose Different Location
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={() => navigate('/choose-location', {
-                                    state: {
-                                        selectedCar,
-                                        selectedPickupLocation,
-                                        selectedDropOffLocation
-                                    }
-                                })}
-                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-                            >
-                                Choose a Location
+                            <button type="submit" className="nextBtn" disabled={!userId || !isFirstStepValid()}>
+                                <span className="btnText">Next</span>
+                                <i className="uil uil-arrow-right"></i>
                             </button>
-                        )}
+                        </div>
                     </div>
-                    {/* Show selected drop-off location */}
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Drop-Off Location *</label>
-                        {selectedDropOffLocation ? (
-                            <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
-                                <h3 className="text-lg font-semibold text-white">{selectedDropOffLocation.locationName}</h3>
-                                <p className="text-gray-300">{selectedDropOffLocation.streetNumber}, {selectedDropOffLocation.streetName}, {selectedDropOffLocation.cityOrTown}</p>
-                                <p className="text-gray-300">{selectedDropOffLocation.provinceOrState}, {selectedDropOffLocation.country}</p>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/choose-location', {
-                                        state: {
-                                            selectedCar,
-                                            selectedPickupLocation,
-                                            selectedDropOffLocation
-                                        }
-                                    })}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
+
+                    {/* STEP 2: Insurance & Payment */}
+                    <div className="form-step second">
+                        <div className="details">
+                            <span className="title">Insurance Coverage</span>
+
+                            <div className="insurance-options">
+                                {/* No Insurance Option */}
+                                <div
+                                    className={`insurance-option ${!selectedInsurance ? 'selected' : ''}`}
+                                    onClick={() => handleInsuranceSelect("none")}
                                 >
-                                    Choose Different Location
+                                    <div className="insurance-option-header">
+                                        <h4>No Insurance</h4>
+                                        <span className="insurance-cost">R0/day</span>
+                                    </div>
+                                    <p className="insurance-description">No additional coverage</p>
+                                </div>
+
+                                {/* Available Insurance Options */}
+                                {insurancesLoading ? (
+                                    <p>Loading insurance options...</p>
+                                ) : (
+                                    insurances.filter(ins => ins.isActive).map((insurance) => (
+                                        <div
+                                            key={insurance.insuranceID}
+                                            className={`insurance-option ${selectedInsurance?.insuranceID === insurance.insuranceID ? 'selected' : ''}`}
+                                            onClick={() => handleInsuranceSelect(insurance.insuranceID.toString())}
+                                        >
+                                            <div className="insurance-option-header">
+                                                <h4>{CoverageTypeDisplay[insurance.coverageType] || insurance.coverageType}</h4>
+                                                <span className="insurance-cost">R{insurance.insuranceCost}/day</span>
+                                            </div>
+                                            <p className="insurance-description">
+                                                {CoverageTypeDescription[insurance.coverageType]}
+                                            </p>
+                                            <p className="insurance-details">
+                                                Provider: {insurance.insuranceProvider} • Deductible: R{insurance.deductible.toLocaleString()}
+                                            </p>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Cost Summary */}
+                            {calculatedCosts && (
+                                <div className="cost-summary">
+                                    <h3>Cost Summary</h3>
+                                    <div className="cost-row">
+                                        <span>Rental ({calculatedCosts.rentalDays} days @ R{selectedCar.rentalPrice}/day)</span>
+                                        <span>R{(selectedCar.rentalPrice * calculatedCosts.rentalDays).toFixed(2)}</span>
+                                    </div>
+                                    {selectedInsurance && (
+                                        <div className="cost-row">
+                                            <span>Insurance ({calculatedCosts.rentalDays} days @ R{selectedInsurance.insuranceCost}/day)</span>
+                                            <span>R{(selectedInsurance.insuranceCost * calculatedCosts.rentalDays).toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    <div className="cost-row">
+                                        <span>Subtotal</span>
+                                        <span>R{calculatedCosts.subtotal.toFixed(2)}</span>
+                                    </div>
+                                    <div className="cost-row">
+                                        <span>Tax (15% VAT)</span>
+                                        <span>R{calculatedCosts.taxAmount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="cost-row total">
+                                        <span>Total</span>
+                                        <span>R{calculatedCosts.totalAmount.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="buttons">
+                                <div className="backBtn" onClick={handleBack}>
+                                    <i className="uil uil-arrow-left"></i>
+                                    <span className="btnText">Back</span>
+                                </div>
+
+                                <button type="submit" className="button-submit" disabled={loading}>
+                                    {loading && <span className="loading-spinner"></span>}
+                                    <span className="btnText">{loading ? 'Creating...' : 'Submit'}</span>
+                                    <i className="uil uil-check"></i>
                                 </button>
                             </div>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={() => navigate('/choose-location', {
-                                    state: {
-                                        selectedCar,
-                                        selectedPickupLocation,
-                                        selectedDropOffLocation
-                                    }
-                                })}
-                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-                            >
-                                Choose a Location
-                            </button>
-                        )}
+                        </div>
                     </div>
-
-                    <div className="mb-4">
-                        <label className="block mb-1 font-semibold text-white">Booking Status *</label>
-                        <select name="bookingStatus" value={form.bookingStatus} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:border-blue-500 focus:outline-none">
-                            <option value="CONFIRMED">Confirmed</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="CANCELLED">Cancelled</option>
-                        </select>
-                    </div>
-
-                    <div style={{display: "flex", marginTop: "20px", gap: "10px"}}>
-                        <button type="submit"
-                                disabled={!userId}
-                                style={{
-                                    backgroundColor: userId ? "#00ca09" : "#666",
-                                    cursor: userId ? "pointer" : "not-allowed",
-                                    opacity: userId ? 1 : 0.6
-                                }}
-                                className="submit-btn"
-                                title={!userId ? "Please login to submit booking" : "Submit booking"}>
-                            Submit
-                        </button>
-                        <button type="reset"
-                                style={{backgroundColor: "#003ffa"}}
-                                className="submit-btn" onClick={() => setForm({
-                            cars: [""],
-                            bookingDateAndTime: "",
-                            startDate: "",
-                            endDate: "",
-                            pickupLocation: [""],
-                            dropOffLocation: [""],
-                            bookingStatus: "PENDING" // <-- Use uppercase
-                        })}>Reset</button>
-                        <button type="button"
-                                style={{backgroundColor: "#ff0000"}}
-                                className="submit-btn"
-                                onClick={() => navigate("/bookings")}>Back</button>
-                    </div>
-
-                    {message && (
-                        <p className={`mb-4 px-4 py-2 rounded border ${message.includes("successfully")
-                            ? "bg-[#1e4d2b] text-green-400 border-green-500"
-                            : "bg-[#4c1d1d] text-red-400 border-red-500"}`}>
-                            {message}
-                        </p>
-                    )}
                 </form>
+
+                {/* Messages */}
+                {message && (
+                    <div className={`message ${messageType}`}>
+                        {message}
+                    </div>
+                )}
             </div>
+
+            {/* Include Iconscout Icons */}
+            <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
         </div>
     );
 }

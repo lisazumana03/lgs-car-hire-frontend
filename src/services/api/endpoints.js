@@ -17,7 +17,8 @@ export const API_ENDPOINTS = {
     READ: (id) => `${BASE_URL}/booking/read/${id}`,
     UPDATE: `${BASE_URL}/booking/update`,
     DELETE: (id) => `${BASE_URL}/booking/delete/${id}`,
-    LIST: `${BASE_URL}/booking/getall`,
+    CANCEL: (id) => `${BASE_URL}/booking/cancel/${id}`,
+    LIST: `${BASE_URL}/booking/all`,
     BY_USER: (userId) => `${BASE_URL}/booking/user/${userId}`,
   },
 
@@ -45,11 +46,11 @@ export const API_ENDPOINTS = {
 
   INSURANCE: {
     BASE: `${BASE_URL}/insurance`,
-    CREATE: `${BASE_URL}/insurance/create`,
-    READ: (id) => `${BASE_URL}/insurance/read/${id}`,
-    UPDATE: `${BASE_URL}/insurance/update`,
-    DELETE: (id) => `${BASE_URL}/insurance/delete/${id}`,
-    LIST: `${BASE_URL}/insurance/getall`,
+    CREATE: `${BASE_URL}/insurance`,
+    READ: (id) => `${BASE_URL}/insurance/${id}`,
+    UPDATE: (id) => `${BASE_URL}/insurance/${id}`,
+    DELETE: (id) => `${BASE_URL}/insurance/${id}`,
+    LIST: `${BASE_URL}/insurance`,
   },
 
   INVOICE: {
@@ -68,7 +69,7 @@ export const API_ENDPOINTS = {
     READ: (id) => `${BASE_URL}/location/read/${id}`,
     UPDATE: `${BASE_URL}/location/update`,
     DELETE: (id) => `${BASE_URL}/location/delete/${id}`,
-    LIST: `${BASE_URL}/location/getall`,
+    LIST: `${BASE_URL}/location/all`,
   },
 
   MAINTENANCE: {

@@ -58,7 +58,14 @@ function CarSelection() {
     };
 
     const handleBookCar = (carID) => {
-        navigate(`/make-booking?carId=${carID}`);
+        const selectedCar = cars.find(car => car.carID === carID);
+        if (selectedCar) {
+            navigate('/make-booking', {
+                state: { selectedCar }
+            });
+        } else {
+            console.error('Car not found:', carID);
+        }
     };
 
     // Get unique brands and categories for filters
