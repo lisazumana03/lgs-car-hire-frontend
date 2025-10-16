@@ -1,0 +1,191 @@
+import React, { useState, useEffect } from 'react';
+import { getAllNotifications } from '../../../services/notification.service';
+import "../../../assets/styling/Notification.css";
+
+function NotificationsPage() {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastFetch, setLastFetch] = useState(null);
+
+  useEffect(() => {
+    fetchNotifications();
+    
+    // Set up auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchNotifications(true); // Silent refresh
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchNotifications = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      setError(null);
+
+      const response = await getAllNotifications();
+      const data = response.data || [];
+
+      // Sort by date (newest first) and limit to latest 10
+      const sortedData = data
+        .sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.dateCreated || a.dateSent || 0);
+          const dateB = new Date(b.createdAt || b.dateCreated || b.dateSent || 0);
+          return dateB - dateA; // Newest first
+        })
+        .slice(0, 10); // Limit to latest 10
+      
+      // Check if data has changed
+      if (JSON.stringify(sortedData) !== JSON.stringify(notifications)) {
+        setNotifications(sortedData);
+        setLastFetch(new Date());
+      }
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+      if (!silent) {
+        setError('Failed to load notifications. Please try again later.');
+        setNotifications([]); // Clear any existing notifications
+      }
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toUpperCase()) {
+      case 'BOOKED':
+      case 'COMPLETED':
+        return '#4ade80'; // Green
+      case 'PENDING':
+        return '#fbbf24'; // Yellow
+      case 'CANCELLED':
+        return '#ef4444'; // Red
+      default:
+        return '#6b7280'; // Gray
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status?.toUpperCase()) {
+      case 'BOOKED':
+        return 'BOOKED';
+      case 'COMPLETED':
+        return 'COMPLETED';
+      case 'PENDING':
+        return 'PENDING';
+      case 'CANCELLED':
+        return 'CANCELLED';
+      default:
+        return 'UNKNOWN';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handleRefresh = () => {
+    fetchNotifications();
+  };
+
+  if (loading) {
+    return (
+      <div className="notifications-container">
+        <div className="notifications-header">
+          <h1>Latest Notifications</h1>
+          <button onClick={handleRefresh} className="refresh-btn" disabled>
+            🔄 Refreshing...
+          </button>
+        </div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <h2>Loading notifications...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="notifications-container">
+      <div className="notifications-header">
+        <h1>Latest Notifications</h1>
+        <div className="header-actions">
+          <span className="notification-count">
+            Showing latest {notifications.length} notifications
+          </span>
+          <button onClick={handleRefresh} className="refresh-btn">
+            🔄 Refresh
+          </button>
+          {lastFetch && (
+            <span className="last-updated">
+              Last updated: {lastFetch.toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {error && (
+        <div className="error-banner">
+          <span>⚠️ {error}</span>
+          <button onClick={() => {
+            setError(null);
+            fetchNotifications();
+          }} className="retry-btn">
+            Retry
+          </button>
+        </div>
+      )}
+
+      <div className="notifications-list">
+        {notifications.length === 0 ? (
+          <div className="no-notifications">
+            <h3>No notifications yet</h3>
+            <p>You'll see your booking updates and important messages here.</p>
+          </div>
+        ) : (
+          notifications.map((notification) => (
+            <div key={notification.notificationID} className="notification-card">
+              <div className="notification-icon">
+                <div className="user-avatar">
+                  👤
+                </div>
+              </div>
+              
+              <div className="notification-content">
+                <h3 className="notification-title">
+                  {notification.title || `Notification from ${notification.userName || 'System'}`}
+                </h3>
+                <p className="notification-message">
+                  {notification.message || notification.description || 'No message available'}
+                </p>
+                <div className="notification-meta">
+                  <span className="notification-time">
+                    {formatDate(notification.createdAt || notification.dateCreated || notification.dateSent)}
+                  </span>
+                  {notification.userName && (
+                    <span className="notification-user">
+                      From: {notification.userName}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="notification-status">
+                <span 
+                  className={`status-badge status-${notification.status?.toLowerCase() || 'unknown'}`}
+                >
+                  {getStatusText(notification.status)}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default NotificationsPage;
