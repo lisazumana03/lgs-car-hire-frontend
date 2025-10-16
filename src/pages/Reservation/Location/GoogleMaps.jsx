@@ -64,6 +64,7 @@ function MapWithDirections({
             setPickupMarker(marker);
             map.panTo(pickupLocation);
         }
+    }, [map, pickupLocation]);
     }, [map, pickupLocation, pickupMarker]);
 
     // Update dropoff marker
@@ -85,6 +86,7 @@ function MapWithDirections({
 
             setDropoffMarker(marker);
         }
+    }, [map, dropoffLocation]);
     }, [map, dropoffLocation, dropoffMarker]);
 
     // Calculate and display directions
