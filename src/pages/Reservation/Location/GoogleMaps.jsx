@@ -65,6 +65,7 @@ function MapWithDirections({
             map.panTo(pickupLocation);
         }
     }, [map, pickupLocation]);
+    }, [map, pickupLocation, pickupMarker]);
 
     // Update dropoff marker
     useEffect(() => {
@@ -86,6 +87,7 @@ function MapWithDirections({
             setDropoffMarker(marker);
         }
     }, [map, dropoffLocation]);
+    }, [map, dropoffLocation, dropoffMarker]);
 
     // Calculate and display directions
     useEffect(() => {

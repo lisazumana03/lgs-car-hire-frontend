@@ -44,13 +44,14 @@ function ReviewEditList() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Only send editable fields, not reviewID
+      // Send editable fields and reviewID
       const payload = {
+        reviewID: editingId,
         fullName: editForm.fullName,
         comment: editForm.comment,
         rating: editForm.rating
       };
-      await axios.put(`http://localhost:3045/review/update/${editingId}`, payload);
+      await axios.put("http://localhost:3045/review/update", payload);
       setEditingId(null);
       fetchReviews();
     } catch (err) {

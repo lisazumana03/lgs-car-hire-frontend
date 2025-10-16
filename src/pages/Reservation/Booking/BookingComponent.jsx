@@ -2,7 +2,7 @@
 Lisakhanya Zumana (230864821)
 Date: 31/08/2025
  */
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function BookingComponent(){
     const navigate = useNavigate();
