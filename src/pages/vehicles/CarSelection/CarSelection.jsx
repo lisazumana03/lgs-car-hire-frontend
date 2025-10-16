@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAvailableCars } from "../../../services/car.service";
+import { getActivePricingRuleForCarType } from "../../../services/pricingRule.service";
+import CarCard from "../../../components/vehicles/CarCard/CarCard";
+import { getCategoryLabel } from '../../../models/carType.model';
 import './CarSelection.css';
 
 function CarSelection() {
@@ -10,7 +13,7 @@ function CarSelection() {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedBrand, setSelectedBrand] = useState('all');
-    const [priceSort, setPriceSort] = useState('none');
+    const [selectedCategory, setSelectedCategory] = useState('all');
 
     useEffect(() => {
         fetchCars();
@@ -21,7 +24,31 @@ function CarSelection() {
             setLoading(true);
             setError('');
             const response = await getAvailableCars();
-            setCars(response.data || []);
+            const carsData = response.data || [];
+
+            // Fetch pricing for each car based on carTypeID
+            const carsWithPricing = await Promise.all(
+                carsData.map(async (car) => {
+                    if (car.carTypeID) {
+                        try {
+                            const pricingResponse = await getActivePricingRuleForCarType(car.carTypeID);
+                            const pricing = pricingResponse.data;
+                            return {
+                                ...car,
+                                dailyRate: pricing?.baseDailyRate || null,
+                                weeklyRate: pricing?.weeklyRate || null,
+                                monthlyRate: pricing?.monthlyRate || null
+                            };
+                        } catch (err) {
+                            console.error(`Error fetching pricing for car type ${car.carTypeID}:`, err);
+                            return car;
+                        }
+                    }
+                    return car;
+                })
+            );
+
+            setCars(carsWithPricing);
         } catch (err) {
             console.error('Error fetching cars:', err);
             setError('Failed to load cars. Please try again later.');
@@ -30,210 +57,120 @@ function CarSelection() {
         }
     };
 
-    const handleBookCar = (car) => {
-        // Navigate to booking form with pre-filled car data
-        navigate('/make-booking', {
-            state: { 
-                selectedCar: {
-                    carID: car.carID,
-                    brand: car.brand,
-                    model: car.model,
-                    year: car.year,
-                    rentalPrice: car.rentalPrice,
-                    imageUrl: car.imageUrl
-                }
-            }
-        });
+    const handleBookCar = (carID) => {
+        navigate(`/make-booking?carId=${carID}`);
     };
 
-    // Get unique brands for filter
+    // Get unique brands and categories for filters
     const brands = [...new Set(cars.map(car => car.brand))];
+    const categories = [...new Set(cars.map(car => car.carTypeCategory).filter(Boolean))];
 
-    // Filter and sort cars
+    // Filter cars
     let filteredCars = cars.filter(car => {
-        const matchesSearch = 
-            car.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        const matchesSearch =
+            car.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            car.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             `${car.brand} ${car.model}`.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const matchesBrand = selectedBrand === 'all' || car.brand === selectedBrand;
-        
-        return matchesSearch && matchesBrand;
-    });
 
-    // Sort by price
-    if (priceSort === 'low-high') {
-        filteredCars.sort((a, b) => a.rentalPrice - b.rentalPrice);
-    } else if (priceSort === 'high-low') {
-        filteredCars.sort((a, b) => b.rentalPrice - a.rentalPrice);
-    }
+        const matchesBrand = selectedBrand === 'all' || car.brand === selectedBrand;
+        const matchesCategory = selectedCategory === 'all' || car.carTypeCategory === selectedCategory;
+
+        return matchesSearch && matchesBrand && matchesCategory;
+    });
 
     if (loading) {
         return (
-            <div className="loading-container">
+            <div className="modern-selection-loading">
                 <div className="loading-spinner"></div>
-                <p className="loading-text">Loading available cars...</p>
+                <p className="loading-text">Loading available vehicles...</p>
             </div>
         );
     }
 
     return (
-        <div className="car-selection-container">
-            <div className="car-selection-wrapper">
-                {/* Header */}
-                <div className="selection-header">
-                    <h1 className="selection-title">Choose Your Perfect Car</h1>
-                    <p className="selection-subtitle">Select from our premium fleet of luxury vehicles</p>
+        <div className="modern-selection-container">
+            {/* Hero Header */}
+            <div className="selection-hero">
+                <div className="hero-content">
+                    <h1 className="hero-title">Choose Your Perfect Vehicle</h1>
+                    <p className="hero-subtitle">Select from our premium fleet of available vehicles</p>
                 </div>
+            </div>
 
+            <div className="selection-content">
                 {error && (
-                    <div className="error-message">
-                        {error}
+                    <div className="modern-error-message">
+                        <svg className="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p>{error}</p>
                     </div>
                 )}
 
-                {/* Search and Filter Section */}
-                <div className="filters-container">
-                    <div className="filters-grid">
-                        {/* Search Bar */}
-                        <div className="search-container">
-                            <input
-                                type="text"
-                                placeholder="Search by brand or model..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                            />
-                        </div>
-
-                        {/* Brand Filter */}
-                        <div className="filter-group">
-                            <select
-                                value={selectedBrand}
-                                onChange={(e) => setSelectedBrand(e.target.value)}
-                                className="filter-select"
-                            >
-                                <option value="all">All Brands</option>
-                                {brands.map(brand => (
-                                    <option key={brand} value={brand}>{brand}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Price Sort */}
-                        <div className="filter-group">
-                            <select
-                                value={priceSort}
-                                onChange={(e) => setPriceSort(e.target.value)}
-                                className="filter-select"
-                            >
-                                <option value="none">Sort by Price</option>
-                                <option value="low-high">Price: Low to High</option>
-                                <option value="high-low">Price: High to Low</option>
-                            </select>
-                        </div>
+                {/* Modern Filters */}
+                <div className="modern-filters-section">
+                    <div className="search-wrapper">
+                        <svg className="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search by brand or model..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="modern-search-input"
+                        />
                     </div>
 
-                    {/* Results Count */}
-                    <div className="results-section">
-                        <span className="results-count">
-                            {filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'} available
+                    <div className="modern-filters-grid">
+                        <select
+                            value={selectedBrand}
+                            onChange={(e) => setSelectedBrand(e.target.value)}
+                            className="modern-select"
+                        >
+                            <option value="all">All Brands</option>
+                            {brands.map(brand => (
+                                <option key={brand} value={brand}>{brand}</option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="modern-select"
+                        >
+                            <option value="all">All Categories</option>
+                            {categories.map(category => (
+                                <option key={category} value={category}>{getCategoryLabel(category)}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="status-bar">
+                        <span className="results-badge">
+                            {filteredCars.length} {filteredCars.length === 1 ? 'vehicle' : 'vehicles'} available
                         </span>
                     </div>
                 </div>
 
                 {/* Cars Grid */}
                 {filteredCars.length === 0 ? (
-                    <div className="no-results">
-                        <p className="no-results-text">No cars found matching your criteria</p>
-                        <p className="no-results-subtext">Try adjusting your search or filters</p>
+                    <div className="modern-no-results">
+                        <svg className="no-results-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="no-results-title">No vehicles available</p>
+                        <p className="no-results-text">Try adjusting your search criteria</p>
                     </div>
                 ) : (
-                    <div className="cars-grid">
+                    <div className="modern-cars-grid">
                         {filteredCars.map(car => (
-                            <div key={car.carID} className="car-card">
-                                {/* Car Image */}
-                                <div className="car-image-container">
-                                    {car.imageUrl ? (
-                                        <img 
-                                            src={car.imageUrl} 
-                                            alt={`${car.brand} ${car.model}`}
-                                            className="car-image"
-                                        />
-                                    ) : (
-                                        <svg className="car-placeholder-icon" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-                                        </svg>
-                                    )}
-                                </div>
-
-                                {/* Car Details */}
-                                <div className="car-details">
-                                    {/* Header */}
-                                    <div className="car-header">
-                                        <h3 className="car-title">
-                                            {car.brand} {car.model}
-                                        </h3>
-                                        <div className="car-meta">
-                                            <p className="car-year">{car.year}</p>
-                                            <span className="car-separator">•</span>
-                                            <p className="car-id">ID: {car.carID}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Specifications */}
-                                    <div className="car-specs">
-                                        <div className="spec-item">
-                                            <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                            </svg>
-                                            {car.carTypeName || 'Standard'}
-                                        </div>
-                                        <div className="spec-item">
-                                            <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                                            </svg>
-                                            {car.carTypeFuelType || 'Petrol'}
-                                        </div>
-                                        <div className="spec-item">
-                                            <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                            </svg>
-                                            {car.carTypeNumberOfSeats || '5'} Seats
-                                        </div>
-                                    </div>
-
-                                    {/* Availability Badge */}
-                                    <div className="car-badges">
-                                        {car.availability ? (
-                                            <span className="badge badge-available">
-                                                Available
-                                            </span>
-                                        ) : (
-                                            <span className="badge badge-rented">
-                                                Rented
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Price and Book Button */}
-                                    <div className="car-footer">
-                                        <div className="price-section">
-                                            <p className="car-price">
-                                                R{car.rentalPrice}
-                                            </p>
-                                            <p className="price-unit">per day</p>
-                                        </div>
-                                        <button
-                                            onClick={() => handleBookCar(car)}
-                                            disabled={!car.availability}
-                                            className={`book-button ${car.availability ? 'available' : 'unavailable'}`}
-                                        >
-                                            {car.availability ? 'Book Now' : 'Not Available'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <CarCard
+                                key={car.carID}
+                                car={car}
+                                onBook={handleBookCar}
+                                showDetails={true}
+                            />
                         ))}
                     </div>
                 )}
@@ -241,10 +178,13 @@ function CarSelection() {
                 {/* Back Button */}
                 <div className="back-section">
                     <button
-                        onClick={() => navigate('/bookings')}
-                        className="back-button"
+                        onClick={() => navigate(-1)}
+                        className="modern-back-button"
                     >
-                        Back to Bookings
+                        <svg className="back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back
                     </button>
                 </div>
             </div>

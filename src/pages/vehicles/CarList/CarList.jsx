@@ -1,102 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllCars, getAvailableCars } from "../../../services/car.service";
+import { getActivePricingRuleForCarType } from "../../../services/pricingRule.service";
+import CarCard from "../../../components/vehicles/CarCard/CarCard";
+import { getCategoryLabel } from "../../../models/carType.model";
 import "./CarList.css";
-
-function CarCard({ car, onBook }) {
-    const [imageError, setImageError] = useState(false);
-
-    return (
-        <div className="car-card">
-            <div className="car-image-container">
-                {car.imageUrl && !imageError ? (
-                    <img 
-                        src={car.imageUrl} 
-                        alt={`${car.brand} ${car.model}`}
-                        className="car-image"
-                        onError={() => setImageError(true)}
-                    />
-                ) : (
-                    <svg className="car-placeholder-icon" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-                    </svg>
-                )}
-            </div>
-
-            {/* Car Details */}
-            <div className="car-details">
-                {/* Header */}
-                <div className="car-header">
-                    <h3 className="car-title">
-                        {car.brand} {car.model}
-                    </h3>
-                    <div className="car-meta">
-                        <p className="car-year">{car.year}</p>
-                        <span className="car-separator">•</span>
-                        <p className="car-id">ID: {car.carID}</p>
-                    </div>
-                </div>
-
-                {/* Specifications */}
-                <div className="car-specs">
-                    <div className="spec-item">
-                        <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        {car.carTypeName || 'Standard'}
-                    </div>
-                    <div className="spec-item">
-                        <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                        {car.carTypeFuelType || 'Petrol'}
-                    </div>
-                    <div className="spec-item">
-                        <svg className="spec-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        {car.carTypeNumberOfSeats || '5'} Seats
-                    </div>
-                </div>
-
-                {/* Badges */}
-                <div className="car-badges">
-                    {car.insuranceID && (
-                        <span className="badge badge-insurance">
-                            Insurance Included
-                        </span>
-                    )}
-                    {car.availability ? (
-                        <span className="badge badge-available">
-                            Available
-                        </span>
-                    ) : (
-                        <span className="badge badge-rented">
-                            Rented
-                        </span>
-                    )}
-                </div>
-
-                {/* Price and Book Button */}
-                <div className="car-footer">
-                    <div className="price-section">
-                        <p className="car-price">
-                            R{car.rentalPrice}
-                        </p>
-                        <p className="price-unit">per day</p>
-                    </div>
-                    <button
-                        onClick={() => onBook(car.carID)}
-                        disabled={!car.availability}
-                        className={`book-button ${car.availability ? 'available' : 'unavailable'}`}
-                    >
-                        {car.availability ? 'Book Now' : 'Not Available'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 function CarView() {
     const [cars, setCars] = useState([]);
@@ -121,7 +29,32 @@ function CarView() {
             const response = showOnlyAvailable
                 ? await getAvailableCars()
                 : await getAllCars();
-            setCars(response.data);
+
+            const carsData = response.data || [];
+
+            // Fetch pricing for each car based on carTypeID
+            const carsWithPricing = await Promise.all(
+                carsData.map(async (car) => {
+                    if (car.carTypeID) {
+                        try {
+                            const pricingResponse = await getActivePricingRuleForCarType(car.carTypeID);
+                            const pricing = pricingResponse.data;
+                            return {
+                                ...car,
+                                dailyRate: pricing?.baseDailyRate || null,
+                                weeklyRate: pricing?.weeklyRate || null,
+                                monthlyRate: pricing?.monthlyRate || null
+                            };
+                        } catch (err) {
+                            console.error(`Error fetching pricing for car type ${car.carTypeID}:`, err);
+                            return car;
+                        }
+                    }
+                    return car;
+                })
+            );
+
+            setCars(carsWithPricing);
             setLoading(false);
         } catch (err) {
             console.error("Error fetching cars:", err);
@@ -132,29 +65,23 @@ function CarView() {
     };
 
     const brands = [...new Set(cars.map(car => car.brand))];
-    const types = [...new Set(cars.map(car => car.carTypeName).filter(Boolean))];
+    const types = [...new Set(cars.map(car => car.carTypeCategory).filter(Boolean))];
 
     let filteredCars = cars.filter(car => {
         const matchesSearch =
-            car.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            car.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            car.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             `${car.brand} ${car.model}`.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesBrand = selectedBrand === "all" || car.brand === selectedBrand;
-        const matchesType = selectedType === "all" || car.carTypeName === selectedType;
+        const matchesType = selectedType === "all" || car.carTypeCategory === selectedType;
 
         return matchesSearch && matchesBrand && matchesType;
     });
 
-    if (priceSort === "low-high") {
-        filteredCars.sort((a, b) => a.rentalPrice - b.rentalPrice);
-    } else if (priceSort === "high-low") {
-        filteredCars.sort((a, b) => b.rentalPrice - a.rentalPrice);
-    }
-
     if (loading) {
         return (
-            <div className="loading-container">
+            <div className="modern-loading-container">
                 <div className="loading-spinner"></div>
                 <p className="loading-text">Loading cars...</p>
             </div>
@@ -162,103 +89,92 @@ function CarView() {
     }
 
     return (
-        <div className="car-list-container">
-            <div className="car-list-wrapper">
+        <div className="modern-car-list-container">
+            <div className="car-list-content">
                 {error && (
-                    <div className="error-message">
-                        {error}
+                    <div className="modern-error-message">
+                        <svg className="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p>{error}</p>
                     </div>
                 )}
 
-                {/* Search/Filter Section */}
-                <div className="controls-section">
-                    {/* Search and Filter Section */}
-                    <div className="filters-container">
-                        <div className="filters-grid">
-                            {/* Search Bar */}
-                            <div className="search-container">
-                                <input
-                                    type="text"
-                                    placeholder="Search by brand or model..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="search-input"
-                                />
-                            </div>
+                {/* Modern Filter Section */}
+                <div className="modern-filters-section">
+                    {/* Search Bar */}
+                    <div className="search-wrapper">
+                        <svg className="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search by brand or model..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="modern-search-input"
+                        />
+                    </div>
 
-                            {/* Brand Filter */}
-                            <div className="filter-group">
-                                <select
-                                    value={selectedBrand}
-                                    onChange={(e) => setSelectedBrand(e.target.value)}
-                                    className="filter-select"
-                                >
-                                    <option value="all">All Brands</option>
-                                    {brands.map(brand => (
-                                        <option key={brand} value={brand}>{brand}</option>
-                                    ))}
-                                </select>
-                            </div>
+                    {/* Filters Grid */}
+                    <div className="modern-filters-grid">
+                        <select
+                            value={selectedBrand}
+                            onChange={(e) => setSelectedBrand(e.target.value)}
+                            className="modern-select"
+                        >
+                            <option value="all">All Brands</option>
+                            {brands.map(brand => (
+                                <option key={brand} value={brand}>{brand}</option>
+                            ))}
+                        </select>
 
-                            {/* Type Filter */}
-                            <div className="filter-group">
-                                <select
-                                    value={selectedType}
-                                    onChange={(e) => setSelectedType(e.target.value)}
-                                    className="filter-select"
-                                >
-                                    <option value="all">All Types</option>
-                                    {types.map(type => (
-                                        <option key={type} value={type}>{type}</option>
-                                    ))}
-                                </select>
-                            </div>
+                        <select
+                            value={selectedType}
+                            onChange={(e) => setSelectedType(e.target.value)}
+                            className="modern-select"
+                        >
+                            <option value="all">All Categories</option>
+                            {types.map(type => (
+                                <option key={type} value={type}>{getCategoryLabel(type)}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                            {/* Price Sort */}
-                            <div className="filter-group">
-                                <select
-                                    value={priceSort}
-                                    onChange={(e) => setPriceSort(e.target.value)}
-                                    className="filter-select"
-                                >
-                                    <option value="none">Sort by Price</option>
-                                    <option value="low-high">Price: Low to High</option>
-                                    <option value="high-low">Price: High to Low</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Available Only Toggle */}
-                        <div className="toggle-section">
-                            <label className="toggle-label">
-                                <input
-                                    type="checkbox"
-                                    checked={showOnlyAvailable}
-                                    onChange={(e) => setShowOnlyAvailable(e.target.checked)}
-                                    className="toggle-checkbox"
-                                />
-                                <span className="toggle-text">Show available cars only</span>
-                            </label>
-                            <span className="results-count">
-                                {filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'} found
-                            </span>
-                        </div>
+                    {/* Status Bar */}
+                    <div className="status-bar">
+                        <label className="modern-checkbox-label">
+                            <input
+                                type="checkbox"
+                                checked={showOnlyAvailable}
+                                onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                                className="modern-checkbox"
+                            />
+                            <span className="checkbox-text">Available only</span>
+                        </label>
+                        <span className="results-badge">
+                            {filteredCars.length} {filteredCars.length === 1 ? 'vehicle' : 'vehicles'}
+                        </span>
                     </div>
                 </div>
 
                 {/* Cars Grid */}
                 {filteredCars.length === 0 ? (
-                    <div className="no-results">
-                        <p className="no-results-text">No cars found matching your criteria</p>
-                        <p className="no-results-subtext">Try adjusting your filters</p>
+                    <div className="modern-no-results">
+                        <svg className="no-results-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="no-results-title">No vehicles found</p>
+                        <p className="no-results-text">Try adjusting your search criteria</p>
                     </div>
                 ) : (
-                    <div className="cars-grid">
+                    <div className="modern-cars-grid">
                         {filteredCars.map(car => (
-                            <CarCard 
-                                key={car.carID} 
-                                car={car} 
+                            <CarCard
+                                key={car.carID}
+                                car={car}
                                 onBook={(carId) => navigate(`/make-booking?carId=${carId}`)}
+                                showDetails={false}
                             />
                         ))}
                     </div>

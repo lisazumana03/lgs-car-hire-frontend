@@ -18,6 +18,7 @@ export const deleteCar = (carId) => {
   return axios.delete(`${API_URL}/delete/${carId}`);
 };
 
+// Retrieval Operations
 export const getAllCars = () => {
   return axios.get(`${API_URL}/all`);
 };
@@ -34,15 +35,27 @@ export const getCarsByYear = (year) => {
   return axios.get(`${API_URL}/year/${year}`);
 };
 
-export const getCarsByPriceRange = (minPrice, maxPrice) => {
-  return axios.get(`${API_URL}/price-range`, {
-    params: { minPrice, maxPrice },
+export const getCarsByStatus = (status) => {
+  return axios.get(`${API_URL}/status/${status}`);
+};
+
+export const getCarByLicensePlate = (licensePlate) => {
+  return axios.get(`${API_URL}/license-plate/${licensePlate}`);
+};
+
+export const getCarByVin = (vin) => {
+  return axios.get(`${API_URL}/vin/${vin}`);
+};
+
+export const updateCarStatus = (carId, status) => {
+  return axios.put(`${API_URL}/status/${carId}`, null, {
+    params: { status },
   });
 };
 
-export const updateCarAvailability = (carId, available) => {
-  return axios.put(`${API_URL}/availability/${carId}`, null, {
-    params: { available },
+export const updateCarMileage = (carId, mileage) => {
+  return axios.put(`${API_URL}/mileage/${carId}`, null, {
+    params: { mileage },
   });
 };
 
