@@ -7,7 +7,7 @@ Updated to match backend MaintenanceController endpoints
 
 import axios from "axios";
 
-const API_URL = "http://localhost:3045/maintenance";
+const API_URL = "http://localhost:3045/api/maintenance";
 
 // Create maintenance (POST /api/maintenance/create)
 export const createMaintenance = (maintenance) => {
@@ -16,6 +16,11 @@ export const createMaintenance = (maintenance) => {
 
 // Read maintenance by ID (GET /api/maintenance/read/{id})
 export const readMaintenance = (id) => {
+  return axios.get(`${API_URL}/read/${id}`);
+};
+
+// Get maintenance by ID (alias for readMaintenance)
+export const getMaintenanceById = (id) => {
   return axios.get(`${API_URL}/read/${id}`);
 };
 
@@ -37,6 +42,7 @@ export const getAllMaintenance = () => {
 export default {
   createMaintenance,
   readMaintenance,
+  getMaintenanceById,
   updateMaintenance,
   deleteMaintenance,
   getAllMaintenance,

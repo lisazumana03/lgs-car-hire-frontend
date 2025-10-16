@@ -5,12 +5,12 @@ import './index.css';
 function UserProfile({ user, onUpdateUser }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
     email: user?.email || '',
     phoneNumber: user?.phoneNumber || '',
     dateOfBirth: user?.dateOfBirth || '',
-    idNumber: user?.idNumber || '',
-    numberPlate: user?.numberPlate || user?.licenseNumber || ''
+    idNumber: user?.idNumber || ''
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -39,12 +39,12 @@ function UserProfile({ user, onUpdateUser }) {
   const handleCancel = () => {
     setIsEditing(false);
     setFormData({
-      name: user.name || '',
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
       email: user.email || '',
       phoneNumber: user.phoneNumber || '',
       dateOfBirth: user.dateOfBirth || '',
-      idNumber: user.idNumber || '',
-      numberPlate: user.numberPlate || user.licenseNumber || ''
+      idNumber: user.idNumber || ''
     });
     setMessage('');
   };
@@ -64,12 +64,24 @@ function UserProfile({ user, onUpdateUser }) {
       console.log('Updating profile for user ID:', userId);
       console.log('Form data:', formData);
 
+      // Prepare update data matching UserDTO structure
+      const updateData = {
+        userId: userId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        idNumber: parseInt(formData.idNumber) || user.idNumber,
+        dateOfBirth: formData.dateOfBirth,
+        phoneNumber: formData.phoneNumber,
+        role: user.role // Keep existing role
+      };
+
       // Call backend API to update profile
-      const response = await updateUserProfile(userId, formData);
+      const response = await updateUserProfile(userId, updateData);
       console.log('Profile updated on backend:', response);
 
       // Update local user object with new data
-      const updatedUser = { ...user, ...formData };
+      const updatedUser = { ...user, ...updateData };
       sessionStorage.setItem('user', JSON.stringify(updatedUser));
       localStorage.setItem('user', JSON.stringify(updatedUser));
 
@@ -103,12 +115,24 @@ function UserProfile({ user, onUpdateUser }) {
               <h3>Personal Information</h3>
               
               <div className="profile-field">
-                <label htmlFor="name">Full Name:</label>
+                <label htmlFor="firstName">First Name:</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div className="profile-field">
+                <label htmlFor="lastName">Last Name:</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleChange}
                   required
                 />
@@ -159,18 +183,6 @@ function UserProfile({ user, onUpdateUser }) {
                   onChange={handleChange}
                 />
               </div>
-              
-              <div className="profile-field">
-                <label htmlFor="numberPlate">Number Plate:</label>
-                <input
-                  type="text"
-                  id="numberPlate"
-                  name="numberPlate"
-                  value={formData.numberPlate}
-                  onChange={handleChange}
-                  placeholder="e.g., ABC 123 GP"
-                />
-              </div>
             </div>
           </div>
           
@@ -189,8 +201,12 @@ function UserProfile({ user, onUpdateUser }) {
             <div className="profile-section">
               <h3>Personal Information</h3>
               <div className="profile-field">
-                <label>Full Name:</label>
-                <span>{user.name || 'N/A'}</span>
+                <label>First Name:</label>
+                <span>{user.firstName || 'N/A'}</span>
+              </div>
+              <div className="profile-field">
+                <label>Last Name:</label>
+                <span>{user.lastName || 'N/A'}</span>
               </div>
               <div className="profile-field">
                 <label>Email:</label>
@@ -209,8 +225,8 @@ function UserProfile({ user, onUpdateUser }) {
                 <span>{user.idNumber || 'N/A'}</span>
               </div>
               <div className="profile-field">
-                <label>Number Plate:</label>
-                <span>{user.numberPlate || user.licenseNumber || 'N/A'}</span>
+                <label>Role:</label>
+                <span>{user.role || 'N/A'}</span>
               </div>
             </div>
           </div>

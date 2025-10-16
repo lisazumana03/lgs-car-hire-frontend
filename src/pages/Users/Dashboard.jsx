@@ -28,7 +28,7 @@ function Dashboard({ user }) {
     <div className="dashboard-container">
       <h1>Welcome to LG'S CAR HIRE</h1>
       <div className="welcome-message">
-        <h2>Hello, {user?.name || 'User'}!</h2>
+        <h2>Hello, {user?.firstName || 'User'}!</h2>
         <p>Welcome to your car rental dashboard. Here you can manage your bookings, view available cars, and access your account.</p>
       </div>
       

@@ -37,6 +37,9 @@ import InvoiceList from "./pages/Reservation/Invoice/InvoiceList.jsx";
 import LocationForm from "./pages/Reservation/Location/LocationForm.jsx";
 import LocationList from "./pages/Reservation/Location/LocationList.jsx";
 import MapsPage from "./pages/Reservation/Location/MapsPage.jsx";
+import LocationChoice from "./pages/Reservation/Location/LocationChoice.jsx";
+import MapsLocationSelector from "./pages/Reservation/Location/MapsLocationSelector.jsx";
+import LocationSelector from "./pages/Reservation/Location/LocationSelector.jsx";
 
 // Vehicle Components
 import CarForm from "./pages/Vehicle/CarForm.jsx";
@@ -55,12 +58,12 @@ import SupportComponent from './pages/Reservation/Support/supportComponent.jsx';
 // Insurance Components
 import InsuranceForm from "./pages/Reservation/Insurance/insuranceForm.jsx";
 import InsuranceList from "./pages/Reservation/Insurance/insuranceList.jsx";
-import InsuranceComponent from "./pages/Reservation/Insurance/insuranceComponent.jsx";
+import InsurancePage from "./pages/Reservation/Insurance/InsurancePage.jsx";
 
 // Maintenance Components
 import MaintenanceForm from "./pages/Reservation/Maintenance/maintenanceForm.jsx";
 import MaintenanceList from "./pages/Reservation/Maintenance/maintenanceList.jsx";
-import MaintenanceComponent from "./pages/Reservation/Maintenance/maintenanceComponent.jsx";
+import MaintenancePage from "./pages/Reservation/Maintenance/MaintenancePage.jsx";
 
 // Public Pages
 import Home from "./Home.jsx";
@@ -76,7 +79,7 @@ function App() {
 
   const handleLogin = async (userData) => {
     console.log('Login received userData:', userData);
-    console.log('User ID in login response:', userData.id);
+    console.log('User ID in login response:', userData.userId);
     console.log('All user data properties:', Object.keys(userData));
 
     setIsAuthenticated(true);
@@ -87,12 +90,12 @@ function App() {
     localStorage.setItem('user', JSON.stringify(userData));
 
     // Fetch complete profile data using the user ID
-    if (userData.id) {
+    if (userData.userId) {
       console.log('Fetching complete profile...');
       try {
-        const fullProfile = await getUserProfile(userData.id);
+        const fullProfile = await getUserProfile(userData.userId);
         console.log('Full profile loaded:', fullProfile);
-        console.log('User ID in profile:', fullProfile.id);
+        console.log('User ID in profile:', fullProfile.userId);
         setCurrentUser(fullProfile); // Update with complete profile data
         
         // Update storage with full profile
@@ -142,16 +145,19 @@ function App() {
                 <Route path="/locations" element={<LocationList />} />
                 <Route path="/register-location" element={<LocationForm/>} />
                 <Route path="/maps" element={<MapsPage />} />
+                <Route path="/location-choice" element={<LocationChoice />} />
+                <Route path="/maps-location-select" element={<MapsLocationSelector />} />
+                <Route path="/choose-location" element={<LocationSelector />} />
                 <Route path="/reviews" element={<ReviewComponent/>} />
                 <Route path="/review-form" element={<ReviewForm/>} />
                 <Route path="/review-list" element={<ReviewList/>} />
                 <Route path="/support" element={<SupportComponent user={currentUser} />} />
                 <Route path="/support-form" element={<SupportForm user={currentUser} />} />
                 <Route path="/support-list" element={<SupportList user={currentUser} />} />
-                <Route path="/insurance" element={<InsuranceComponent user={currentUser} />} />
+                <Route path="/insurance" element={<InsurancePage />} />
                 <Route path="/insurance-form" element={<InsuranceForm user={currentUser} />} />
                 <Route path="/insurance-list" element={<InsuranceList />} />
-                <Route path="/maintenance" element={<MaintenanceComponent user={currentUser} />} />
+                <Route path="/maintenance" element={<MaintenancePage />} />
                 <Route path="/maintenance-form" element={<MaintenanceForm user={currentUser} />} />
                 <Route path="/maintenance-list" element={<MaintenanceList />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

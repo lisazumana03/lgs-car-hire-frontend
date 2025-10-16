@@ -129,6 +129,7 @@ export default function BookingForm() {
         }
 
         // Prepare payload with correct structure including user
+        // Handle both database locations (with locationID) and map-based locations (without locationID)
         const payload = {
             user: {
                 userId: userId  // Include the user with userId
@@ -138,8 +139,17 @@ export default function BookingForm() {
             endDate: form.endDate,
             bookingStatus: form.bookingStatus,
             cars: selectedCar ? [{ carID: selectedCar.carID }] : [],
-            pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
-            dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
+            // If location has locationID, send just the ID; otherwise send the full location object
+            pickupLocation: selectedPickupLocation 
+                ? (selectedPickupLocation.locationID 
+                    ? { locationID: selectedPickupLocation.locationID }
+                    : selectedPickupLocation)
+                : null,
+            dropOffLocation: selectedDropOffLocation 
+                ? (selectedDropOffLocation.locationID 
+                    ? { locationID: selectedDropOffLocation.locationID }
+                    : selectedDropOffLocation)
+                : null,
         };
         
         console.log('Submitting booking with payload:', payload);
@@ -319,11 +329,11 @@ export default function BookingForm() {
                         {selectedPickupLocation ? (
                             <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
                                 <h3 className="text-lg font-semibold text-white">{selectedPickupLocation.locationName}</h3>
-                                <p className="text-gray-300">{selectedPickupLocation.streetNumber}, {selectedPickupLocation.streetName}, {selectedPickupLocation.cityOrTown}</p>
+                                <p className="text-gray-300">{selectedPickupLocation.streetName}, {selectedPickupLocation.cityOrTown}</p>
                                 <p className="text-gray-300">{selectedPickupLocation.provinceOrState}, {selectedPickupLocation.country}</p>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/choose-location', {
+                                    onClick={() => navigate('/maps-location-select', {
                                         state: {
                                             selectedCar,
                                             selectedPickupLocation,
@@ -338,7 +348,7 @@ export default function BookingForm() {
                         ) : (
                             <button
                                 type="button"
-                                onClick={() => navigate('/choose-location', {
+                                onClick={() => navigate('/maps-location-select', {
                                     state: {
                                         selectedCar,
                                         selectedPickupLocation,
@@ -357,11 +367,11 @@ export default function BookingForm() {
                         {selectedDropOffLocation ? (
                             <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-2">
                                 <h3 className="text-lg font-semibold text-white">{selectedDropOffLocation.locationName}</h3>
-                                <p className="text-gray-300">{selectedDropOffLocation.streetNumber}, {selectedDropOffLocation.streetName}, {selectedDropOffLocation.cityOrTown}</p>
+                                <p className="text-gray-300">{selectedDropOffLocation.streetName}, {selectedDropOffLocation.cityOrTown}</p>
                                 <p className="text-gray-300">{selectedDropOffLocation.provinceOrState}, {selectedDropOffLocation.country}</p>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/choose-location', {
+                                    onClick={() => navigate('/maps-location-select', {
                                         state: {
                                             selectedCar,
                                             selectedPickupLocation,
@@ -376,7 +386,7 @@ export default function BookingForm() {
                         ) : (
                             <button
                                 type="button"
-                                onClick={() => navigate('/choose-location', {
+                                onClick={() => navigate('/maps-location-select', {
                                     state: {
                                         selectedCar,
                                         selectedPickupLocation,

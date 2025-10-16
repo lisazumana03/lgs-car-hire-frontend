@@ -119,13 +119,14 @@
   border: 1px solid transparent;
 }
 
-.nav-link:hover {
+/* Only apply to sidebar nav links, not header nav links */
+.sidebar-menu .nav-link:hover {
   background-color: #007bff;
   color: white;
   transform: translateX(5px);
 }
 
-.nav-link.active {
+.sidebar-menu .nav-link.active {
   background-color: #007bff;
   color: white;
   border-color: #0056b3;

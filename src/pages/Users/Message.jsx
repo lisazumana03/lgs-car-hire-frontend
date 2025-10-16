@@ -188,25 +188,6 @@ export default function CreateNotification() { // Define the CreateNotification 
                         )}
                     </div>
                 </section>
-
-                {/* Information section */}
-                <section className="notification-info">
-                    <h3 className="info-title">Notification Guidelines</h3> {/* Info section title */}
-                    <div className="info-content">
-                        <div className="info-item">
-                            <h4>User ID</h4> {/* Info item title */}
-                            <p>Make sure you have the correct user ID before sending the notification.</p> {/* Info item description */}
-                        </div>
-                        <div className="info-item">
-                            <h4>Message Content</h4> {/* Info item title */}
-                            <p>Keep messages clear, professional, and relevant to the user's booking or account.</p> {/* Info item description */}
-                        </div>
-                        <div className="info-item">
-                            <h4>Delivery</h4> {/* Info item title */}
-                            <p>Notifications are delivered immediately and will appear in the user's notification center.</p> {/* Info item description */}
-                        </div>
-                    </div>
-                </section>
             </div>
         </>
     );
