@@ -18,50 +18,51 @@ const Login1 = ({
   const navigate = useNavigate();
 
   return (
-    <section className="bg-muted h-screen relative">
+    <section className="bg-muted min-h-screen relative">
       {/* Back Button */}
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
         <Button
           variant="outline"
           aria-label="Go back to home"
           onClick={() => navigate("/")}
-          className="gap-2"
+          className="gap-2 text-sm sm:text-base"
+          size="sm"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
           Home
         </Button>
       </div>
 
-      <div className="flex h-full items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-6 lg:justify-start">
+        <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
           <a href={logo.url}>
             <img
               src={logo.src}
               alt={logo.alt}
               title={logo.title}
-              className="h-10"
+              className="h-8 sm:h-10"
             />
           </a>
-          <div className="min-w-sm border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
-            {heading && <h1 className="text-xl font-semibold">{heading}</h1>}
+          <div className="border-muted bg-background flex w-full max-w-[90%] sm:max-w-sm flex-col items-center gap-y-3 sm:gap-y-4 rounded-md border px-4 py-6 sm:px-6 sm:py-8 shadow-md">
+            {heading && <h1 className="text-lg sm:text-xl font-semibold">{heading}</h1>}
             <Input
               type="email"
               placeholder="Email"
-              className="text-sm"
+              className="text-sm w-full"
               required
             />
             <Input
               type="password"
               placeholder="Password"
-              className="text-sm"
+              className="text-sm w-full"
               required
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full text-sm sm:text-base">
               {buttonText}
             </Button>
           </div>
-          <div className="text-muted-foreground flex justify-center gap-1 text-sm">
+          <div className="text-muted-foreground flex justify-center gap-1 text-xs sm:text-sm">
             <p>{signupText}</p>
             <a
               href={signupUrl}
