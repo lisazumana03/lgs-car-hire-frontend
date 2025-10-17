@@ -109,10 +109,10 @@ const Navbar1 = ({
 }) => {
   return (
     <section className="py-4">
-      <div className="container">
+      <div className="container mx-auto">
         {/* Desktop Menu */}
-        <nav className="hidden justify-between lg:flex">
-          <div className="flex items-center gap-6">
+        <nav className="hidden lg:flex lg:items-center lg:justify-between relative">
+          <div className="flex items-center gap-2">
             {/* Logo */}
             <a href={logo.url} className="flex items-center gap-2">
               <img
@@ -124,13 +124,13 @@ const Navbar1 = ({
                 {logo.title}
               </span>
             </a>
-            <div className="flex items-center">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
-                </NavigationMenuList>
-              </NavigationMenu>
-            </div>
+          </div>
+          <div className="flex items-center absolute left-1/2 transform -translate-x-1/2">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {menu.map((item) => renderMenuItem(item))}
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
           <div className="flex gap-2">
             <Button asChild variant="outline" size="sm">
