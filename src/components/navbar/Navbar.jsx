@@ -108,8 +108,8 @@ const Navbar1 = ({
   },
 }) => {
   return (
-    <section className="py-4">
-      <div className="container mx-auto">
+    <section className="py-4 px-4">
+      <div className="container mx-auto px-0">
         {/* Desktop Menu */}
         <nav className="hidden lg:flex lg:items-center lg:justify-between relative">
           <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ const Navbar1 = ({
                 className="max-h-8 dark:invert"
                 alt={logo.alt}
               />
-              <span className="text-lg font-semibold tracking-tighter">
+              <span className="text-lg font-semibold tracking-tighter whitespace-nowrap">
                 {logo.title}
               </span>
             </a>
@@ -149,9 +149,12 @@ const Navbar1 = ({
             <a href={logo.url} className="flex items-center gap-2">
               <img
                 src={logo.src}
-                className="max-h-8 dark:invert"
+                className="max-h-6 sm:max-h-8 dark:invert"
                 alt={logo.alt}
               />
+              <span className="text-sm sm:text-base font-semibold tracking-tighter whitespace-nowrap">
+                {logo.title}
+              </span>
             </a>
             <Sheet>
               <SheetTrigger asChild>
@@ -252,11 +255,11 @@ const renderMobileMenuItem = (item) => {
 const SubMenuLink = ({ item }) => {
   return (
     <a
-      className="hover:bg-muted hover:text-accent-foreground flex min-w-80 select-none flex-row gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors"
+      className="hover:bg-muted hover:text-accent-foreground flex w-full sm:min-w-80 select-none flex-row gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors"
       href={item.url}
     >
       <div className="text-foreground">{item.icon}</div>
-      <div>
+      <div className="flex-1">
         <div className="text-sm font-semibold">{item.title}</div>
         {item.description && (
           <p className="text-muted-foreground text-sm leading-snug">
