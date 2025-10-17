@@ -1,43 +1,71 @@
+import HeroPages from "../../components/public/HeroPages";
 
-import { Link } from "react-router-dom";
-import "../../assets/styling/home.css";
-import homeImage from "../../assets/samuel-hagger-qoZSYNBvIxg-unsplash.jpg"
+function Contact() {
+  return (
+    <>
+      <section className="contact-page">
+        <HeroPages name="Contact" />
+        <div className="container">
+          <div className="contact-div">
+            <div className="contact-div__text">
+              <h2>Need additional information?</h2>
+              <p>
+                A multifaceted professional skilled in multiple fields of
+                research, development as well as a learning specialist. Over 15
+                years of experience in the car rental industry.
+              </p>
+              <a href="tel:+27123456789">
+                <i className="fa-solid fa-phone"></i>&nbsp; (123) 456-7869
+              </a>
+              <a href="mailto:contact@lgscarhire.com">
+                <i className="fa-solid fa-envelope"></i>&nbsp;
+                contact@lgscarhire.com
+              </a>
+              <a href="/">
+                <i className="fa-solid fa-location-dot"></i>&nbsp; Johannesburg,
+                South Africa
+              </a>
+            </div>
+            <div className="contact-div__form">
+              <form>
+                <label>
+                  Full Name <b>*</b>
+                </label>
+                <input type="text" placeholder='E.g: "Joe Shmoe"'></input>
 
-export default function Contact(){
-    return(
-        <div className="contact-page">
-            {/* Hero Section */}
-            <section className="hero">
-                <div className="hero-text">
-                    <h1>Contact LG'S CAR HIRE</h1>
-                    <p>Get in touch with us for any inquiries, bookings, or support. We're here to help you with all your car rental needs.</p>
-                    <Link to="/register" className="btn">Get Started</Link>
-                </div>
-                <div className="hero-image">
-                    <img src={homeImage} alt="Luxury Cars" />
-                </div>
-            </section>
+                <label>
+                  Email <b>*</b>
+                </label>
+                <input type="email" placeholder="youremail@example.com"></input>
 
-            {/* Contact Information Section */}
-            <section className="features">
-                <div className="container">
-                    <h2>Get In Touch</h2>
-                    <div className="features-grid">
-                        <div className="feature-card">
-                            <h3>Phone</h3>
-                            <p>Call us at: +27 (0) 11 123 4567<br/>Available 24/7 for your convenience</p>
-                        </div>
-                        <div className="feature-card">
-                            <h3>Email</h3>
-                            <p>Email us at: info@lgscarhire.co.za<br/>We'll respond within 24 hours</p>
-                        </div>
-                        <div className="feature-card">
-                            <h3>Location</h3>
-                            <p>Visit us at: 123 Main Street<br/>Johannesburg, South Africa</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                <label>
+                  Tell us about it <b>*</b>
+                </label>
+                <textarea placeholder="Write Here.."></textarea>
+
+                <button type="submit">
+                  <i className="fa-solid fa-envelope-open-text"></i>&nbsp; Send
+                  Message
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-    );
+        <div className="book-banner">
+          <div className="book-banner__overlay"></div>
+          <div className="container">
+            <div className="text-content">
+              <h2>Book a car by getting in touch with us</h2>
+              <span>
+                <i className="fa-solid fa-phone"></i>
+                <h3>(123) 456-7869</h3>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
+
+export default Contact;

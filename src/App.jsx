@@ -1,9 +1,12 @@
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import './index.css';
+import './assets/styling/carrental-styles.css';
 import Home from "./pages/Home/Home.jsx";
 import About from "./pages/About/About.jsx";
 import Contact from "./pages/Contact/Contact.jsx";
+import Models from "./pages/Models/Models.jsx";
+import TestimonialsPage from "./pages/TestimonialsPage/TestimonialsPage.jsx";
 import AdminDashboard from "./pages/auth/AdminDashboard/AdminDashboard.jsx";
 import LoginForm from "./pages/auth/Login/LoginForm.jsx";
 import RegistrationForm from "./pages/auth/Register/RegistrationForm.jsx";
@@ -35,8 +38,8 @@ import ReviewComponent from './pages/reviews/ReviewComponent/ReviewComponent.jsx
 import ReviewForm from "./pages/reviews/ReviewForm/ReviewForm.jsx";
 import ReviewList from "./pages/reviews/ReviewList/ReviewList.jsx";
 import ReviewEditList from "./pages/reviews/ReviewEditList/ReviewEditList.jsx";
-import Header from "./components/common/Header/Header.jsx";
-import Footer from "./components/common/Footer/Footer.jsx";
+import Navbar from "./components/public/Navbar.jsx";
+import Footer from "./components/public/Footer.jsx";
 
 import { useAuth } from "./context/AuthContext.jsx";
 
@@ -88,28 +91,28 @@ function App() {
                 </>
             ) : (
                 <>
-                <Header />
-                <main className="main-content">
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/contact" element={<Contact />} />
-                        <Route path="/login" element={<LoginForm />} />
-                        <Route path="/register" element={<RegistrationForm />} />
-                        <Route path="/make-booking" element={<BookingForm />} />
-                        <Route path="/register-car" element={<CarForm />} />
-                        <Route path="/cars" element={<CarList />} />
-                        <Route path="/admin" element={<AdminDashboard/>} />
-                        <Route path="/payment" element={<PaymentForm />} />
-                        <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
-                        <Route path="/invoice/:id" element={<InvoiceView />} />
-                        <Route path="/invoices" element={<InvoiceList />} />
-                        <Route path="/locations" element={<LocationList />} />
-                        <Route path="/choose-location" element={<LocationSelector/>} />
-                        <Route path="/register-location" element={<LocationForm/>} />
-                    </Routes>
-                    <Footer />
-                </main>
+                <Navbar />
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/models" element={<Models />} />
+                    <Route path="/testimonials" element={<TestimonialsPage />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/login" element={<LoginForm />} />
+                    <Route path="/register" element={<RegistrationForm />} />
+                    <Route path="/make-booking" element={<BookingForm />} />
+                    <Route path="/register-car" element={<CarForm />} />
+                    <Route path="/cars" element={<CarList />} />
+                    <Route path="/admin" element={<AdminDashboard/>} />
+                    <Route path="/payment" element={<PaymentForm />} />
+                    <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
+                    <Route path="/invoice/:id" element={<InvoiceView />} />
+                    <Route path="/invoices" element={<InvoiceList />} />
+                    <Route path="/locations" element={<LocationList />} />
+                    <Route path="/choose-location" element={<LocationSelector/>} />
+                    <Route path="/register-location" element={<LocationForm/>} />
+                </Routes>
+                <Footer />
                 </>
             )}
         </div>
