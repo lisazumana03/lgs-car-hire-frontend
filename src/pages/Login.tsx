@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -19,6 +19,7 @@ const Login1 = ({
   signupUrl = "/signup",
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,13 +31,28 @@ const Login1 = ({
 
     const result = await login(email, password);
 
-    if (result.success) {
+    if (result.success && result.user) {
       toast.success("Login successful!");
 
-      // Navigate based on user role
-      if (result.user.role === "ADMIN") {
+      // Check if there's a redirect URL with carId
+      const redirect = searchParams.get("redirect");
+      const carId = searchParams.get("carId");
+      const returnTo = searchParams.get("returnTo");
+
+      if (redirect && carId && returnTo) {
+        // Redirect to booking with car ID and return path
+        navigate(`${redirect}?carId=${carId}&returnTo=${returnTo}`);
+      } else if (redirect && carId) {
+        // Redirect to booking with car ID
+        navigate(`${redirect}?carId=${carId}`);
+      } else if (redirect) {
+        // Redirect to the specified page
+        navigate(redirect);
+      } else if (result.user.role === "ADMIN") {
+        // Default admin redirect
         navigate("/admin/dashboard");
       } else {
+        // Default customer redirect
         navigate("/dashboard");
       }
     } else {

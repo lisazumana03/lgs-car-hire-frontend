@@ -1,11 +1,11 @@
-import { Navbar1 } from "@/components/navbar/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import { Button } from "@/components/ui/button";
 import { Car, Shield, Clock, MapPin } from "lucide-react";
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar1 />
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary/10 via-background to-background py-12 sm:py-16 md:py-24 lg:py-32">

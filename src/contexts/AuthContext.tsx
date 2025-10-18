@@ -28,14 +28,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const token = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
 
-    if (token && savedUser) {
+    if (token && savedUser && savedUser !== "undefined" && savedUser !== "null") {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && typeof parsedUser === "object") {
+          setUser(parsedUser);
+        } else {
+          // Invalid user data, clear storage
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
       } catch (error) {
         console.error("Error parsing saved user:", error);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
+    } else if (savedUser === "undefined" || savedUser === "null") {
+      // Clean up invalid storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
     setLoading(false);
   }, []);
