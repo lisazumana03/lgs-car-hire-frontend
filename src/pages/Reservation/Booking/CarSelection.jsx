@@ -31,8 +31,8 @@ function CarSelection() {
     };
 
     const handleBookCar = (car) => {
-        // Navigate to booking form with pre-filled car data
-        navigate('/make-booking', {
+        // Navigate to map-based location selector with pre-filled car data
+        navigate('/maps-location-select', {
             state: { 
                 selectedCar: {
                     carID: car.carID,

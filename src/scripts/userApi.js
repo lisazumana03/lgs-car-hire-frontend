@@ -3,26 +3,48 @@ import { API_BASE_URL } from "./apiConfig.js";
 
 // User Authentication API Functions using Axios
 
-export async function loginUser(email, password) {
+export async function loginUser(email, password, role) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/users/login`, {
+    // Match LoginRequestDTO structure - send as JSON
+    const loginData = {
       email: email,
       password: password,
-    });
+      role: role, // Must be 'ADMIN', 'CUSTOMER', or 'CAR_OWNER'
+    };
+
+    console.log("Sending login data:", loginData);
+
+    const response = await axios.post(`${API_BASE_URL}/users/login`, loginData);
     return response.data;
   } catch (error) {
     console.error("Login error:", error);
-    throw new Error(error.response?.data?.message || "Login failed");
+    console.error("Error response:", error.response);
+    throw new Error(
+      error.response?.data?.message || "Invalid credentials or role"
+    );
   }
 }
 
 export async function registerUser(userData) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/users/signup`, userData);
+    console.log("Sending registration data:", userData);
+    console.log("API URL:", `${API_BASE_URL}/users/register`);
+
+    // Match SignUpRequestDTO - use /register endpoint
+    const response = await axios.post(
+      `${API_BASE_URL}/users/register`,
+      userData
+    );
     return response.data;
   } catch (error) {
     console.error("Registration error:", error);
-    throw new Error(error.response?.data?.message || "Registration failed");
+    console.error("Error response:", error.response);
+    console.error("Error response data:", error.response?.data);
+    throw new Error(
+      error.response?.data?.message ||
+        error.response?.data ||
+        "Registration failed"
+    );
   }
 }
 
@@ -63,13 +85,9 @@ export async function updateUserProfile(userId, profileData) {
 }
 
 export async function logoutUser() {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/users/logout`);
-    return response.data || true;
-  } catch (error) {
-    console.error("Logout error:", error);
-    throw new Error(error.response?.data?.message || "Logout failed");
-  }
+  // Logout is handled client-side (clear session/localStorage)
+  // No backend call needed
+  return true;
 }
 
 export default {

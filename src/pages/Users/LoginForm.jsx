@@ -5,7 +5,8 @@ import { loginUser } from '../../scripts/index.js';
 function LoginForm({ onLogin }) {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    role: 'CUSTOMER' // Default role
   });
   const [message, setMessage] = useState('');
 
@@ -21,7 +22,7 @@ function LoginForm({ onLogin }) {
     setMessage('Logging in...');
     
     try {
-      const userData = await loginUser(formData.email, formData.password);
+      const userData = await loginUser(formData.email, formData.password, formData.role);
       setMessage('Login successful! Redirecting...');
       console.log('Login response:', userData);
       
@@ -60,6 +61,27 @@ function LoginForm({ onLogin }) {
           onChange={handleChange}
           required
         />
+
+        <label htmlFor="role">Role</label>
+        <select
+          id="role"
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          required
+          style={{
+            width: '100%',
+            padding: '10px',
+            marginBottom: '15px',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            fontSize: '14px'
+          }}
+        >
+          <option value="CUSTOMER">Customer</option>
+          <option value="CAR_OWNER">Car Owner</option>
+          <option value="ADMIN">Administrator</option>
+        </select>
 
         <LoginButton onClick={handleSubmit} />
 
