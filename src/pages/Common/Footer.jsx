@@ -8,7 +8,7 @@ function Footer(){
             borderTop: '1px solid rgba(212, 175, 55, 0.3)',
             marginTop: '40px'
         }}>
-            <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#d4af37', marginBottom: '15px' }}>
+            <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#3c37d4', marginBottom: '15px' }}>
                 LG'S CAR HIRE
             </div>
             <p>&copy; {new Date().getFullYear()} LG's Car Hire. All rights reserved.</p>

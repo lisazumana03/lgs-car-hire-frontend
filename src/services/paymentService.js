@@ -3,7 +3,7 @@
  * paymentService.js
  */
 
-import axios from "axios";
+import apiClient from "../scripts/apiConfig";
 
 const API_URL = "http://localhost:3045";
 
@@ -11,7 +11,7 @@ const paymentService = {
   // Verify payment with backend (after Paystack success)
   verify: async (reference, bookingId, amount) => {
     try {
-      const response = await axios.post(`${API_URL}/payment/verify`, {
+      const response = await apiClient.post(`${API_URL}/payment/verify`, {
         bookingId,
         amount,
         paymentMethod: "PAYSTACK",
@@ -27,7 +27,7 @@ const paymentService = {
 
   read: async (paymentId) => {
     try {
-      const response = await axios.get(`${API_URL}/payments/${paymentId}`);
+      const response = await apiClient.get(`${API_URL}/payments/${paymentId}`);
       return response.data;
     } catch (error) {
       throw new Error(
@@ -38,7 +38,7 @@ const paymentService = {
 
   update: async (paymentData) => {
     try {
-      const response = await axios.put(
+      const response = await apiClient.put(
         `${API_URL}/payments/update`,
         paymentData
       );
@@ -52,7 +52,7 @@ const paymentService = {
 
   delete: async (paymentId) => {
     try {
-      const response = await axios.delete(
+      const response = await apiClient.delete(
         `${API_URL}/payments/delete/${paymentId}`
       );
       return response.data;
@@ -65,7 +65,9 @@ const paymentService = {
 
   getUserPayments: async (userId) => {
     try {
-      const response = await axios.get(`${API_URL}/payments/user/${userId}`);
+      const response = await apiClient.get(
+        `${API_URL}/payments/user/${userId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(

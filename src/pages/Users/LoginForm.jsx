@@ -5,8 +5,7 @@ import { loginUser } from '../../scripts/index.js';
 function LoginForm({ onLogin }) {
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    role: 'CUSTOMER' // Default role
+    password: ''
   });
   const [message, setMessage] = useState('');
 
@@ -22,13 +21,21 @@ function LoginForm({ onLogin }) {
     setMessage('Logging in...');
     
     try {
-      const userData = await loginUser(formData.email, formData.password, formData.role);
+      const response = await loginUser(formData.email, formData.password);
+      // Response structure: { token, user, tokenType }
+      
+      // Save JWT token and user data to localStorage
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('tokenType', response.tokenType || 'Bearer');
+      localStorage.setItem('user', JSON.stringify(response.user));
+      sessionStorage.setItem('user', JSON.stringify(response.user)); // For compatibility
+      
       setMessage('Login successful! Redirecting...');
-      console.log('Login response:', userData);
+      console.log('Login successful:', response);
       
       // Call onLogin to update parent state and redirect
       setTimeout(() => {
-        onLogin(userData);
+        onLogin(response);
       }, 1000);
     } catch (error) {
       setMessage(`Login failed: ${error.message}`);
@@ -61,27 +68,6 @@ function LoginForm({ onLogin }) {
           onChange={handleChange}
           required
         />
-
-        <label htmlFor="role">Role</label>
-        <select
-          id="role"
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          required
-          style={{
-            width: '100%',
-            padding: '10px',
-            marginBottom: '15px',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}
-        >
-          <option value="CUSTOMER">Customer</option>
-          <option value="CAR_OWNER">Car Owner</option>
-          <option value="ADMIN">Administrator</option>
-        </select>
 
         <LoginButton onClick={handleSubmit} />
 

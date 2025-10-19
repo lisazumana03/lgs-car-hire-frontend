@@ -14,8 +14,27 @@ const InvoiceList = () => {
 
     const fetchInvoices = async () => {
         try {
-            // Get actual user ID from localStorage or context
-            const userId = localStorage.getItem('userId') || '1'; // Fallback to 1 for testing
+            // Get user ID from localStorage user object
+            const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+            let userId = null;
+            
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    userId = user.userId || user.id || user.userID;
+                    console.log('User object:', user);
+                    console.log('Extracted user ID:', userId);
+                } catch (error) {
+                    console.error('Error parsing user from storage:', error);
+                }
+            }
+            
+            if (!userId) {
+                console.warn('No user ID found, trying fallback methods...');
+                // Try other possible keys
+                userId = localStorage.getItem('userId') || localStorage.getItem('userID') || '1';
+            }
+            
             console.log('Fetching invoices for user:', userId);
 
             const invoiceData = await invoiceService.getUserInvoices(userId);
@@ -27,14 +46,64 @@ const InvoiceList = () => {
 
             // Fallback: try to get all invoices
             try {
+                console.log('Trying fallback: get all invoices...');
                 const allInvoices = await invoiceService.getAllInvoices();
+                console.log('All invoices fetched:', allInvoices);
                 setInvoices(allInvoices);
                 setError('');
             } catch (fallbackError) {
+                console.error('Fallback also failed:', fallbackError);
                 setError('Failed to load invoices. Please try again later.');
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const createTestInvoice = async () => {
+        try {
+            console.log('Creating test invoice...');
+            
+            // Get user ID
+            const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+            let userId = null;
+            
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    userId = user.userId || user.id || user.userID;
+                } catch (error) {
+                    console.error('Error parsing user from storage:', error);
+                }
+            }
+            
+            if (!userId) {
+                userId = '1'; // Fallback
+            }
+
+            const testInvoiceData = {
+                userId: userId,
+                subTotal: 500.00,
+                taxAmount: 75.00,
+                totalAmount: 575.00,
+                issueDate: new Date().toISOString(),
+                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+                status: 'PENDING',
+                carModel: 'Test Car Model'
+            };
+
+            console.log('Test invoice data:', testInvoiceData);
+            
+            const createdInvoice = await invoiceService.create(testInvoiceData);
+            console.log('Test invoice created:', createdInvoice);
+            
+            // Refresh the invoice list
+            await fetchInvoices();
+            
+            alert('Test invoice created successfully!');
+        } catch (error) {
+            console.error('Error creating test invoice:', error);
+            alert('Failed to create test invoice: ' + error.message);
         }
     };
 
@@ -65,6 +134,21 @@ const InvoiceList = () => {
                 </div>
             )}
 
+            {/* Debug Information */}
+            <div style={{
+                backgroundColor: '#f8f9fa',
+                color: '#495057',
+                padding: '10px',
+                borderRadius: '5px',
+                marginBottom: '20px',
+                fontSize: '12px',
+                fontFamily: 'monospace'
+            }}>
+                <strong>Debug Info:</strong><br/>
+                Invoices count: {invoices.length}<br/>
+                Invoices data: {JSON.stringify(invoices, null, 2)}
+            </div>
+
             {invoices.length === 0 ? (
                 <div className="message info" style={{
                     backgroundColor: '#d1ecf1',
@@ -73,7 +157,13 @@ const InvoiceList = () => {
                     borderRadius: '5px',
                     textAlign: 'center'
                 }}>
-                    No invoices found.
+                    No invoices found. This could mean:
+                    <ul style={{textAlign: 'left', marginTop: '10px'}}>
+                        <li>No invoices exist for this user</li>
+                        <li>User ID is incorrect</li>
+                        <li>Backend API is not responding</li>
+                        <li>Authentication issues</li>
+                    </ul>
                 </div>
             ) : (
                 <div className="invoice-list">
@@ -133,6 +223,19 @@ const InvoiceList = () => {
                 style={{ marginTop: '20px' }}
             >
                 Back to Dashboard
+            </button>
+
+            {/* Test Invoice Creation Button */}
+            <button
+                className="submit-btn"
+                onClick={createTestInvoice}
+                style={{ 
+                    marginTop: '10px', 
+                    marginLeft: '10px',
+                    backgroundColor: '#28a745'
+                }}
+            >
+                Create Test Invoice
             </button>
         </div>
     );

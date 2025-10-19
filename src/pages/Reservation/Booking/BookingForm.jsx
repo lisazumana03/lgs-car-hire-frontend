@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
+import { createBookingNotification } from "../../../services/notificationService";
 
 const getCurrentDateTime = () => {
     const now = new Date();
@@ -157,7 +158,43 @@ export default function BookingForm() {
         try {
             const response = await create(payload);
             console.log("Booking created:", response.data);
-            setMessage("Booking created successfully!");
+            
+            // Get the created booking ID
+            const bookingId = response.data?.bookingID || response.data?.id;
+            
+            // Automatically send notification to user
+            let notificationSent = false;
+            if (bookingId && userId) {
+                try {
+                    await createBookingNotification(
+                        userId,
+                        bookingId,
+                        "confirmed - Your car is on its way!"
+                    );
+                    console.log("Booking notification sent successfully");
+                    notificationSent = true;
+                } catch (notifError) {
+                    console.error("Failed to send booking notification:", notifError);
+                    console.error("Notification error details:", {
+                        status: notifError.response?.status,
+                        message: notifError.response?.data,
+                        error: notifError.message
+                    });
+                    
+                    // Check if it's a permission error (403)
+                    if (notifError.response?.status === 403) {
+                        console.warn("Notification blocked by backend permissions - this is expected if notifications are admin-only");
+                    }
+                    // Don't fail the booking if notification fails
+                }
+            }
+            
+            // Show appropriate message based on notification status
+            if (notificationSent) {
+                setMessage("Booking created successfully! You'll receive a notification shortly.");
+            } else {
+                setMessage("Booking created successfully! Your booking has been confirmed.");
+            }
             setMessageType("success");
             setForm({
                 cars: [""],

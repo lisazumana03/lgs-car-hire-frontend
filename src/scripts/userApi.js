@@ -1,26 +1,29 @@
 import axios from "axios";
-import { API_BASE_URL } from "./apiConfig.js";
+import apiClient, { API_BASE_URL } from "./apiConfig.js";
 
-// User Authentication API Functions using Axios
+// User Authentication API Functions
 
-export async function loginUser(email, password, role) {
+export async function loginUser(email, password) {
   try {
-    // Match LoginRequestDTO structure - send as JSON
+    // Send only email and password - backend determines role from database
     const loginData = {
       email: email,
       password: password,
-      role: role, // Must be 'ADMIN', 'CUSTOMER', or 'CAR_OWNER'
     };
 
     console.log("Sending login data:", loginData);
 
-    const response = await axios.post(`${API_BASE_URL}/users/login`, loginData);
-    return response.data;
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, loginData);
+
+    // Backend returns: { token, user, tokenType }
+    // User object includes the role from database
+    console.log("Login response:", response.data);
+    return response.data; // Return full response with token
   } catch (error) {
     console.error("Login error:", error);
     console.error("Error response:", error.response);
     throw new Error(
-      error.response?.data?.message || "Invalid credentials or role"
+      error.response?.data?.message || "Invalid email or password"
     );
   }
 }
@@ -28,14 +31,17 @@ export async function loginUser(email, password, role) {
 export async function registerUser(userData) {
   try {
     console.log("Sending registration data:", userData);
-    console.log("API URL:", `${API_BASE_URL}/users/register`);
+    console.log("API URL:", `${API_BASE_URL}/auth/register`);
 
-    // Match SignUpRequestDTO - use /register endpoint
+    // Match SignUpRequestDTO - use /auth/register endpoint
     const response = await axios.post(
-      `${API_BASE_URL}/users/register`,
+      `${API_BASE_URL}/auth/register`,
       userData
     );
-    return response.data;
+
+    // Backend returns: { token, user, tokenType }
+    console.log("Registration response:", response.data);
+    return response.data; // Return full response with token
   } catch (error) {
     console.error("Registration error:", error);
     console.error("Error response:", error.response);
@@ -50,7 +56,8 @@ export async function registerUser(userData) {
 
 export async function getUserProfile(userId) {
   try {
-    const response = await axios.get(`${API_BASE_URL}/users/${userId}`);
+    // Use apiClient which automatically includes JWT token
+    const response = await apiClient.get(`/users/${userId}`);
     return response.data;
   } catch (error) {
     console.error("Get profile error:", error);
@@ -63,12 +70,9 @@ export async function updateUserProfile(userId, profileData) {
     console.log("Updating user profile...");
     console.log("User ID:", userId);
     console.log("Profile data being sent:", profileData);
-    console.log("API URL:", `${API_BASE_URL}/users/${userId}`);
 
-    const response = await axios.put(
-      `${API_BASE_URL}/users/${userId}`,
-      profileData
-    );
+    // Use apiClient which automatically includes JWT token
+    const response = await apiClient.put(`/users/${userId}`, profileData);
 
     console.log("Profile update response:", response.data);
     return response.data;

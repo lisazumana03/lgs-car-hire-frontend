@@ -2,29 +2,29 @@
 Imtiyaaz Waggie 219374759
  */
 
-import axios from "axios";
+import apiClient from "../scripts/apiConfig";
 
 const API_URL = "http://localhost:3045/api/car";
 
 export const create = (car) => {
-  return axios.post(`${API_URL}/create`, car);
+  return apiClient.post(`${API_URL}/create`, car);
 };
 
 export const getCarById = (carId) => {
-  return axios.get(`${API_URL}/read/${carId}`);
+  return apiClient.get(`${API_URL}/read/${carId}`);
 };
 
 export const updateCar = (car) => {
-  return axios.put(`${API_URL}/update`, car);
+  return apiClient.put(`${API_URL}/update`, car);
 };
 
 export const deleteCar = (carId) => {
-  return axios.delete(`${API_URL}/delete/${carId}`);
+  return apiClient.delete(`${API_URL}/delete/${carId}`);
 };
 
 export const getAllCars = async () => {
   try {
-    const response = await axios.get(`${API_URL}/all`);
+    const response = await apiClient.get(`${API_URL}/all`);
 
     // Process cars to create image URLs from byte arrays
     const carsWithImageUrls = response.data.map((car) => {
@@ -68,7 +68,7 @@ export const getAllCars = async () => {
 
 export const getCarsByBrand = async (brand) => {
   try {
-    const response = await axios.get(`${API_URL}/brand/${brand}`);
+    const response = await apiClient.get(`${API_URL}/brand/${brand}`);
 
     // Process cars to create image URLs
     const carsWithImageUrls = response.data.map((car) => {
@@ -97,7 +97,7 @@ export const getCarsByBrand = async (brand) => {
 export const getAvailableCars = async () => {
   try {
     console.log(" Fetching available cars from:", `${API_URL}/available`);
-    const response = await axios.get(`${API_URL}/available`);
+    const response = await apiClient.get(`${API_URL}/available`);
 
     console.log(` Received ${response.data.length} cars from backend`);
 
@@ -176,17 +176,17 @@ export const getAvailableCars = async () => {
 };
 
 export const getCarsByYear = (year) => {
-  return axios.get(`${API_URL}/year/${year}`);
+  return apiClient.get(`${API_URL}/year/${year}`);
 };
 
 export const getCarsByPriceRange = (minPrice, maxPrice) => {
-  return axios.get(`${API_URL}/price-range`, {
+  return apiClient.get(`${API_URL}/price-range`, {
     params: { minPrice, maxPrice },
   });
 };
 
 export const updateCarAvailability = (carId, available) => {
-  return axios.put(`${API_URL}/availability/${carId}`, null, {
+  return apiClient.put(`${API_URL}/availability/${carId}`, null, {
     params: { available },
   });
 };
@@ -196,7 +196,7 @@ export const uploadCarImage = (carId, imageFile) => {
   formData.append("image", imageFile);
 
   // Updated to use new CarImageController endpoint
-  return axios.post(
+  return apiClient.post(
     `http://localhost:3045/api/car/image/upload/${carId}`,
     formData,
     {
@@ -209,11 +209,11 @@ export const uploadCarImage = (carId, imageFile) => {
 
 // New image endpoints from CarImageController
 export const deleteCarImage = (carId) => {
-  return axios.delete(`http://localhost:3045/api/car/image/${carId}`);
+  return apiClient.delete(`http://localhost:3045/api/car/image/${carId}`);
 };
 
 export const checkCarImageExists = (carId) => {
-  return axios.get(`http://localhost:3045/api/car/image/${carId}/exists`);
+  return apiClient.get(`http://localhost:3045/api/car/image/${carId}/exists`);
 };
 
 export const getCarImageUrl = (carId) => {

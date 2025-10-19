@@ -3,7 +3,7 @@ Notification Service
 Handles all notification-related API calls
 */
 
-import axios from "axios";
+import apiClient from "../scripts/apiConfig";
 
 // Base API URL for notifications
 const API_URL = "http://localhost:3045/api/notifications";
@@ -50,7 +50,11 @@ export const createNotification = async (notificationData) => {
   try {
     console.log("Sending notification:", notificationData);
     console.log("API URL:", API_URL);
-    const response = await axios.post(API_URL, notificationData, axiosConfig); // Send POST request to create notification
+    const response = await apiClient.post(
+      API_URL,
+      notificationData,
+      axiosConfig
+    ); // Send POST request to create notification
     console.log("Notification created successfully:", response.data);
     return response.data; // Return the created notification data
   } catch (error) {
@@ -87,7 +91,11 @@ export const createPaymentNotification = async (
     };
 
     console.log("Sending payment notification:", notificationData);
-    const response = await axios.post(API_URL, notificationData, axiosConfig); // Send POST request to create notification
+    const response = await apiClient.post(
+      API_URL,
+      notificationData,
+      axiosConfig
+    ); // Send POST request to create notification
     console.log("Payment notification created:", response.data);
     return response.data; // Return the created notification data
   } catch (error) {
@@ -106,12 +114,27 @@ export const createBookingNotification = async (
 ) => {
   try {
     const statusText = status ? status.toLowerCase() : "confirmed";
+
+    // Create a friendly message
+    let message;
+    if (statusText.includes("on its way")) {
+      message = `🚗 Great news! Your booking #${bookingId} is ${statusText}`;
+    } else {
+      message = `Your booking #${bookingId} has been ${statusText}`;
+    }
+
     const notificationData = {
       userId: userId, // User ID who will receive the notification
-      message: `Your booking ${bookingId} has been ${statusText}`, // Notification message
+      message: message, // Notification message
     };
 
-    const response = await axios.post(API_URL, notificationData, axiosConfig); // Send POST request to create notification
+    console.log("Sending booking notification:", notificationData);
+
+    const response = await apiClient.post(
+      API_URL,
+      notificationData,
+      axiosConfig
+    ); // Send POST request to create notification
     return response.data; // Return the created notification data
   } catch (error) {
     console.error("Error creating booking notification:", error); // Log error for debugging
@@ -122,7 +145,10 @@ export const createBookingNotification = async (
 // Get all notifications for a specific user
 export const getUserNotifications = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/user/${userId}`, axiosConfig); // Send GET request to fetch user notifications
+    const response = await apiClient.get(
+      `${API_URL}/user/${userId}`,
+      axiosConfig
+    ); // Send GET request to fetch user notifications
     return response.data; // Return the notifications data
   } catch (error) {
     console.error("Error fetching user notifications:", error); // Log error for debugging
@@ -141,7 +167,10 @@ export const getCurrentUserNotifications = async () => {
 
     console.log("Fetching notifications for user ID:", userId); // Debug log
 
-    const response = await axios.get(`${API_URL}/user/${userId}`, axiosConfig); // Send GET request to fetch user notifications
+    const response = await apiClient.get(
+      `${API_URL}/user/${userId}`,
+      axiosConfig
+    ); // Send GET request to fetch user notifications
     return response.data; // Return the notifications data
   } catch (error) {
     console.error("Error fetching current user notifications:", error); // Log error for debugging
@@ -152,7 +181,7 @@ export const getCurrentUserNotifications = async () => {
 // Get all notifications (admin function)
 export const getAllNotifications = async () => {
   try {
-    const response = await axios.get(API_URL, axiosConfig); // Send GET request to fetch all notifications
+    const response = await apiClient.get(API_URL, axiosConfig); // Send GET request to fetch all notifications
     return response.data; // Return all notifications data
   } catch (error) {
     console.error("Error fetching all notifications:", error); // Log error for debugging
@@ -163,7 +192,7 @@ export const getAllNotifications = async () => {
 // Mark a notification as read
 export const markNotificationAsRead = async (notificationId) => {
   try {
-    const response = await axios.put(
+    const response = await apiClient.put(
       `${API_URL}/${notificationId}/read`,
       {},
       axiosConfig
@@ -178,7 +207,7 @@ export const markNotificationAsRead = async (notificationId) => {
 // Delete a notification
 export const deleteNotification = async (notificationId) => {
   try {
-    const response = await axios.delete(
+    const response = await apiClient.delete(
       `${API_URL}/${notificationId}`,
       axiosConfig
     ); // Send DELETE request to remove notification

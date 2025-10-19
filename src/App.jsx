@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import './index.css';
+
+// Protected Route Component
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 // User Components
 import RegistrationForm from "./pages/Users/RegistrationForm.jsx";
@@ -23,11 +26,13 @@ import BookingForm from "./pages/Reservation/Booking/BookingForm.jsx";
 import BookingHistory from "./pages/Reservation/Booking/BookingHistory.jsx";
 import BookingList from "./pages/Reservation/Booking/BookingList.jsx";
 import BookingComponent from "./pages/Reservation/Booking/BookingComponent.jsx";
+import BookingDetails from "./pages/Reservation/Booking/BookingDetails.jsx";
 import CarSelection from "./pages/Reservation/Booking/CarSelection.jsx";
 
 // Payment Components
 import PaymentForm from "./pages/Reservation/Payment/PaymentForm.jsx";
 import PaymentConfirmation from "./pages/Reservation/Payment/PaymentConfirmation.jsx";
+import PaymentSuccess from "./pages/Reservation/Payment/PaymentSuccess.jsx";
 
 // Invoice Components
 import InvoiceView from "./pages/Reservation/Invoice/InvoiceView.jsx";
@@ -77,45 +82,57 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  const handleLogin = async (userData) => {
-    console.log('Login received userData:', userData);
-    console.log('User ID in login response:', userData.userId);
-    console.log('All user data properties:', Object.keys(userData));
-
-    setIsAuthenticated(true);
-    setCurrentUser(userData);
+  // Check for existing JWT token on app load
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
     
-    // Store user in both session and local storage
-    sessionStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('user', JSON.stringify(userData));
-
-    // Fetch complete profile data using the user ID
-    if (userData.userId) {
-      console.log('Fetching complete profile...');
+    if (token && storedUser) {
       try {
-        const fullProfile = await getUserProfile(userData.userId);
-        console.log('Full profile loaded:', fullProfile);
-        console.log('User ID in profile:', fullProfile.userId);
-        setCurrentUser(fullProfile); // Update with complete profile data
-        
-        // Update storage with full profile
-        sessionStorage.setItem('user', JSON.stringify(fullProfile));
-        localStorage.setItem('user', JSON.stringify(fullProfile));
+        const user = JSON.parse(storedUser);
+        setIsAuthenticated(true);
+        setCurrentUser(user);
+        console.log('User authenticated from localStorage:', user);
       } catch (error) {
-        console.error('Failed to fetch complete profile:', error);
-        // Keep the basic user data if profile fetch fails
+        console.error('Failed to parse stored user:', error);
+        // Clear invalid data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
-    } else {
-      console.log('No user ID available, skipping profile fetch');
     }
+  }, []);
+
+  const handleLogin = async (authResponse) => {
+    console.log('Login received auth response:', authResponse);
+    
+    // authResponse structure: { token, user, tokenType }
+    const { user, token, tokenType } = authResponse;
+    
+    if (!token || !user) {
+      console.error('Invalid auth response - missing token or user');
+      return;
+    }
+
+    // JWT token and user are already saved by LoginForm
+    // Just update app state
+    setIsAuthenticated(true);
+    setCurrentUser(user);
+    
+    console.log('User authenticated:', user);
+    console.log('JWT Token saved to localStorage');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
-    // Clear user from storage
-    sessionStorage.removeItem('user');
+    
+    // Clear ALL authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('tokenType');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
+    
+    console.log('User logged out - all auth data cleared');
   };
 
   return (
@@ -124,7 +141,7 @@ function App() {
         {isAuthenticated ? (
           // Authenticated user - show sidebar with main menu
           <>
-            <Sidebar onLogout={handleLogout} />
+            <Sidebar onLogout={handleLogout} currentUser={currentUser} />
             <main className="main-content">
               <Routes>
                 <Route path="/dashboard" element={<Dashboard user={currentUser} />} />
@@ -133,17 +150,44 @@ function App() {
                 <Route path="/make-booking" element={<BookingForm user={currentUser} />} />
                 <Route path="/booking-history" element={<BookingHistory />} />
                 <Route path="/booking-list" element={<BookingList />} />
+                <Route path="/booking-details" element={<BookingDetails />} />
+                <Route path="/booking-details/:id" element={<BookingDetails />} />
                 <Route path="/cars" element={<CarList />} />
-                <Route path="/register-car" element={<CarForm />} />
+                {/* Admin/Car Owner only */}
+                <Route 
+                  path="/register-car" 
+                  element={
+                    <ProtectedRoute requireRole="ADMIN">
+                      <CarForm />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="/select-car" element={<CarSelection />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/notification-test" element={<Message user={currentUser} />} />
+                {/* Admin and Car Owner only - Messages */}
+                <Route 
+                  path="/notification-test" 
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <Message user={currentUser} />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="/payment" element={<PaymentForm user={currentUser} />} />
                 <Route path="/payment/confirmation" element={<PaymentConfirmation user={currentUser} />} />
+                <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/invoice/:id" element={<InvoiceView />} />
                 <Route path="/invoices" element={<InvoiceList />} />
                 <Route path="/locations" element={<LocationList />} />
-                <Route path="/register-location" element={<LocationForm/>} />
+                {/* Admin only */}
+                <Route 
+                  path="/register-location" 
+                  element={
+                    <ProtectedRoute requireAdmin={true}>
+                      <LocationForm/>
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="/maps" element={<MapsPage />} />
                 <Route path="/location-choice" element={<LocationChoice />} />
                 <Route path="/maps-location-select" element={<MapsLocationSelector />} />
@@ -154,12 +198,56 @@ function App() {
                 <Route path="/support" element={<SupportComponent user={currentUser} />} />
                 <Route path="/support-form" element={<SupportForm user={currentUser} />} />
                 <Route path="/support-list" element={<SupportList user={currentUser} />} />
-                <Route path="/insurance" element={<InsurancePage />} />
-                <Route path="/insurance-form" element={<InsuranceForm user={currentUser} />} />
-                <Route path="/insurance-list" element={<InsuranceList />} />
-                <Route path="/maintenance" element={<MaintenancePage />} />
-                <Route path="/maintenance-form" element={<MaintenanceForm user={currentUser} />} />
-                <Route path="/maintenance-list" element={<MaintenanceList />} />
+                {/* Admin and Car Owner only - Insurance */}
+                <Route 
+                  path="/insurance" 
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <InsurancePage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/insurance-form" 
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <InsuranceForm user={currentUser} />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/insurance-list" 
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <InsuranceList />
+                    </ProtectedRoute>
+                  } 
+                />
+                {/* Admin and Car Owner only - Maintenance */}
+                <Route 
+                  path="/maintenance" 
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <MaintenancePage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/maintenance-form" 
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <MaintenanceForm user={currentUser} />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/maintenance-list" 
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <MaintenanceList />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </main>
@@ -187,12 +275,33 @@ function App() {
 }
 
 // Sidebar component with proper React Router navigation
-function Sidebar({ onLogout }) {
+function Sidebar({ onLogout, currentUser }) {
     const location = useLocation();
+    const isAdmin = currentUser?.role === 'ADMIN';
+    const isCarOwner = currentUser?.role === 'CAR_OWNER';
 
     return (
         <div className="sidebar">
             <h2>LG'S CAR HIRE</h2>
+            
+            {/* User Info Display */}
+            {currentUser && (
+              <div style={{
+                padding: '15px',
+                marginBottom: '20px',
+                backgroundColor: '#2a2a2a',
+                borderRadius: '8px',
+                borderLeft: '4px solid #d4af37'
+              }}>
+                <p style={{ fontSize: '14px', marginBottom: '5px', color: '#f5f5f5' }}>
+                  <strong>{currentUser.firstName} {currentUser.lastName}</strong>
+                </p>
+                <p style={{ fontSize: '12px', color: '#d4af37' }}>
+                  {currentUser.role}
+                </p>
+              </div>
+            )}
+            
             <ul className="sidebar-menu">
                 <li>
                     <Link
@@ -221,15 +330,19 @@ function Sidebar({ onLogout }) {
                         <span className="title">Cars</span>
                     </Link>
                 </li>
-                <li>
-                    <Link
-                        to="/register-car"
-                        className={`sidebar-link ${location.pathname === '/register-car' ? 'active' : ''}`}
-                    >
-                        <span className="icon">➕</span>
-                        <span className="title">Add Car</span>
-                    </Link>
-                </li>
+                
+                {/* Admin and Car Owner can add cars */}
+                {(isAdmin || isCarOwner) && (
+                  <li>
+                      <Link
+                          to="/register-car"
+                          className={`sidebar-link ${location.pathname === '/register-car' ? 'active' : ''}`}
+                      >
+                          <span className="icon">➕</span>
+                          <span className="title">Add Car</span>
+                      </Link>
+                  </li>
+                )}
                 <li>
                     <Link
                         to="/notifications"
@@ -239,15 +352,19 @@ function Sidebar({ onLogout }) {
                         <span className="title">Notifications</span>
                     </Link>
                 </li>
-                <li>
-                    <Link
-                        to="/notification-test"
-                        className={`sidebar-link ${location.pathname === '/notification-test' ? 'active' : ''}`}
-                    >
-                        <span className="icon">🧪</span>
-                        <span className="title">Messages</span>
-                    </Link>
-                </li>
+                
+                {/* Admin and Car Owner can manage messages */}
+                {(isAdmin || isCarOwner) && (
+                  <li>
+                      <Link
+                          to="/notification-test"
+                          className={`sidebar-link ${location.pathname === '/notification-test' ? 'active' : ''}`}
+                      >
+                          <span className="icon">🧪</span>
+                          <span className="title">Messages</span>
+                      </Link>
+                  </li>
+                )}
                 <li>
                     <Link
                         to="/profile"
@@ -268,31 +385,38 @@ function Sidebar({ onLogout }) {
                 </li>
                 <li>
                     <Link
-                        to="/invoices"
-                        className={`sidebar-link ${location.pathname === '/invoices' ? 'active' : ''}`}
+                        to="/booking-details"
+                        className={`sidebar-link ${location.pathname === '/booking-details' ? 'active' : ''}`}
                     >
-                        <span className="icon">📄</span>
-                        <span className="title">Invoices</span>
+                        <span className="icon">📋</span>
+                        <span className="title">Booking Details</span>
                     </Link>
                 </li>
-                <li>
-                    <Link
-                        to="/insurance"
-                        className={`sidebar-link ${location.pathname === '/insurance' ? 'active' : ''}`}
-                    >
-                        <span className="icon">🛡️</span>
-                        <span className="title">Insurance</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link
-                        to="/maintenance"
-                        className={`sidebar-link ${location.pathname === '/maintenance' ? 'active' : ''}`}
-                    >
-                        <span className="icon">🔧</span>
-                        <span className="title">Maintenance</span>
-                    </Link>
-                </li>
+                {/* Admin and Car Owner can manage insurance */}
+                {(isAdmin || isCarOwner) && (
+                  <li>
+                      <Link
+                          to="/insurance"
+                          className={`sidebar-link ${location.pathname === '/insurance' ? 'active' : ''}`}
+                      >
+                          <span className="icon">🛡️</span>
+                          <span className="title">Insurance</span>
+                      </Link>
+                  </li>
+                )}
+                
+                {/* Admin and Car Owner can manage maintenance */}
+                {(isAdmin || isCarOwner) && (
+                  <li>
+                      <Link
+                          to="/maintenance"
+                          className={`sidebar-link ${location.pathname === '/maintenance' ? 'active' : ''}`}
+                      >
+                          <span className="icon">🔧</span>
+                          <span className="title">Maintenance</span>
+                      </Link>
+                  </li>
+                )}
                 <li>
                     <Link
                         to="/reviews"
@@ -320,15 +444,19 @@ function Sidebar({ onLogout }) {
                         <span className="title">Locations</span>
                     </Link>
                 </li>
-                <li>
-                    <Link
-                        to="/register-location"
-                        className={`sidebar-link ${location.pathname === '/register-location' ? 'active' : ''}`}
-                    >
-                        <span className="icon">📌</span>
-                        <span className="title">Add Location</span>
-                    </Link>
-                </li>
+                
+                {/* Admin can add locations */}
+                {isAdmin && (
+                  <li>
+                      <Link
+                          to="/register-location"
+                          className={`sidebar-link ${location.pathname === '/register-location' ? 'active' : ''}`}
+                      >
+                          <span className="icon">📌</span>
+                          <span className="title">Add Location</span>
+                      </Link>
+                  </li>
+                )}
                 <li>
                     <Link
                         to="/maps"
