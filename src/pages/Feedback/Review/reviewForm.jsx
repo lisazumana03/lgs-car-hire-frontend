@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { getAllCars } from "../../../services/carService";
+import { create as createReview } from "../../../services/reviewService";
 
 function ReviewForm({ onAdd }) {
   const [form, setForm] = useState({ fullName: "", comment: "", rating: 0, carID: "" });
@@ -19,27 +19,27 @@ function ReviewForm({ onAdd }) {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const payload = {
-    fullName: form.fullName,
-    comment: form.comment,
-    rating: form.rating,
-    car: { carID: form.carID }   // <-- Wrap carID here
-  };
+    const payload = {
+      fullName: form.fullName,
+      comment: form.comment,
+      rating: parseInt(form.rating) || 0,
+      car: { carID: parseInt(form.carID) }
+    };
 
-  axios.post("http://localhost:3045/review/create", payload)
-    .then(res => {
-      if (onAdd) onAdd(res.data);
+    try {
+      // Use reviewService which includes JWT token automatically
+      const response = await createReview(payload);
+      if (onAdd) onAdd(response.data);
       alert("Review submitted successfully!");
       setForm({ fullName: "", comment: "", rating: 0, carID: "" });
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Failed to submit review. Please try again.");
-    });
-};
+    } catch (err) {
+      console.error("Error submitting review:", err);
+      alert(err.response?.data?.message || "Failed to submit review. Please try again.");
+    }
+  };
 
   return (
     <div className="form" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'linear-gradient(120deg, #232526 0%, #414345 100%)'}}>

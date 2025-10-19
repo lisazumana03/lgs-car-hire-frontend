@@ -1,13 +1,25 @@
-import axios from "axios";
+import apiClient from "../scripts/apiConfig";
 
 const API_URL = "http://localhost:3045/support";
 
-export const create = (support) => axios.post(`${API_URL}/create`, support);
+export const create = (support) => apiClient.post("/support/create", support);
 
-export const getAllTickects = () => axios.get(API_URL);
+export const getAllTickects = () => apiClient.get("/support/all");
 
-export const updateSupportTicket = (support) => axios.put(`${API_URL}`, support);
+// Correct spelling alias
+export const getAllTickets = () => apiClient.get("/support/all");
 
-export const deleteSupportTicket = (supportId) => axios.delete(`${API_URL}/${supportId}`);
+export const updateSupport = (support) =>
+  apiClient.put("/support/update", support);
 
-export const cancelSupportTicket = (supportId) => axios.delete(`${API_URL}/${supportId}`);
+export const updateSupportTicket = (support) =>
+  apiClient.put("/support/update", support);
+
+export const deleteSupport = (supportId) =>
+  apiClient.delete(`/support/delete/${supportId}`);
+
+export const deleteSupportTicket = (supportId) =>
+  apiClient.delete(`/support/delete/${supportId}`);
+
+export const cancelSupportTicket = (supportId) =>
+  apiClient.delete(`/support/delete/${supportId}`);

@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { getAllTickets } from "../../../services/supportService";
 
 const SupportList = () => {
   const [supportTickets, setSupportTickets] = useState([]);
@@ -9,18 +8,18 @@ const SupportList = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const fetchTickets = () => {
+  const fetchTickets = async () => {
     setLoading(true);
-    axios.get("http://localhost:3045/support/all")
-      .then((res) => {
-        setSupportTickets(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setSupportTickets([]);
-        setError('Failed to load support tickets.');
-        setLoading(false);
-      });
+    try {
+      const response = await getAllTickets();
+      setSupportTickets(response.data || []);
+    } catch (err) {
+      console.error('Error fetching support tickets:', err);
+      setSupportTickets([]);
+      setError('Failed to load support tickets.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

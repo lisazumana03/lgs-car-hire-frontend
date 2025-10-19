@@ -111,7 +111,7 @@ const PaymentForm = ({ user }) => {
                     status: "COMPLETED"
                 };
 
-                navigate('/payment/confirmation', {
+                navigate('/payment/success', {
                     state: { payment: mockPaymentData, booking: selectedBooking }
                 });
             } catch (err) {

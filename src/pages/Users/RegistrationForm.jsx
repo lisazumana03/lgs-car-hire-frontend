@@ -49,14 +49,30 @@ function RegistrationForm() {
         role: formData.role
       };
 
-      const data = await registerUser(userData);
-      setMessage('Account created successfully! Redirecting to login...');
-      console.log('Registration response:', data);
+      const response = await registerUser(userData);
+      // Response structure: { token, user, tokenType }
       
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+      // Save JWT token and user data (auto-login after registration)
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('tokenType', response.tokenType || 'Bearer');
+        localStorage.setItem('user', JSON.stringify(response.user));
+        sessionStorage.setItem('user', JSON.stringify(response.user));
+        
+        setMessage('Account created successfully! Redirecting to dashboard...');
+        console.log('Registration successful:', response);
+        
+        // Redirect to dashboard after 2 seconds
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
+      } else {
+        // If no token returned, redirect to login
+        setMessage('Account created successfully! Please login...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
     } catch (error) {
       setMessage(`Registration failed: ${error.message}`);
       console.error('Registration error:', error);

@@ -26,10 +26,6 @@ const InvoiceView = () => {
         fetchInvoice();
     }, [id]);
 
-    const handlePrint = () => {
-        window.print();
-    };
-
     const handleDownload = async () => {
         try {
             const blob = await invoiceService.downloadInvoice(id);
@@ -112,18 +108,36 @@ Car: ${invoice.carModel || 'Vehicle'}
         <div className="form">
             <div style={{ textAlign: 'right', marginBottom: '20px' }}>
                 <button
+                    onClick={() => {
+                        console.log('Full invoice object:', invoice);
+                        // Try multiple possible field names for booking ID
+                        const bookingId = invoice.bookingId 
+                            || invoice.booking?.bookingID 
+                            || invoice.booking?.id 
+                            || invoice.bookingID
+                            || invoice.booking_id;
+                        
+                        console.log('Extracted booking ID:', bookingId);
+                        
+                        if (bookingId) {
+                            console.log('Navigating to:', `/booking-details/${bookingId}`);
+                            navigate(`/booking-details/${bookingId}`);
+                        } else {
+                            alert('Booking ID not available in invoice. Your InvoiceDTO may need to include bookingId field.');
+                            console.error('Invoice structure:', JSON.stringify(invoice, null, 2));
+                        }
+                    }}
+                    className="submit-btn"
+                    style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#007bff' }}
+                >
+                    View Booking Details
+                </button>
+                <button
                     onClick={handleDownload}
                     className="submit-btn"
                     style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#28a745' }}
                 >
                     Download Invoice
-                </button>
-                <button
-                    onClick={handlePrint}
-                    className="submit-btn"
-                    style={{ padding: '10px 20px', marginRight: '10px' }}
-                >
-                    Print Invoice
                 </button>
                 <button
                     onClick={() => navigate('/dashboard')}

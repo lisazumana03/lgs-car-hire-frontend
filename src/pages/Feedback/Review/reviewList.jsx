@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { getAllTickects } from '../../../services/reviewService';
 
 const ReviewList = () => {
     const [reviews, setReviews] = useState([]);
@@ -8,17 +8,17 @@ const ReviewList = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const fetchReviews = () => {
+    const fetchReviews = async () => {
         setLoading(true);
-        axios.get('http://localhost:3045/review/all')
-            .then(res => {
-                setReviews(res.data || []);
-                setLoading(false);
-            })
-            .catch(err => {
-                setError('Failed to load reviews.');
-                setLoading(false);
-            });
+        try {
+            const response = await getAllTickects();
+            setReviews(response.data || []);
+        } catch (err) {
+            console.error('Error fetching reviews:', err);
+            setError('Failed to load reviews.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getAllTickets, updateSupport, deleteSupport } from "../../../services/supportService";
 
 const SupportEditList = () => {
   const [supportTickets, setSupportTickets] = useState([]);
@@ -13,28 +13,28 @@ const SupportEditList = () => {
     fetchTickets();
   }, []);
 
-  const fetchTickets = () => {
+  const fetchTickets = async () => {
     setLoading(true);
-    axios.get("http://localhost:3045/support/all")
-      .then((res) => {
-        setSupportTickets(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setSupportTickets([]);
-        setLoading(false);
-      });
+    try {
+      const response = await getAllTickets();
+      setSupportTickets(response.data || []);
+    } catch (err) {
+      console.error('Error fetching support tickets:', err);
+      setSupportTickets([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (ticketID) => {
+  const handleDelete = async (ticketID) => {
     if (window.confirm("Are you sure you want to delete this ticket?")) {
-      axios.delete(`http://localhost:3045/support/delete/${ticketID}`)
-        .then(() => {
-          fetchTickets();
-        })
-        .catch(() => {
-          alert("Failed to delete ticket.");
-        });
+      try {
+        await deleteSupport(ticketID);
+        fetchTickets();
+      } catch (err) {
+        console.error('Error deleting ticket:', err);
+        alert("Failed to delete ticket.");
+      }
     }
   };
 
@@ -61,9 +61,10 @@ const SupportEditList = () => {
       description: editForm.description
     };
     try {
-      await axios.put('http://localhost:3045/support/update', payload);
+      await updateSupport(payload);
       setEditingId(null);
       fetchTickets();
+      alert('Support ticket updated successfully!');
     } catch (err) {
       console.error('Failed to update ticket', err);
       alert('Failed to update ticket.');

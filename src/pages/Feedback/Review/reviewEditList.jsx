@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getAllTickects, updateSupportTicket as updateReview, deleteSupportTicket as deleteReview } from "../../../services/reviewService";
 
 function ReviewEditList() {
   const [reviews, setReviews] = useState([]);
@@ -10,18 +10,18 @@ function ReviewEditList() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const fetchReviews = () => {
+  const fetchReviews = async () => {
     setLoading(true);
-    axios.get("http://localhost:3045/review/all")
-      .then(res => {
-        setReviews(res.data || []);
-        setLoading(false);
-      })
-      .catch(() => {
-        setReviews([]);
-        setLoading(false);
-        setError('Failed to load reviews.');
-      });
+    try {
+      const response = await getAllTickects();
+      setReviews(response.data || []);
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+      setReviews([]);
+      setError('Failed to load reviews.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -49,22 +49,28 @@ function ReviewEditList() {
         reviewID: editingId,
         fullName: editForm.fullName,
         comment: editForm.comment,
-        rating: editForm.rating
+        rating: parseInt(editForm.rating) || 0
       };
-      await axios.put("http://localhost:3045/review/update", payload);
+      await updateReview(payload);
       setEditingId(null);
       fetchReviews();
+      alert('Review updated successfully!');
     } catch (err) {
+      console.error('Error updating review:', err);
       alert('Failed to update review.');
-      console.error(err);
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this review?")) {
-      axios.delete(`http://localhost:3045/review/delete/${id}`)
-        .then(fetchReviews)
-        .catch(console.error);
+      try {
+        await deleteReview(id);
+        fetchReviews();
+        alert('Review deleted successfully!');
+      } catch (err) {
+        console.error('Error deleting review:', err);
+        alert('Failed to delete review.');
+      }
     }
   };
 

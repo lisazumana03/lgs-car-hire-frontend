@@ -6,6 +6,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import PaymentIcon from "@mui/icons-material/Payment";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 // List of sidebar items
 const SidebarData = [
   {
@@ -42,8 +43,12 @@ const SidebarData = [
     title: "Invoices", //to view invoice page
     path: "/invoices",
     icon: ReceiptIcon,
+  },
+  {
+    title: "Booking Details",
+    path: "/booking-details",
+    icon: AssignmentIcon,
   }
-
 ];
 
 export default SidebarData;
