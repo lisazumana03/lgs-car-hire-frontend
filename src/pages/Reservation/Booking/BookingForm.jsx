@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { create } from "../../../services/bookingService";
 import { getAvailableCars } from "../../../services/carService";
-import { createBookingNotification } from "../../../services/notificationService";
 
 const getCurrentDateTime = () => {
     const now = new Date();
@@ -25,7 +24,6 @@ export default function BookingForm() {
 
     const [userId, setUserId] = useState(null);
     const [form, setForm] = useState({
-        cars: [selectedCar?.carID || ""],
         bookingDateAndTime: getCurrentDateTime(),
         startDate: "",
         endDate: "",
@@ -43,15 +41,15 @@ export default function BookingForm() {
     useEffect(() => {
         // Try to get user from session/localStorage
         const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
-        
+
         if (userStr) {
             try {
                 const user = JSON.parse(userStr);
                 const currentUserId = user.id || user.userID || user.userId || user.ID;
-                
+
                 console.log('Current user:', user);
                 console.log('User ID extracted:', currentUserId);
-                
+
                 setUserId(currentUserId);
             } catch (error) {
                 console.error('Error parsing user from storage:', error);
@@ -64,7 +62,6 @@ export default function BookingForm() {
             setMessageType('error');
         }
     }, []);
-
 
     // Fetch available cars on component mount
     useEffect(() => {
@@ -96,9 +93,7 @@ export default function BookingForm() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === "cars") {
-            setForm((prev) => ({ ...prev, cars: [value] }));
-        } else if (name === "bookingStatus") {
+        if (name === "bookingStatus") {
             setForm((prev) => ({ ...prev, bookingStatus: value.toUpperCase() }));
         } else {
             setForm((prev) => ({ ...prev, [name]: value }));
@@ -110,14 +105,14 @@ export default function BookingForm() {
 
     const handleSubmit = async (error) => {
         error.preventDefault();
-        
+
         // Check if user is logged in
         if (!userId) {
             setMessage("Please login to make a booking");
             setMessageType("error");
             return;
         }
-        
+
         if (!isStartDateValid) {
             setMessage("Start date/time must be after or equal to booking date/time.");
             setMessageType("error");
@@ -130,98 +125,51 @@ export default function BookingForm() {
         }
 
         // Prepare payload with correct structure including user
-        // Handle both database locations (with locationID) and map-based locations (without locationID)
         const payload = {
             user: {
-                userId: userId  // Include the user with userId
+                userId: userId
             },
             bookingDateAndTime: form.bookingDateAndTime,
             startDate: form.startDate,
             endDate: form.endDate,
             bookingStatus: form.bookingStatus,
-            cars: selectedCar ? [{ carID: selectedCar.carID }] : [],
-            // If location has locationID, send just the ID; otherwise send the full location object
-            pickupLocation: selectedPickupLocation 
-                ? (selectedPickupLocation.locationID 
-                    ? { locationID: selectedPickupLocation.locationID }
-                    : selectedPickupLocation)
-                : null,
-            dropOffLocation: selectedDropOffLocation 
-                ? (selectedDropOffLocation.locationID 
-                    ? { locationID: selectedDropOffLocation.locationID }
-                    : selectedDropOffLocation)
-                : null,
+            car: selectedCar ? { carID: selectedCar.carID } : null, // Single car object
+            pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
+            dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
         };
-        
+
         console.log('Submitting booking with payload:', payload);
 
         try {
             const response = await create(payload);
             console.log("Booking created:", response.data);
-            
-            // Get the created booking ID
-            const bookingId = response.data?.bookingID || response.data?.id;
-            
-            // Automatically send notification to user
-            let notificationSent = false;
-            if (bookingId && userId) {
-                try {
-                    await createBookingNotification(
-                        userId,
-                        bookingId,
-                        "confirmed - Your car is on its way!"
-                    );
-                    console.log("Booking notification sent successfully");
-                    notificationSent = true;
-                } catch (notifError) {
-                    console.error("Failed to send booking notification:", notifError);
-                    console.error("Notification error details:", {
-                        status: notifError.response?.status,
-                        message: notifError.response?.data,
-                        error: notifError.message
-                    });
-                    
-                    // Check if it's a permission error (403)
-                    if (notifError.response?.status === 403) {
-                        console.warn("Notification blocked by backend permissions - this is expected if notifications are admin-only");
-                    }
-                    // Don't fail the booking if notification fails
-                }
-            }
-            
-            // Show appropriate message based on notification status
-            if (notificationSent) {
-                setMessage("Booking created successfully! You'll receive a notification shortly.");
-            } else {
-                setMessage("Booking created successfully! Your booking has been confirmed.");
-            }
+            setMessage("Booking created successfully!");
             setMessageType("success");
             setForm({
-                cars: [""],
                 bookingDateAndTime: "",
                 startDate: "",
                 endDate: "",
-                pickupLocation: [""],
-                dropOffLocation: [""],
+                pickupLocation: "",
+                dropOffLocation: "",
                 bookingStatus: "PENDING"
             });
-            
+
             const calculateTotalAmount = () => {
                 if (!selectedCar?.rentalPrice || !form.startDate || !form.endDate) {
                     return selectedCar?.rentalPrice || 500;
                 }
-                
+
                 const startDate = new Date(form.startDate);
                 const endDate = new Date(form.endDate);
                 const timeDiff = endDate.getTime() - startDate.getTime();
                 const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                
+
                 return (selectedCar.rentalPrice * Math.max(1, daysDiff));
             };
 
             setTimeout(() => {
                 navigate("/payment", {
-                    state: { 
+                    state: {
                         booking: {
                             bookingID: response.data?.bookingID,
                             bookingDateAndTime: form.bookingDateAndTime,
@@ -255,7 +203,7 @@ export default function BookingForm() {
         <div className="form-group">
             <div className="w-full max-w-lg bg-black/90 rounded-xl shadow-lg p-8 mt-8">
                 <h2 style={{}}>Make a Booking</h2>
-                
+
                 {/* User Status Indicator */}
                 {userId ? (
                     <div className="mb-4 p-3 bg-green-900/30 border border-green-500 rounded-lg">
@@ -277,7 +225,7 @@ export default function BookingForm() {
                         </button>
                     </div>
                 )}
-                
+
                 <form onSubmit={handleSubmit} className="form">
                     <div className="mb-4">
                         <label className="block mb-1 font-semibold text-white">Selected Car *</label>
@@ -461,13 +409,12 @@ export default function BookingForm() {
                         <button type="reset"
                                 style={{backgroundColor: "#003ffa"}}
                                 className="submit-btn" onClick={() => setForm({
-                            cars: [""],
                             bookingDateAndTime: "",
                             startDate: "",
                             endDate: "",
-                            pickupLocation: [""],
-                            dropOffLocation: [""],
-                            bookingStatus: "PENDING" // <-- Use uppercase
+                            pickupLocation: "",
+                            dropOffLocation: "",
+                            bookingStatus: "PENDING"
                         })}>Reset</button>
                         <button type="button"
                                 style={{backgroundColor: "#ff0000"}}

@@ -1,3 +1,8 @@
+/**
+ * Sanele Zondi (221602011)
+ * InvoiceView.jsx
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import invoiceService from '../../../services/invoiceService';
@@ -26,43 +31,59 @@ const InvoiceView = () => {
         fetchInvoice();
     }, [id]);
 
-    const handleDownload = async () => {
-        try {
-            const blob = await invoiceService.downloadInvoice(id);
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `invoice-${id}.pdf`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (err) {
-            console.error('Download failed:', err);
-            setError('Failed to download invoice: ' + err.message);
+    const handlePrint = () => {
+        window.print();
+    };
 
-            // Fallback: Create a simple text download
-            const invoiceText = `
+    const handleDownload = () => {
+        const invoiceText = `
+LG'S CAR HIRE
+123 Rental Street
+City, State 12345
+Phone: (123) 456-7890
+
 INVOICE #${invoice.invoiceID}
-Date: ${new Date(invoice.issueDate).toLocaleDateString()}
-Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}
-Subtotal: R${invoice.subTotal?.toFixed(2) || '0.00'}
-Tax: R${invoice.taxAmount?.toFixed(2) || '0.00'}
-Total: R${invoice.totalAmount?.toFixed(2) || '0.00'}
-Status: ${invoice.status}
-Car: ${invoice.carModel || 'Vehicle'}
-            `.trim();
+Issue Date: ${new Date(invoice.issueDate).toLocaleDateString()}
+Return Date: ${new Date(invoice.dueDate).toLocaleDateString()}
 
-            const blob = new Blob([invoiceText], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `invoice-${id}.txt`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-        }
+BILL TO:
+Name: ${invoice.customerName}
+Email: ${invoice.customerEmail}
+Pickup Location: ${invoice.pickupLocationName}
+${invoice.pickupLocationAddress}
+Return Location: ${invoice.dropOffLocationName || invoice.pickupLocationName}
+
+CAR RENTAL DETAILS:
+Vehicle: ${invoice.carModel}
+Rental Period: ${invoice.bookingStartDate && invoice.bookingEndDate ?
+            Math.ceil((new Date(invoice.bookingEndDate) - new Date(invoice.bookingStartDate)) / (1000 * 60 * 60 * 24)) || 1 :
+            1} days
+Daily Rate: R${invoice.subTotal && invoice.bookingStartDate && invoice.bookingEndDate ?
+            (invoice.subTotal / Math.ceil((new Date(invoice.bookingEndDate) - new Date(invoice.bookingStartDate)) / (1000 * 60 * 60 * 24))).toFixed(2) :
+            invoice.subTotal?.toFixed(2)}
+
+BREAKDOWN:
+Subtotal: R${invoice.subTotal?.toFixed(2) || '0.00'}
+Tax (15%): R${invoice.taxAmount?.toFixed(2) || '0.00'}
+Total: R${invoice.totalAmount?.toFixed(2) || '0.00'}
+
+STATUS: ${invoice.status === 'PAID' ? 'PAID' : 'PENDING PAYMENT'}
+
+NOTES:
+- R5000 deposit required upon pickup
+- Deposit will be refunded upon safe return of the vehicle in original condition
+- Thank you for your business!
+        `.trim();
+
+        const blob = new Blob([invoiceText], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `invoice-${id}.txt`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
     };
 
     if (loading) {
@@ -94,50 +115,32 @@ Car: ${invoice.carModel || 'Vehicle'}
         );
     }
 
-    // Calculate rental days based on issue date and due date (since we don't have booking dates)
-    const rentalDays = invoice.issueDate && invoice.dueDate ?
-        Math.ceil((new Date(invoice.dueDate) - new Date(invoice.issueDate)) / (1000 * 60 * 60 * 24)) || 1 :
+    const rentalDays = invoice.bookingStartDate && invoice.bookingEndDate ?
+        Math.ceil((new Date(invoice.bookingEndDate) - new Date(invoice.bookingStartDate)) / (1000 * 60 * 60 * 24)) || 1 :
         1;
 
     const dailyRate = rentalDays > 0 ? (invoice.subTotal / rentalDays).toFixed(2) : invoice.subTotal.toFixed(2);
 
-    // Use the carModel from the DTO
-    const carModel = invoice.carModel && invoice.carModel !== "Unknown" ? invoice.carModel : 'Vehicle';
+    const carModel = invoice.carModel && invoice.carModel !== "Unknown" ?
+        invoice.carModel :
+        (invoice.booking?.cars?.[0]?.model || 'Vehicle');
 
     return (
         <div className="form">
             <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-                <button
-                    onClick={() => {
-                        console.log('Full invoice object:', invoice);
-                        // Try multiple possible field names for booking ID
-                        const bookingId = invoice.bookingId 
-                            || invoice.booking?.bookingID 
-                            || invoice.booking?.id 
-                            || invoice.bookingID
-                            || invoice.booking_id;
-                        
-                        console.log('Extracted booking ID:', bookingId);
-                        
-                        if (bookingId) {
-                            console.log('Navigating to:', `/booking-details/${bookingId}`);
-                            navigate(`/booking-details/${bookingId}`);
-                        } else {
-                            alert('Booking ID not available in invoice. Your InvoiceDTO may need to include bookingId field.');
-                            console.error('Invoice structure:', JSON.stringify(invoice, null, 2));
-                        }
-                    }}
-                    className="submit-btn"
-                    style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#007bff' }}
-                >
-                    View Booking Details
-                </button>
                 <button
                     onClick={handleDownload}
                     className="submit-btn"
                     style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#28a745' }}
                 >
                     Download Invoice
+                </button>
+                <button
+                    onClick={handlePrint}
+                    className="submit-btn"
+                    style={{ padding: '10px 20px', marginRight: '10px' }}
+                >
+                    Print Invoice
                 </button>
                 <button
                     onClick={() => navigate('/dashboard')}
@@ -177,25 +180,31 @@ Car: ${invoice.carModel || 'Vehicle'}
                             <strong>Invoice #:</strong> {invoice.invoiceID}
                         </p>
                         <p style={{ margin: '2px 0', color: '#666' }}>
-                            <strong>Date:</strong> {new Date(invoice.issueDate).toLocaleDateString()}
+                            <strong>Issue Date:</strong> {new Date(invoice.issueDate).toLocaleDateString()}
                         </p>
                         <p style={{ margin: '2px 0', color: '#666' }}>
-                            <strong>Due Date:</strong> {new Date(invoice.dueDate).toLocaleDateString()}
+                            <strong>Return Date:</strong> {new Date(invoice.dueDate).toLocaleDateString()}
                         </p>
                     </div>
                 </div>
 
-                {/* Client Information - Simplified since we don't have user data in DTO */}
+                {/* Client Information */}
                 <div style={{ marginBottom: '30px' }}>
                     <h3 style={{ color: '#007bff', marginBottom: '15px' }}>Bill To:</h3>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        Customer
+                        <strong>Name:</strong> {invoice.customerName}
                     </p>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        customer@email.com
+                        <strong>Email:</strong> {invoice.customerEmail}
                     </p>
                     <p style={{ margin: '5px 0', color: '#333' }}>
-                        Pickup Location
+                        <strong>Pickup Location:</strong> {invoice.pickupLocationName}
+                    </p>
+                    <p style={{ margin: '5px 0', color: '#333', fontSize: '0.9em' }}>
+                        {invoice.pickupLocationAddress}
+                    </p>
+                    <p style={{ margin: '5px 0', color: '#333' }}>
+                        <strong>Return Location:</strong> {invoice.dropOffLocationName || invoice.pickupLocationName}
                     </p>
                 </div>
 
@@ -277,7 +286,8 @@ Car: ${invoice.carModel || 'Vehicle'}
                     color: '#666'
                 }}>
                     <p>Thank you for your business!</p>
-                    <p>Deposit due date is due by {new Date(invoice.dueDate).toLocaleDateString()}</p>
+                    <p><strong>R5000 deposit required upon pickup.</strong></p>
+                    <p>Deposit will be refunded upon safe return of the vehicle in original condition.</p>
                 </div>
             </div>
         </div>
