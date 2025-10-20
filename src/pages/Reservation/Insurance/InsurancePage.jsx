@@ -1,3 +1,8 @@
+/*
+Sibulele Nohamba
+220374686
+Date: 28/08/2025
+ */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllInsurance, createInsurance, deleteInsurance } from '../../../services/insuranceService';
