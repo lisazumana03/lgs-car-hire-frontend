@@ -17,24 +17,24 @@ function CarCard({ car, onBook }) {
         if (car.imageUrl && car.imageUrl.startsWith('data:')) {
             return car.imageUrl;
         }
-        
+
         // Option 2: Check for base64 image
         if (car.imageBase64) {
             return car.imageBase64;
         }
-        
+
         // Option 3: Check for regular image URL
         if (car.imageUrl) {
             return car.imageUrl;
         }
-        
+
         // Option 4: Try to fetch image from backend endpoint
         // Backend endpoint: GET /api/car/{id}/image
         // If no image exists, onError will show placeholder
         if (car.carID) {
             return `http://localhost:3045/api/car/${car.carID}/image`;
         }
-        
+
         return null;
     };
 
@@ -45,8 +45,8 @@ function CarCard({ car, onBook }) {
             {/* Car Image */}
             <div className="car-image-container">
                 {carImageSrc && !imageError ? (
-                    <img 
-                        src={carImageSrc} 
+                    <img
+                        src={carImageSrc}
                         alt={`${car.brand} ${car.model}`}
                         className="car-image"
                         onError={() => setImageError(true)}
@@ -138,7 +138,7 @@ function CarView() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-    const [showOnlyAvailable, setShowOnlyAvailable] = useState(true);
+    const [showOnlyAvailable, setShowOnlyAvailable] = useState(false); // CHANGE: Default to FALSE
     const [selectedType, setSelectedType] = useState("all");
     const [selectedBrand, setSelectedBrand] = useState("all");
     const [priceSort, setPriceSort] = useState("none");
@@ -156,13 +156,17 @@ function CarView() {
             const response = showOnlyAvailable
                 ? await getAvailableCars()
                 : await getAllCars();
-            setCars(response.data);
+
+            console.log("Cars loaded:", response.data.length); // Debug log
+            console.log("Show only available:", showOnlyAvailable); // Debug log
+
+            setCars(response.data || []); // Ensure we always have an array
             setLoading(false);
         } catch (err) {
             console.error("Error fetching cars:", err);
             setError("Unable to load cars. Please try again later.");
             setLoading(false);
-            setCars([]);
+            setCars([]); // Set empty array on error
         }
     };
 
@@ -171,8 +175,8 @@ function CarView() {
 
     let filteredCars = cars.filter(car => {
         const matchesSearch =
-            car.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            car.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            car.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             `${car.brand} ${car.model}`.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesBrand = selectedBrand === "all" || car.brand === selectedBrand;
@@ -207,7 +211,6 @@ function CarView() {
 
                 {/* Search/Filter Section */}
                 <div className="controls-section">
-                    {/* Search and Filter Section */}
                     <div className="filters-container">
                         <div className="filters-grid">
                             {/* Search Bar */}
@@ -276,6 +279,11 @@ function CarView() {
                             </label>
                             <span className="results-count">
                                 {filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'} found
+                                {!showOnlyAvailable && (
+                                    <span style={{fontSize: '0.8em', color: '#888', marginLeft: '10px'}}>
+                                        ({filteredCars.filter(car => car.availability).length} available)
+                                    </span>
+                                )}
                             </span>
                         </div>
                     </div>
@@ -290,9 +298,9 @@ function CarView() {
                 ) : (
                     <div className="cars-grid">
                         {filteredCars.map(car => (
-                            <CarCard 
-                                key={car.carID} 
-                                car={car} 
+                            <CarCard
+                                key={car.carID}
+                                car={car}
                                 onBook={(carId) => navigate(`/make-booking?carId=${carId}`)}
                             />
                         ))}
