@@ -7,19 +7,19 @@ Date: 28/08/2025
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import Header from "../Common/Header";
-import Navigation from "../Common/Navigation";
-import Footer from "../Common/Footer";
+import Header from "../../Common/Header";
+import Navigation from "../../Common/Navigation";
+import Footer from "../../Common/Footer";
 
-import "../../assets/styling/Global.css";
-import "../../assets/styling/Dashboard.css";
-import "../../assets/styling/Sidebar.css";
+import "../../../assets/styling/Global.css";
+import "../../../assets/styling/Dashboard.css";
+import "../../../assets/styling/Sidebar.css";
 
 import {
   getInsuranceById,
   createInsurance,
   updateInsurance,
-} from "../../services/insuranceService";
+} from "../../../services/insuranceService";
 
 export default function InsuranceForm() {
   const { id } = useParams();

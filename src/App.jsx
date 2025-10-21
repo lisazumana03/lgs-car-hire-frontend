@@ -49,6 +49,7 @@ import LocationSelector from "./pages/Reservation/Location/LocationSelector.jsx"
 // Vehicle Components
 import CarForm from "./pages/Vehicle/CarForm.jsx";
 import CarList from "./pages/Vehicle/CarList.jsx";
+import ManageCars from "./pages/Vehicle/ManageCars.jsx";
 
 // Feedback Components
 import ReviewForm from "./pages/Feedback/Review/reviewForm.jsx";
@@ -61,12 +62,12 @@ import SupportList from "./pages/Reservation/Support/supportList.jsx";
 import SupportComponent from './pages/Reservation/Support/supportComponent.jsx';
 
 // Insurance Components
-import InsuranceForm from "./pages/Reservation/Insurance/insuranceForm.jsx";
+import InsuranceForm from "./pages/Reservation/Insurance/InsuranceForm.jsx";
 import InsuranceList from "./pages/Reservation/Insurance/insuranceList.jsx";
 import InsurancePage from "./pages/Reservation/Insurance/InsurancePage.jsx";
 
 // Maintenance Components
-import MaintenanceForm from "./pages/Reservation/Maintenance/maintenanceForm.jsx";
+import MaintenanceForm from "./pages/Reservation/Maintenance/MaintenanceForm.jsx";
 import MaintenanceList from "./pages/Reservation/Maintenance/maintenanceList.jsx";
 import MaintenancePage from "./pages/Reservation/Maintenance/MaintenancePage.jsx";
 
@@ -153,14 +154,23 @@ function App() {
                 <Route path="/booking-details" element={<BookingDetails />} />
                 <Route path="/booking-details/:id" element={<BookingDetails />} />
                 <Route path="/cars" element={<CarList />} />
-                {/* Admin/Car Owner only */}
-                <Route 
-                  path="/register-car" 
+                {/* Admin and Car Owner only - Manage Cars */}
+                <Route
+                  path="/manage-cars"
                   element={
-                    <ProtectedRoute requireRole="ADMIN">
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
+                      <ManageCars />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Admin and Car Owner only - Register Car (Keep for the add form) */}
+                <Route
+                  path="/register-car"
+                  element={
+                    <ProtectedRoute requireRole={['ADMIN', 'CAR_OWNER']}>
                       <CarForm />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
                 <Route path="/select-car" element={<CarSelection />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
@@ -331,15 +341,15 @@ function Sidebar({ onLogout, currentUser }) {
                     </Link>
                 </li>
                 
-                {/* Admin and Car Owner can add cars */}
+                {/* Admin and Car Owner can manage cars */}
                 {(isAdmin || isCarOwner) && (
                   <li>
                       <Link
-                          to="/register-car"
-                          className={`sidebar-link ${location.pathname === '/register-car' ? 'active' : ''}`}
+                          to="/manage-cars"
+                          className={`sidebar-link ${location.pathname === '/manage-cars' ? 'active' : ''}`}
                       >
-                          <span className="icon">➕</span>
-                          <span className="title">Add Car</span>
+                          <span className="icon">🔧</span>
+                          <span className="title">Manage Cars</span>
                       </Link>
                   </li>
                 )}
@@ -412,7 +422,7 @@ function Sidebar({ onLogout, currentUser }) {
                           to="/maintenance"
                           className={`sidebar-link ${location.pathname === '/maintenance' ? 'active' : ''}`}
                       >
-                          <span className="icon">🔧</span>
+                          <span className="icon">🛠️</span>
                           <span className="title">Maintenance</span>
                       </Link>
                   </li>

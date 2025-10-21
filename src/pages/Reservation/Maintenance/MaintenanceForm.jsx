@@ -7,19 +7,19 @@ Date: 31/08/2025
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import Header from "../Common/Header";
-import Navigation from "../Common/Navigation";
-import Footer from "../Common/Footer";
+import Header from "../../Common/Header";
+import Navigation from "../../Common/Navigation";
+import Footer from "../../Common/Footer";
 
-import "../../assets/styling/Global.css";
-import "../../assets/styling/Dashboard.css";
-import "../../assets/styling/Sidebar.css";
+import "../../../assets/styling/Global.css";
+import "../../../assets/styling/Dashboard.css";
+import "../../../assets/styling/Sidebar.css";
 
 import {
   getMaintenanceById,
   createMaintenance,
   updateMaintenance,
-} from "../../services/maintenanceService";
+} from "../../../services/maintenanceService";
 
 export default function MaintenanceForm() {
   const { id } = useParams();

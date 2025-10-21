@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { create, updateCar, uploadCarImage } from "../../services/carService.js";
 import { createCarType, getAllCarTypes } from "../../services/carTypeService.js";
 import "./AdminCarForm.css";
 
 function CarForm() {
+    const navigate = useNavigate();
     const [step, setStep] = useState(1); // 1 = Car Info, 2 = Car Type Info
     const [createdCarId, setCreatedCarId] = useState(null);
     const [existingCarTypes, setExistingCarTypes] = useState([]);
@@ -235,29 +237,10 @@ function CarForm() {
 
             setSuccess(`Successfully added ${formData.brand} ${formData.model} with its type configuration!`);
 
-            // Reset form
-            setFormData({
-                model: "",
-                brand: "",
-                year: new Date().getFullYear(),
-                availability: true,
-                rentalPrice: "",
-                createNewType: true,
-                typeName: "",
-                fuelType: "Petrol",
-                numberOfWheels: 4,
-                numberOfSeats: 5,
-                existingTypeId: null
-            });
-            setImageFile(null);
-            setImagePreview(null);
-            setStep(1);
-            setCreatedCarId(null);
-
-            // Refresh car types list
-            fetchExistingCarTypes();
-
-            setTimeout(() => setSuccess(""), 7000);
+            // Redirect to Manage Cars page after a short delay
+            setTimeout(() => {
+                navigate('/manage-cars');
+            }, 1500);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to create car type. Please try again.");
         } finally {
@@ -269,26 +252,10 @@ function CarForm() {
         // Skip creating type and just finish with the car
         setSuccess(`Successfully added ${formData.brand} ${formData.model} without type configuration!`);
 
-        // Reset form
-        setFormData({
-            model: "",
-            brand: "",
-            year: new Date().getFullYear(),
-            availability: true,
-            rentalPrice: "",
-            createNewType: true,
-            typeName: "",
-            fuelType: "Petrol",
-            numberOfWheels: 4,
-            numberOfSeats: 5,
-            existingTypeId: null
-        });
-        setImageFile(null);
-        setImagePreview(null);
-        setStep(1);
-        setCreatedCarId(null);
-
-        setTimeout(() => setSuccess(""), 7000);
+        // Redirect to Manage Cars page after a short delay
+        setTimeout(() => {
+            navigate('/manage-cars');
+        }, 1500);
     };
 
     return (
