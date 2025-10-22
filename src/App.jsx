@@ -55,6 +55,7 @@ import ManageCars from "./pages/Vehicle/ManageCars.jsx";
 import ReviewForm from "./pages/Feedback/Review/reviewForm.jsx";
 import ReviewList from "./pages/Feedback/Review/reviewList.jsx";
 import ReviewComponent from './pages/Feedback/Review/reviewComponent.jsx';
+import ReviewEditList from './pages/Feedback/Review/reviewEditList.jsx';
 
 // Support Components
 import SupportForm from "./pages/Reservation/Support/supportForm.jsx";
@@ -206,6 +207,7 @@ function App() {
                 <Route path="/reviews" element={<ReviewComponent/>} />
                 <Route path="/review-form" element={<ReviewForm/>} />
                 <Route path="/review-list" element={<ReviewList/>} />
+                <Route path="/edit-reviews" element={<ReviewEditList/>} />
                 <Route path="/support" element={<SupportComponent user={currentUser} />} />
                 <Route path="/support-form" element={<SupportForm user={currentUser} />} />
                 <Route path="/support-list" element={<SupportList user={currentUser} />} />
