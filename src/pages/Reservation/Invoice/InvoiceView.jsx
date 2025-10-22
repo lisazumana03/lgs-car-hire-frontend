@@ -131,7 +131,6 @@ NOTES:
                 >
                     Download Invoice
                 </button>
-                {/* ADD BOOKING DETAILS BUTTON */}
                 <button
                     onClick={() => navigate('/booking-details')}
                     className="submit-btn"

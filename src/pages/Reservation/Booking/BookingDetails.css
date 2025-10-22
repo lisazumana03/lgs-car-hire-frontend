@@ -619,3 +619,97 @@
   background: rgba(156, 163, 175, 0.3);
   color: #9ca3af;
 }
+
+/* Invoices Section Styles */
+.invoices-card {
+  margin-bottom: 2rem;
+}
+
+.invoices-header {
+  color: #1e40af;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.invoices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.invoice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #374151;
+  border-radius: 8px;
+  border: 1px solid #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.invoice-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.invoice-info {
+  flex: 1;
+}
+
+.invoice-info h4 {
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.invoice-info p {
+  color: #d1d5db;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.invoice-status.paid {
+  color: #10b981;
+  font-weight: bold;
+}
+
+.invoice-status.pending {
+  color: #f59e0b;
+  font-weight: bold;
+}
+
+.view-invoice-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.view-invoice-btn:hover {
+  background: #1d4ed8;
+}
+
+.no-invoices {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
+.no-invoices p {
+  margin-bottom: 1rem;
+}
+
+/* Additional action button style */
+.action-button-tertiary {
+  background: #17a2b8 !important;
+}
+
+.action-button-tertiary:hover {
+  background: #138496 !important;
+}
+
