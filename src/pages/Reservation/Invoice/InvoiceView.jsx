@@ -31,10 +31,6 @@ const InvoiceView = () => {
         fetchInvoice();
     }, [id]);
 
-    const handlePrint = () => {
-        window.print();
-    };
-
     const handleDownload = () => {
         const invoiceText = `
 LG'S CAR HIRE
@@ -135,12 +131,20 @@ NOTES:
                 >
                     Download Invoice
                 </button>
+                {/* ADD BOOKING DETAILS BUTTON */}
                 <button
-                    onClick={handlePrint}
+                    onClick={() => navigate('/booking-details')}
                     className="submit-btn"
-                    style={{ padding: '10px 20px', marginRight: '10px' }}
+                    style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#fd7e14' }}
                 >
-                    Print Invoice
+                    Booking Details
+                </button>
+                <button
+                    onClick={() => navigate('/invoices')}
+                    className="submit-btn"
+                    style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#17a2b8' }}
+                >
+                    View All Invoices
                 </button>
                 <button
                     onClick={() => navigate('/dashboard')}

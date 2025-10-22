@@ -285,6 +285,7 @@ function App() {
 }
 
 // Sidebar component with proper React Router navigation
+// Sidebar component with proper React Router navigation
 function Sidebar({ onLogout, currentUser }) {
     const location = useLocation();
     const isAdmin = currentUser?.role === 'ADMIN';
@@ -293,25 +294,25 @@ function Sidebar({ onLogout, currentUser }) {
     return (
         <div className="sidebar">
             <h2>LG'S CAR HIRE</h2>
-            
+
             {/* User Info Display */}
             {currentUser && (
-              <div style={{
-                padding: '15px',
-                marginBottom: '20px',
-                backgroundColor: '#2a2a2a',
-                borderRadius: '8px',
-                borderLeft: '4px solid #d4af37'
-              }}>
-                <p style={{ fontSize: '14px', marginBottom: '5px', color: '#f5f5f5' }}>
-                  <strong>{currentUser.firstName} {currentUser.lastName}</strong>
-                </p>
-                <p style={{ fontSize: '12px', color: '#d4af37' }}>
-                  {currentUser.role}
-                </p>
-              </div>
+                <div style={{
+                    padding: '15px',
+                    marginBottom: '20px',
+                    backgroundColor: '#2a2a2a',
+                    borderRadius: '8px',
+                    borderLeft: '4px solid #d4af37'
+                }}>
+                    <p style={{ fontSize: '14px', marginBottom: '5px', color: '#f5f5f5' }}>
+                        <strong>{currentUser.firstName} {currentUser.lastName}</strong>
+                    </p>
+                    <p style={{ fontSize: '12px', color: '#d4af37' }}>
+                        {currentUser.role}
+                    </p>
+                </div>
             )}
-            
+
             <ul className="sidebar-menu">
                 <li>
                     <Link
@@ -340,18 +341,18 @@ function Sidebar({ onLogout, currentUser }) {
                         <span className="title">Cars</span>
                     </Link>
                 </li>
-                
+
                 {/* Admin and Car Owner can manage cars */}
                 {(isAdmin || isCarOwner) && (
-                  <li>
-                      <Link
-                          to="/manage-cars"
-                          className={`sidebar-link ${location.pathname === '/manage-cars' ? 'active' : ''}`}
-                      >
-                          <span className="icon">🔧</span>
-                          <span className="title">Manage Cars</span>
-                      </Link>
-                  </li>
+                    <li>
+                        <Link
+                            to="/manage-cars"
+                            className={`sidebar-link ${location.pathname === '/manage-cars' ? 'active' : ''}`}
+                        >
+                            <span className="icon">🔧</span>
+                            <span className="title">Manage Cars</span>
+                        </Link>
+                    </li>
                 )}
                 <li>
                     <Link
@@ -362,18 +363,18 @@ function Sidebar({ onLogout, currentUser }) {
                         <span className="title">Notifications</span>
                     </Link>
                 </li>
-                
+
                 {/* Admin and Car Owner can manage messages */}
                 {(isAdmin || isCarOwner) && (
-                  <li>
-                      <Link
-                          to="/notification-test"
-                          className={`sidebar-link ${location.pathname === '/notification-test' ? 'active' : ''}`}
-                      >
-                          <span className="icon">🧪</span>
-                          <span className="title">Messages</span>
-                      </Link>
-                  </li>
+                    <li>
+                        <Link
+                            to="/notification-test"
+                            className={`sidebar-link ${location.pathname === '/notification-test' ? 'active' : ''}`}
+                        >
+                            <span className="icon">🧪</span>
+                            <span className="title">Messages</span>
+                        </Link>
+                    </li>
                 )}
                 <li>
                     <Link
@@ -384,15 +385,18 @@ function Sidebar({ onLogout, currentUser }) {
                         <span className="title">Profile</span>
                     </Link>
                 </li>
+
+                {/* REPLACED: Payments with Invoices */}
                 <li>
                     <Link
-                        to="/payment"
-                        className={`sidebar-link ${location.pathname === '/payment' ? 'active' : ''}`}
+                        to="/invoices"
+                        className={`sidebar-link ${location.pathname === '/invoices' ? 'active' : ''}`}
                     >
-                        <span className="icon">💳</span>
-                        <span className="title">Payments</span>
+                        <span className="icon">📋</span>
+                        <span className="title">Invoices</span>
                     </Link>
                 </li>
+
                 <li>
                     <Link
                         to="/booking-details"
@@ -404,28 +408,28 @@ function Sidebar({ onLogout, currentUser }) {
                 </li>
                 {/* Admin and Car Owner can manage insurance */}
                 {(isAdmin || isCarOwner) && (
-                  <li>
-                      <Link
-                          to="/insurance"
-                          className={`sidebar-link ${location.pathname === '/insurance' ? 'active' : ''}`}
-                      >
-                          <span className="icon">🛡️</span>
-                          <span className="title">Insurance</span>
-                      </Link>
-                  </li>
+                    <li>
+                        <Link
+                            to="/insurance"
+                            className={`sidebar-link ${location.pathname === '/insurance' ? 'active' : ''}`}
+                        >
+                            <span className="icon">🛡️</span>
+                            <span className="title">Insurance</span>
+                        </Link>
+                    </li>
                 )}
-                
+
                 {/* Admin and Car Owner can manage maintenance */}
                 {(isAdmin || isCarOwner) && (
-                  <li>
-                      <Link
-                          to="/maintenance"
-                          className={`sidebar-link ${location.pathname === '/maintenance' ? 'active' : ''}`}
-                      >
-                          <span className="icon">🛠️</span>
-                          <span className="title">Maintenance</span>
-                      </Link>
-                  </li>
+                    <li>
+                        <Link
+                            to="/maintenance"
+                            className={`sidebar-link ${location.pathname === '/maintenance' ? 'active' : ''}`}
+                        >
+                            <span className="icon">🛠️</span>
+                            <span className="title">Maintenance</span>
+                        </Link>
+                    </li>
                 )}
                 <li>
                     <Link
@@ -454,31 +458,31 @@ function Sidebar({ onLogout, currentUser }) {
                         <span className="title">Locations</span>
                     </Link>
                 </li>
-                
+
                 {/* Admin can add locations */}
                 {isAdmin && (
-                  <li>
-                      <Link
-                          to="/register-location"
-                          className={`sidebar-link ${location.pathname === '/register-location' ? 'active' : ''}`}
-                      >
-                          <span className="icon">📌</span>
-                          <span className="title">Add Location</span>
-                      </Link>
-                  </li>
+                    <li>
+                        <Link
+                            to="/register-location"
+                            className={`sidebar-link ${location.pathname === '/register-location' ? 'active' : ''}`}
+                        >
+                            <span className="icon">📌</span>
+                            <span className="title">Add Location</span>
+                        </Link>
+                    </li>
                 )}
                 <li>
                     <Link
                         to="/maps"
                         className={`sidebar-link ${location.pathname === '/maps' ? 'active' : ''}`}
                     >
-                        <span className="icon">M</span>
+                        <span className="icon">🗺️</span>
                         <span className="title">Maps</span>
                     </Link>
                 </li>
                 <li className="logout-item">
                     <button onClick={onLogout} className="logout-btn">
-                        <span className="icon">L</span>
+                        <span className="icon">🚪</span>
                         <span className="title">Logout</span>
                     </button>
                 </li>
