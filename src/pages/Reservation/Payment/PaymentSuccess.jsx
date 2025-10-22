@@ -17,7 +17,7 @@ const PaymentSuccess = () => {
             <div className="payment-container">
                 <div className="payment-wrapper">
                     <h1 className="payment-title">Payment Information Not Found</h1>
-                    <button 
+                    <button
                         onClick={() => navigate('/dashboard')}
                         className="submit-btn"
                     >
@@ -59,9 +59,9 @@ const PaymentSuccess = () => {
                     </div>
                 </div>
 
-                <div style={{ 
-                    display: 'flex', 
-                    gap: '15px', 
+                <div style={{
+                    display: 'flex',
+                    gap: '15px',
                     justifyContent: 'center',
                     flexWrap: 'wrap'
                 }}>
@@ -74,13 +74,6 @@ const PaymentSuccess = () => {
                             View Booking Details
                         </button>
                     )}
-                    <button
-                        onClick={() => navigate('/invoices')}
-                        className="submit-btn"
-                        style={{ backgroundColor: '#28a745', padding: '15px 30px', fontSize: '1.1rem' }}
-                    >
-                        View Invoices
-                    </button>
                     <button
                         onClick={() => navigate('/dashboard')}
                         className="submit-btn"
@@ -95,4 +88,3 @@ const PaymentSuccess = () => {
 };
 
 export default PaymentSuccess;
-

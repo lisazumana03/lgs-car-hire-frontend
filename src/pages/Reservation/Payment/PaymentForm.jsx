@@ -57,10 +57,10 @@ const PaymentForm = () => {
             try {
                 const token = localStorage.getItem('token');
                 console.log("Creating payment with token:", token ? "Present" : "Missing");
-                
+
                 const paymentRes = await fetch("http://localhost:3045/api/payment/create-payment", {
                     method: "POST",
-                    headers: { 
+                    headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
@@ -76,70 +76,33 @@ const PaymentForm = () => {
                 if (paymentRes.ok) {
                     const paymentData = await paymentRes.json();
                     console.log("Payment successful:", paymentData);
-                    const paymentId = paymentData.paymentID || paymentData.id;
-                    
-                    // Try to create invoice
-                    try {
-                        console.log("Creating invoice with paymentId:", paymentId);
-                        const invoiceRes = await fetch("http://localhost:3045/api/invoice/create", {
-                            method: "POST",
-                            headers: { 
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${token}`
-                            },
-                            body: JSON.stringify({
-                                paymentId: paymentId
-                            }),
-                        });
 
-                        console.log("Invoice API response status:", invoiceRes.status);
-
-                        if (invoiceRes.ok) {
-                            const invoiceData = await invoiceRes.json();
-                            console.log("Invoice created successfully:", invoiceData);
-                            // Redirect to invoice view
-                            navigate(`/invoice/${invoiceData.invoiceID}`);
-                        } else {
-                            const errorText = await invoiceRes.text();
-                            console.error("Invoice creation failed:", invoiceRes.status, errorText);
-                            // Still redirect to invoices list
-                            navigate('/invoices', {
-                                state: { 
-                                    message: "Payment successful but invoice creation failed. Please check your invoices.",
-                                    paymentId: paymentId
-                                }
-                            });
+                    // REDIRECT TO BOOKING DETAILS INSTEAD OF INVOICE CREATION
+                    navigate(`/booking-details/${bookingId}`, {
+                        state: {
+                            paymentSuccess: true,
+                            message: "Payment completed successfully!",
+                            paymentData: paymentData
                         }
-                    } catch (invoiceError) {
-                        console.error("Invoice creation error:", invoiceError);
-                        navigate('/invoices', {
-                            state: { 
-                                message: "Payment successful! Your invoice should appear shortly.",
-                                paymentId: paymentId
-                            }
-                        });
-                    }
+                    });
                 } else {
                     const errorText = await paymentRes.text();
                     console.error("Payment API failed:", paymentRes.status, errorText);
-                    
-                    if (paymentRes.status === 403) {
-                        console.error("403 Forbidden - Check backend permissions for /api/payment/create-payment");
-                        setMessage("Payment recorded by Paystack but backend permission error. Contact support.");
-                    }
-                    
-                    // Still show success to user since Paystack payment went through
-                    navigate('/invoices', {
-                        state: { 
-                            message: "Payment completed via Paystack. If invoice doesn't appear, contact support with reference: " + response.reference
+
+                    // Still redirect to booking details since Paystack payment went through
+                    navigate(`/booking-details/${bookingId}`, {
+                        state: {
+                            paymentSuccess: true,
+                            message: "Payment completed via Paystack. If invoice doesn't appear, contact support."
                         }
                     });
                 }
             } catch (err) {
                 console.error("Payment processing error:", err);
-                navigate('/invoices', {
-                    state: { 
-                        message: "Payment may have been processed. Please check your invoices or contact support."
+                navigate(`/booking-details/${bookingId}`, {
+                    state: {
+                        paymentSuccess: true,
+                        message: "Payment may have been processed. Please check your booking details."
                     }
                 });
             }
