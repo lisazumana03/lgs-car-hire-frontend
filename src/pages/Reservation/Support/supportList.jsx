@@ -45,7 +45,7 @@ const SupportList = () => {
                 <div style={{background: 'linear-gradient(90deg, #2563eb 0%, #38bdf8 100%)', padding: '26px 36px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '22px', borderTopRightRadius: '22px'}}>
                   <div style={{flex: 1}}>
                     <span style={{fontWeight: 'bold', fontSize: '1.35rem', color: '#fff', letterSpacing: '0.5px'}}>{ticket.subject || 'No Subject'}</span>
-                    <span style={{display: 'block', fontSize: '1rem', color: '#e0e7ef', marginTop: '2px'}}>Ticket ID: {ticket.ticketID || ticket.id || ticket._id}</span>
+                    <span style={{display: 'block', fontSize: '1rem', color: '#e0e7ef', marginTop: '2px'}}>Ticket ID: {ticket.ticketID }</span>
                   </div>
                 </div>
                 <div style={{background: '#f1f5f9', padding: '22px 36px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center'}}>
@@ -61,7 +61,7 @@ const SupportList = () => {
                 </div>
                 <div style={{padding: '28px 36px', background: '#fff', borderBottomLeftRadius: '22px', borderBottomRightRadius: '22px'}}>
                   <span style={{fontWeight: 'bold', color: '#2563eb', fontSize: '1.12rem'}}>Description: </span>
-                  <span style={{color: '#334155', fontSize: '1.12rem', fontWeight: '500'}}>{ticket.description || ticket.problem || ticket.issue || 'No description provided.'}</span>
+                  <span style={{color: '#334155', fontSize: '1.12rem', fontWeight: '500'}}>{ticket.description|| 'No description provided.'}</span>
                 </div>
               </div>
             ))
