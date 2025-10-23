@@ -10,6 +10,137 @@ import invoiceService from '../../../services/invoiceService';
 import Footer from '../../Common/Footer';
 import './BookingDetails.css';
 
+// Inline Invoice Component - Professional Design
+const InlineInvoiceView = ({ invoice, onDownload }) => {
+  if (!invoice) {
+    return (
+        <div className="inline-invoice-panel">
+          <div className="loading-container">
+            <p>Loading invoice data...</p>
+          </div>
+        </div>
+    );
+  }
+
+  const rentalDays = invoice.bookingStartDate && invoice.bookingEndDate ?
+      Math.ceil((new Date(invoice.bookingEndDate) - new Date(invoice.bookingStartDate)) / (1000 * 60 * 60 * 24)) || 1 :
+      1;
+
+  const dailyRate = rentalDays > 0 ? (invoice.subTotal / rentalDays).toFixed(2) : (invoice.subTotal || 0).toFixed(2);
+  const carModel = invoice.carModel && invoice.carModel !== "Unknown" ?
+      invoice.carModel :
+      (invoice.booking?.cars?.[0]?.model || 'Vehicle');
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  return (
+      <div className="inline-invoice-panel">
+        {/* Company Header */}
+        <div className="invoice-company-header">
+          <div className="company-info">
+            <h2>LG'S CAR HIRE</h2>
+            <p>123 Rental Street, City, State 12345</p>
+            <p>Phone: (123) 456-7890</p>
+          </div>
+          <div className="invoice-number">
+            <h3>INVOICE #{invoice.invoiceID}</h3>
+            <p>Issue Date: {formatDate(invoice.issueDate)}</p>
+          </div>
+        </div>
+
+        {/* Invoice Header */}
+        <div className="invoice-header">
+          <div className="invoice-title-section">
+            <button
+                onClick={onDownload}
+                className="download-invoice-btn"
+            >
+              Download Invoice
+            </button>
+          </div>
+          <div className="invoice-meta">
+            <p><strong>Status:</strong>
+              <span className={`invoice-status-badge ${(invoice.status || 'PENDING').toLowerCase()}`}>
+              {invoice.status || 'PENDING'}
+            </span>
+            </p>
+          </div>
+        </div>
+
+        {/* Invoice Details */}
+        <div className="invoice-details-grid">
+          <div className="invoice-customer">
+            <h4>Bill To</h4>
+            <p><strong>{invoice.customerName}</strong></p>
+            <p>{invoice.customerEmail}</p>
+            <p>{invoice.pickupLocationName}</p>
+            <p>{invoice.pickupLocationAddress}</p>
+          </div>
+
+          <div className="invoice-vehicle">
+            <h4>Vehicle Details</h4>
+            <p><strong>{carModel}</strong></p>
+            <p>Rental Period: {rentalDays} day{rentalDays !== 1 ? 's' : ''}</p>
+            <p>Daily Rate: R{dailyRate}</p>
+          </div>
+        </div>
+
+        {/* Invoice Breakdown */}
+        <div className="invoice-breakdown">
+          <table className="invoice-table">
+            <thead>
+            <tr>
+              <th>Description</th>
+              <th>Days</th>
+              <th>Rate</th>
+              <th>Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Car Rental - {carModel}</td>
+              <td>{rentalDays}</td>
+              <td>R{dailyRate}</td>
+              <td>R{(invoice.subTotal || 0).toFixed(2)}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+              <td colSpan="3" className="text-right"><strong>Subtotal:</strong></td>
+              <td><strong>R{(invoice.subTotal || 0).toFixed(2)}</strong></td>
+            </tr>
+            <tr>
+              <td colSpan="3" className="text-right"><strong>Tax (15%):</strong></td>
+              <td><strong>R{(invoice.taxAmount || 0).toFixed(2)}</strong></td>
+            </tr>
+            <tr className="total-row">
+              <td colSpan="3" className="text-right"><strong>Total Amount:</strong></td>
+              <td><strong className="total-amount">R{(invoice.totalAmount || 0).toFixed(2)}</strong></td>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        {/* Invoice Notes */}
+        <div className="invoice-notes">
+          <p>Terms & Conditions</p>
+          <ul>
+            <li>R5000 deposit required upon pickup</li>
+            <li>Deposit will be refunded upon safe return of the vehicle</li>
+            <li>Please present this invoice during vehicle pickup</li>
+          </ul>
+        </div>
+      </div>
+  );
+};
+
 const BookingDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -39,25 +170,17 @@ const BookingDetails = () => {
       setLoading(true);
       console.log('Fetching booking details for ID:', id);
 
-      // Check if token exists
-      const token = localStorage.getItem('token');
-      console.log('Token present:', token ? 'Yes' : 'No');
-
       const response = await read(id);
       console.log('Booking response:', response);
       console.log('Booking data:', response.data);
       setBooking(response.data);
 
       // Fetch invoices for this booking
-      await fetchBookingInvoices();
+      await fetchBookingInvoices(response.data);
     } catch (error) {
       console.error('Error fetching booking details:', error);
-      console.error('Error response:', error.response);
-      console.error('Error status:', error.response?.status);
-      console.error('Error data:', error.response?.data);
-
       if (error.response?.status === 403) {
-        setError('Access denied: You do not have permission to view this booking. This may be a backend permission issue.');
+        setError('Access denied: You do not have permission to view this booking.');
       } else if (error.response?.status === 401) {
         setError('Authentication required: Please log in again.');
       } else {
@@ -68,51 +191,120 @@ const BookingDetails = () => {
     }
   };
 
-  const fetchBookingInvoices = async () => {
+  const fetchBookingInvoices = async (bookingData) => {
     if (!id) return;
 
     try {
       setInvoiceLoading(true);
-      // Get user ID from localStorage
-      const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
-      let userId = null;
+      console.log('Fetching invoices for booking:', id);
 
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          userId = user.userId || user.id || user.userID;
-        } catch (error) {
-          console.error('Error parsing user from storage:', error);
+      // Try multiple approaches to get invoices
+      let invoiceData = [];
+
+      // Approach 1: Get all invoices and filter by booking ID
+      try {
+        const allInvoices = await invoiceService.getAllInvoices();
+        console.log('All invoices:', allInvoices);
+
+        // Filter invoices for this specific booking
+        invoiceData = allInvoices.filter(invoice => {
+          const matchesBooking =
+              invoice.bookingId === parseInt(id) ||
+              invoice.booking?.bookingID === parseInt(id) ||
+              invoice.booking?.id === parseInt(id) ||
+              invoice.bookingID === parseInt(id);
+
+          console.log(`Invoice ${invoice.invoiceID} matches booking ${id}:`, matchesBooking);
+          return matchesBooking;
+        });
+      } catch (error) {
+        console.log('Failed to get all invoices, trying user-specific approach:', error);
+
+        // Approach 2: Get user invoices
+        const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+        let userId = null;
+
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            userId = user.userId || user.id || user.userID;
+          } catch (error) {
+            console.error('Error parsing user from storage:', error);
+          }
         }
+
+        if (!userId) {
+          userId = localStorage.getItem('userId') || localStorage.getItem('userID') || '1';
+        }
+
+        const userInvoices = await invoiceService.getUserInvoices(userId);
+        invoiceData = userInvoices.filter(invoice =>
+            invoice.bookingId === parseInt(id) ||
+            invoice.booking?.bookingID === parseInt(id) ||
+            invoice.booking?.id === parseInt(id)
+        );
       }
 
-      if (!userId) {
-        userId = localStorage.getItem('userId') || localStorage.getItem('userID') || '1';
+      console.log('Filtered invoices for booking:', invoiceData);
+      setInvoices(invoiceData);
+
+
+      if (invoiceData.length === 0 && paymentSuccess) {
+        console.log('No invoices found, creating mock invoice from payment data');
+        const mockInvoice = createMockInvoice(bookingData, paymentData);
+        setInvoices([mockInvoice]);
       }
 
-      const invoiceData = await invoiceService.getUserInvoices(userId);
-
-      // Filter invoices for this specific booking
-      const bookingInvoices = invoiceData.filter(invoice =>
-          invoice.bookingId === parseInt(id) ||
-          invoice.booking?.bookingID === parseInt(id) ||
-          invoice.booking?.id === parseInt(id)
-      );
-
-      setInvoices(bookingInvoices);
     } catch (error) {
       console.error('Error fetching booking invoices:', error);
+
+      // Create mock invoice as fallback
+      if (paymentSuccess) {
+        console.log('Creating fallback mock invoice');
+        const mockInvoice = createMockInvoice(booking, paymentData);
+        setInvoices([mockInvoice]);
+      }
     } finally {
       setInvoiceLoading(false);
     }
   };
 
+  // Create mock invoice when real invoice data is not available
+  const createMockInvoice = (bookingData, paymentData) => {
+    const bookingId = bookingData?.id || bookingData?.bookingID || id;
+    const rentalPrice = bookingData?.car?.rentalPrice || 500;
+    const startDate = bookingData?.startDate || new Date().toISOString();
+    const endDate = bookingData?.endDate || new Date(Date.now() + 86400000).toISOString();
+
+    const rentalDays = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) || 1;
+    const subTotal = rentalPrice * rentalDays;
+    const taxAmount = subTotal * 0.15;
+    const totalAmount = subTotal + taxAmount;
+
+    return {
+      invoiceID: `${bookingId}`,
+      bookingId: parseInt(bookingId),
+      issueDate: new Date().toISOString(),
+      Date: endDate,
+      customerName: bookingData?.user?.firstName + ' ' + bookingData?.user?.lastName || 'Customer',
+      customerEmail: bookingData?.user?.email || 'customer@example.com',
+      carModel: bookingData?.car?.brand + ' ' + bookingData?.car?.model || 'Vehicle',
+      pickupLocationName: bookingData?.pickupLocation?.locationName || 'Pickup Location',
+      pickupLocationAddress: bookingData?.pickupLocation?.streetName + ', ' + bookingData?.pickupLocation?.cityOrTown || 'Address',
+      subTotal: subTotal,
+      taxAmount: taxAmount,
+      totalAmount: totalAmount,
+      status: paymentData?.status || 'PAID',
+      bookingStartDate: startDate,
+      bookingEndDate: endDate,
+      isMock: true
+    };
+  };
+
   const fetchAllBookings = async () => {
     try {
       setLoading(true);
-      console.log('Fetching all bookings...');
       const response = await getAllBookings();
-      console.log('All bookings response:', response);
       setAllBookings(response.data || []);
     } catch (error) {
       console.error('Error fetching all bookings:', error);
@@ -161,14 +353,9 @@ const BookingDetails = () => {
 
     let mapsUrl = '';
 
-    // Check if coordinates are available (latitude and longitude)
     if (location.latitude && location.longitude) {
-      // Use coordinates for precise location
       mapsUrl = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
-      console.log(`Opening maps with coordinates: ${location.latitude}, ${location.longitude}`);
-    }
-    // Fallback to address search
-    else {
+    } else {
       let address = '';
 
       if (typeof location === 'string') {
@@ -176,7 +363,6 @@ const BookingDetails = () => {
       } else if (location.fullAddress) {
         address = location.fullAddress;
       } else if (location.streetName) {
-        // Build address from components
         address = [
           location.locationName,
           location.streetName,
@@ -186,24 +372,71 @@ const BookingDetails = () => {
         ].filter(Boolean).join(', ');
       } else if (location.locationName) {
         address = location.locationName;
-      } else if (location.address) {
-        address = location.address;
-      } else if (location.name) {
-        address = location.name;
       }
 
       if (address) {
         mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-        console.log(`Opening maps with address search: ${address}`);
       } else {
-        console.log('No valid address or coordinates found');
         alert('Location coordinates not available for this booking');
         return;
       }
     }
 
-    // Open in new tab
     window.open(mapsUrl, '_blank');
+  };
+
+  // Download Invoice Function
+  const handleDownloadInvoice = (invoice) => {
+    const rentalDays = invoice.bookingStartDate && invoice.bookingEndDate ?
+        Math.ceil((new Date(invoice.bookingEndDate) - new Date(invoice.bookingStartDate)) / (1000 * 60 * 60 * 24)) || 1 :
+        1;
+
+    const dailyRate = rentalDays > 0 ? (invoice.subTotal / rentalDays).toFixed(2) : (invoice.subTotal || 0).toFixed(2);
+
+    const invoiceText = `
+LG'S CAR HIRE
+123 Rental Street
+City, State 12345
+Phone: (123) 456-7890
+
+INVOICE #${invoice.invoiceID}
+Issue Date: ${new Date(invoice.issueDate).toLocaleDateString()}
+Return Date: ${new Date(invoice.dueDate).toLocaleDateString()}
+
+BILL TO:
+Name: ${invoice.customerName}
+Email: ${invoice.customerEmail}
+Pickup Location: ${invoice.pickupLocationName}
+${invoice.pickupLocationAddress}
+Return Location: ${invoice.dropOffLocationName || invoice.pickupLocationName}
+
+CAR RENTAL DETAILS:
+Vehicle: ${invoice.carModel}
+Rental Period: ${rentalDays} days
+Daily Rate: R${dailyRate}
+
+BREAKDOWN:
+Subtotal: R${(invoice.subTotal || 0).toFixed(2)}
+Tax (15%): R${(invoice.taxAmount || 0).toFixed(2)}
+Total: R${(invoice.totalAmount || 0).toFixed(2)}
+
+STATUS: ${invoice.status || 'PAID'}
+
+NOTES:
+- R5000 deposit required upon pickup
+- Deposit will be refunded upon safe return of the vehicle in original condition
+- Thank you for your business!
+    `.trim();
+
+    const blob = new Blob([invoiceText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `invoice-${invoice.invoiceID}.txt`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -239,7 +472,6 @@ const BookingDetails = () => {
     );
   }
 
-  // If no specific booking ID, show list of bookings to choose from
   if (!id && allBookings.length > 0) {
     return (
         <div className="booking-details-container">
@@ -349,6 +581,42 @@ const BookingDetails = () => {
               </div>
             </div>
           </div>
+
+          {/* NEW: Invoice Section - Always show if payment was made */}
+          {(paymentSuccess || invoices.length > 0) && (
+              <div className="booking-card invoices-card">
+                <h3 className="invoices-header">
+                  {invoices.some(inv => inv.isMock) ? 'Payment Confirmation' : 'Booking Invoice'}
+                </h3>
+
+                {invoiceLoading ? (
+                    <div className="loading-container">
+                      <div className="loading-spinner"></div>
+                      <p>Loading invoice...</p>
+                    </div>
+                ) : (
+                    <div className="inline-invoices-container">
+                      {invoices.map((invoice) => (
+                          <InlineInvoiceView
+                              key={invoice.invoiceID}
+                              invoice={invoice}
+                              onDownload={() => handleDownloadInvoice(invoice)}
+                          />
+                      ))}
+
+                      {/* Show message if no invoices but payment was successful */}
+                      {invoices.length === 0 && paymentSuccess && (
+                          <div className="payment-confirmation-message">
+                            <h4>Payment Processed Successfully</h4>
+                            <p>Your payment has been received. The invoice will be generated shortly.</p>
+                            <p><strong>Reference:</strong> {paymentData?.reference}</p>
+                            <p><strong>Amount:</strong> R{paymentData?.amount}</p>
+                          </div>
+                      )}
+                    </div>
+                )}
+              </div>
+          )}
 
           {/* Booking Dates Section */}
           <div className="booking-card dates-card">
@@ -468,58 +736,6 @@ const BookingDetails = () => {
             </div>
           </div>
 
-          {/* NEW: Invoices Section */}
-          <div className="booking-card invoices-card">
-            <h3 className="invoices-header">Related Invoices</h3>
-
-            {invoiceLoading ? (
-                <div className="loading-container">
-                  <div className="loading-spinner"></div>
-                  <p>Loading invoices...</p>
-                </div>
-            ) : invoices.length === 0 ? (
-                <div className="no-invoices">
-                  <p>No invoices found for this booking.</p>
-                  <button
-                      onClick={() => navigate('/payment', { state: { booking } })}
-                      className="action-button"
-                      style={{ backgroundColor: '#28a745', marginTop: '10px' }}
-                  >
-                    Make Payment
-                  </button>
-                </div>
-            ) : (
-                <div className="invoices-list">
-                  {invoices.map((invoice) => (
-                      <div
-                          key={invoice.invoiceID}
-                          className="invoice-item"
-                          onClick={() => navigate(`/invoice/${invoice.invoiceID}`)}
-                      >
-                        <div className="invoice-info">
-                          <h4>Invoice #{invoice.invoiceID}</h4>
-                          <p>Amount: R{invoice.totalAmount?.toFixed(2)}</p>
-                          <p>Status: <span className={`invoice-status ${invoice.status?.toLowerCase()}`}>
-                      {invoice.status || 'PENDING'}
-                    </span></p>
-                          <p>Issue Date: {formatDate(invoice.issueDate)}</p>
-                          <p>Due Date: {formatDate(invoice.dueDate)}</p>
-                        </div>
-                        <button
-                            className="view-invoice-btn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/invoice/${invoice.invoiceID}`);
-                            }}
-                        >
-                          View Invoice
-                        </button>
-                      </div>
-                  ))}
-                </div>
-            )}
-          </div>
-
           {/* Action Buttons */}
           <div className="action-buttons">
             <button
@@ -534,12 +750,16 @@ const BookingDetails = () => {
             >
               Dashboard
             </button>
-            <button
-                onClick={() => navigate('/invoices')}
-                className="action-button action-button-tertiary"
-            >
-              View All Invoices
-            </button>
+            {/* Only show Make Payment button if no payment was made */}
+            {!paymentSuccess && invoices.length === 0 && (
+                <button
+                    onClick={() => navigate('/payment', { state: { booking } })}
+                    className="action-button action-button-tertiary"
+                    style={{ backgroundColor: '#28a745' }}
+                >
+                  Make Payment
+                </button>
+            )}
           </div>
         </div>
         <Footer />

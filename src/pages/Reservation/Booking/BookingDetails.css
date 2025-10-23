@@ -712,4 +712,403 @@
 .action-button-tertiary:hover {
   background: #138496 !important;
 }
+/* Inline Invoice Styles - Professional Design */
+.inline-invoice-panel {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e0e0e0;
+  color: #333333;
+  position: relative;
+}
 
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #2c5aa0;
+  position: relative;
+}
+
+.invoice-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.invoice-title {
+  color: #2c5aa0;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: 'Arial', sans-serif;
+}
+
+.download-invoice-btn {
+  background: #2c5aa0;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+}
+
+.download-invoice-btn:hover {
+  background: #1e3d6f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+.view-full-invoice-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+  margin-left: 10px;
+}
+
+.view-full-invoice-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.invoice-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.invoice-meta {
+  text-align: right;
+  font-size: 1rem;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-meta p {
+  margin: 6px 0;
+  color: #495057;
+}
+
+.invoice-meta strong {
+  color: #2c5aa0;
+}
+
+.invoice-status-badge {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-left: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-status-badge.paid {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.invoice-status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.invoice-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.invoice-customer, .invoice-vehicle {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.invoice-customer h4, .invoice-vehicle h4 {
+  color: #2c5aa0;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-bottom: 2px solid #2c5aa0;
+  padding-bottom: 8px;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-customer p, .invoice-vehicle p {
+  margin: 8px 0;
+  color: #495057;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-customer strong, .invoice-vehicle strong {
+  color: #2c5aa0;
+}
+
+.invoice-breakdown {
+  margin-bottom: 25px;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-table th {
+  background: #2c5aa0;
+  color: white;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.invoice-table td {
+  padding: 16px;
+  border-bottom: 1px solid #dee2e6;
+  color: #495057;
+  font-weight: 500;
+}
+
+.invoice-table tfoot td {
+  border-bottom: none;
+  font-weight: 600;
+  background: #f8f9fa;
+}
+
+.total-row {
+  background: #e9ecef;
+  border-top: 2px solid #2c5aa0;
+}
+
+.total-amount {
+  color: #2c5aa0;
+  font-size: 1.2rem;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.invoice-notes {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #2c5aa0;
+}
+
+.invoice-notes p {
+  color: #2c5aa0;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-notes ul {
+  margin: 12px 0 0 0;
+  padding-left: 20px;
+}
+
+.invoice-notes li {
+  margin-bottom: 6px;
+  font-size: 1rem;
+  color: #495057;
+  font-family: 'Arial', sans-serif;
+}
+
+.inline-invoices-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Payment Confirmation Message */
+.payment-confirmation-message {
+  background: #d4edda;
+  padding: 25px;
+  border-radius: 8px;
+  text-align: center;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.payment-confirmation-message h4 {
+  color: #155724;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+  font-family: 'Arial', sans-serif;
+}
+
+.payment-confirmation-message p {
+  margin: 8px 0;
+  font-size: 1.1rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.payment-confirmation-message strong {
+  color: #155724;
+}
+
+/* Mock Invoice Indicator */
+.mock-invoice-badge {
+  background: #fff3cd;
+  color: #856404;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-left: 10px;
+  text-transform: uppercase;
+  border: 1px solid #ffeaa7;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Animation for invoice appearance */
+@keyframes invoiceAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inline-invoice-panel {
+  animation: invoiceAppear 0.6s ease-out;
+}
+
+/* Hover effects */
+.invoice-customer:hover, .invoice-vehicle:hover {
+  transform: translateY(-2px);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-table tr:hover {
+  background: #f8f9fa;
+  transition: background 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .invoice-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .invoice-meta {
+    text-align: left;
+    width: 100%;
+  }
+
+  .invoice-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-table {
+    font-size: 0.9rem;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 12px 8px;
+  }
+
+  .invoice-title {
+    font-size: 1.5rem;
+  }
+
+  .invoice-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .download-invoice-btn,
+  .view-full-invoice-btn {
+    flex: 1;
+    min-width: 140px;
+  }
+}
+
+/* Company Header */
+.invoice-company-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #2c5aa0;
+}
+
+.company-info h2 {
+  color: #2c5aa0;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: 'Arial', sans-serif;
+}
+
+.company-info p {
+  margin: 4px 0;
+  color: #6c757d;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-number {
+  text-align: right;
+}
+
+.invoice-number h3 {
+  color: #2c5aa0;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-family: 'Arial', sans-serif;
+}
+
+.invoice-number p {
+  margin: 4px 0;
+  color: #6c757d;
+  font-family: 'Arial', sans-serif;
+}
