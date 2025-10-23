@@ -31,9 +31,9 @@ function CarSelection() {
     };
 
     const handleBookCar = (car) => {
-        // Navigate to map-based location selector with pre-filled car data
-        navigate('/maps-location-select', {
-            state: { 
+        // Navigate directly to predefined location selector
+        navigate('/choose-location', {
+            state: {
                 selectedCar: {
                     carID: car.carID,
                     brand: car.brand,
@@ -51,13 +51,13 @@ function CarSelection() {
 
     // Filter and sort cars
     let filteredCars = cars.filter(car => {
-        const matchesSearch = 
+        const matchesSearch =
             car.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
             car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
             `${car.brand} ${car.model}`.toLowerCase().includes(searchTerm.toLowerCase());
-        
+
         const matchesBrand = selectedBrand === 'all' || car.brand === selectedBrand;
-        
+
         return matchesSearch && matchesBrand;
     });
 
@@ -155,8 +155,8 @@ function CarSelection() {
                                 {/* Car Image */}
                                 <div className="car-image-container">
                                     {car.imageUrl ? (
-                                        <img 
-                                            src={car.imageUrl} 
+                                        <img
+                                            src={car.imageUrl}
                                             alt={`${car.brand} ${car.model}`}
                                             className="car-image"
                                         />

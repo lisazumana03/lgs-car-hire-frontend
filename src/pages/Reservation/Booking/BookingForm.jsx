@@ -318,7 +318,7 @@ export default function BookingForm() {
                                 <p className="text-gray-300">{selectedPickupLocation.provinceOrState}, {selectedPickupLocation.country}</p>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/maps-location-select', {
+                                    onClick={() => navigate('/choose-location', {
                                         state: {
                                             selectedCar,
                                             selectedPickupLocation,
@@ -327,13 +327,13 @@ export default function BookingForm() {
                                     })}
                                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
                                 >
-                                    Choose Different Location
+                                    Change Location
                                 </button>
                             </div>
                         ) : (
                             <button
                                 type="button"
-                                onClick={() => navigate('/maps-location-select', {
+                                onClick={() => navigate('/choose-location', {
                                     state: {
                                         selectedCar,
                                         selectedPickupLocation,
@@ -356,7 +356,7 @@ export default function BookingForm() {
                                 <p className="text-gray-300">{selectedDropOffLocation.provinceOrState}, {selectedDropOffLocation.country}</p>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/maps-location-select', {
+                                    onClick={() => navigate('/choose-location', {
                                         state: {
                                             selectedCar,
                                             selectedPickupLocation,
@@ -365,13 +365,13 @@ export default function BookingForm() {
                                     })}
                                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-2"
                                 >
-                                    Choose Different Location
+                                    Change Location
                                 </button>
                             </div>
                         ) : (
                             <button
                                 type="button"
-                                onClick={() => navigate('/maps-location-select', {
+                                onClick={() => navigate('/choose-location', {
                                     state: {
                                         selectedCar,
                                         selectedPickupLocation,

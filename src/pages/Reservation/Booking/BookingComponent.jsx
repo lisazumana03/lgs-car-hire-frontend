@@ -20,18 +20,18 @@ export default function BookingComponent(){
                         Choose a Car
                     </Link>
                 </div>
-                
+
                 <div className="booking-card">
                     <h3>Make a New Booking</h3>
-                    <p>Create a new car rental booking with your preferred vehicle and dates.</p>
+                    <p>Create a new car rental booking with your preferred vehicle and locations.</p>
                     <Link
-                        to="/make-booking"
+                        to="/select-car"
                         className="booking-btn secondary"
                     >
-                        Make Booking
+                        Start New Booking
                     </Link>
                 </div>
-                
+
                 <div className="booking-card">
                     <h3>View Your Bookings</h3>
                     <p>Check your booking history and current reservations.</p>
@@ -42,7 +42,7 @@ export default function BookingComponent(){
                         View Booking History
                     </Link>
                 </div>
-                
+
                 <div className="booking-card">
                     <h3>Manage All Bookings</h3>
                     <p>Admin view to manage all bookings in the system.</p>
@@ -55,26 +55,26 @@ export default function BookingComponent(){
                 </div>
             </div>
             <div>
-            <h2 className="text-4xl font-bold text-white mb-8">Booking Options</h2>
-            <div className="booking-links flex flex-col gap-6 mb-4 w-full max-w-md">
-                <button
-                    type="button"
-                    className="submit-btn"
-                    style={{ marginBottom: "10px", backgroundColor: "#ff0000" }}
-                    onClick={() => navigate("/make-booking")}
-                >
-                    Make Booking
-                </button>
-                <button
-                    type="button"
-                    className="submit-btn"
-                    style={{marginBottom: "10px", backgroundColor: "#ff0000"}}
-                    onClick={() => navigate("/booking-history")}
-                >
-                    View Booking History
-                </button>
+                <h2 className="text-4xl font-bold text-white mb-8">Booking Options</h2>
+                <div className="booking-links flex flex-col gap-6 mb-4 w-full max-w-md">
+                    <button
+                        type="button"
+                        className="submit-btn"
+                        style={{ marginBottom: "10px", backgroundColor: "#ff0000" }}
+                        onClick={() => navigate("/select-car")}
+                    >
+                        Start New Booking
+                    </button>
+                    <button
+                        type="button"
+                        className="submit-btn"
+                        style={{marginBottom: "10px", backgroundColor: "#ff0000"}}
+                        onClick={() => navigate("/booking-history")}
+                    >
+                        View Booking History
+                    </button>
+                </div>
             </div>
-        </div>
         </div>
     );
 }

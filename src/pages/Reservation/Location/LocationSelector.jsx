@@ -88,7 +88,13 @@ function LocationSelector() {
             <div className="location-selection-wrapper">
                 <div className="selection-header">
                     <h1>Choose Pick Up and Drop Off Locations</h1>
-                    <p>Select two different locations for your booking</p>
+                    <p>Select from our pre-approved locations across South Africa</p>
+                    <div className="location-notice">
+                        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
+                            <p className="font-semibold">📍 Predefined Locations Only</p>
+                            <p className="text-sm">All locations are admin-approved for quality and safety</p>
+                        </div>
+                    </div>
                 </div>
 
                 {error && <div className="error-message">{error}</div>}
