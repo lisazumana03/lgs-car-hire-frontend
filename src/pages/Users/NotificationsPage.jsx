@@ -125,16 +125,15 @@ function NotificationsPage() {
         <h1>Latest Notifications</h1>
         {currentUser && (
           <div className="user-info-banner" style={{ 
-            padding: '15px', 
-            backgroundColor: 'transparent', 
+            padding: '15px',
             borderRadius: '8px', 
             marginBottom: '15px',
             border: '1px solid #555'
           }}>
-            <p className="user-info" style={{ margin: 0, color: 'white' }}>
+            <p className="user-info" style={{ margin: 0, color: 'black' }}>
               <strong>Logged in as:</strong> {currentUser.name || currentUser.email} 
               {currentUser.role && <span className="user-role"> ({currentUser.role})</span>}
-              <span className="user-id" style={{ color: 'white', fontWeight: 'bold' }}> | User ID: {
+              <span className="user-id" style={{ color: 'black', fontWeight: 'bold' }}> | User ID: {
                 console.log("Current user object:", currentUser) ||
                 console.log("User properties:", Object.keys(currentUser)) ||
                 (currentUser.id || currentUser.userID || currentUser.userId || currentUser.ID || 'N/A')

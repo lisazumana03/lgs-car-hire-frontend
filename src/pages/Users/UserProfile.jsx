@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { updateUserProfile } from '../../scripts/userApi';
-import './index.css';
+import './UserProfile.css';
 
 function UserProfile({ user, onUpdateUser }) {
   const [isEditing, setIsEditing] = useState(false);

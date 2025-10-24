@@ -133,12 +133,42 @@ export default function BookingForm() {
             startDate: form.startDate,
             endDate: form.endDate,
             bookingStatus: form.bookingStatus,
-            car: selectedCar ? { carID: selectedCar.carID } : null, // Single car object
-            pickupLocation: selectedPickupLocation ? { locationID: selectedPickupLocation.locationID } : null,
-            dropOffLocation: selectedDropOffLocation ? { locationID: selectedDropOffLocation.locationID } : null,
+            car: selectedCar ? {
+                carID: selectedCar.carID,
+                brand: selectedCar.brand,
+                model: selectedCar.model,
+                year: selectedCar.year,
+                rentalPrice: selectedCar.rentalPrice,
+                availability: selectedCar.availability
+            } : null, // Single car object
+            pickupLocation: selectedPickupLocation ? {
+                locationID: selectedPickupLocation.locationID,
+                locationName: selectedPickupLocation.locationName,
+                streetNumber: selectedPickupLocation.streetNumber,
+                streetName: selectedPickupLocation.streetName,
+                cityOrTown: selectedPickupLocation.cityOrTown,
+                provinceOrState: selectedPickupLocation.provinceOrState,
+                country: selectedPickupLocation.country,
+                latitude: selectedPickupLocation.latitude,
+                longitude: selectedPickupLocation.longitude
+            } : null,
+            dropOffLocation: selectedDropOffLocation ? {
+                locationID: selectedDropOffLocation.locationID,
+                locationName: selectedDropOffLocation.locationName,
+                streetNumber: selectedDropOffLocation.streetNumber,
+                streetName: selectedDropOffLocation.streetName,
+                cityOrTown: selectedDropOffLocation.cityOrTown,
+                provinceOrState: selectedDropOffLocation.provinceOrState,
+                country: selectedDropOffLocation.country,
+                latitude: selectedDropOffLocation.latitude,
+                longitude: selectedDropOffLocation.longitude
+            } : null,
         };
 
         console.log('Submitting booking with payload:', payload);
+        console.log('Selected pickup location:', selectedPickupLocation);
+        console.log('Selected dropoff location:', selectedDropOffLocation);
+        console.log('Selected car:', selectedCar);
 
         try {
             const response = await create(payload);

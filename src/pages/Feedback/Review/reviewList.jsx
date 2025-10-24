@@ -51,7 +51,7 @@ const ReviewList = () => {
                                     </div>
                                     <div style={{textAlign: 'right'}}>
                                         <span style={{background: 'linear-gradient(90deg, #fbbf24 0%, #f59e42 100%)', borderRadius: '10px', padding: '8px 20px', fontSize: '1.08rem', marginLeft: '16px', boxShadow: '0 2px 8px rgba(251,191,36,0.12)'}}>
-                                            <span style={{color: '#FFD700', fontWeight: 'bold'}}>{Array(review.rating).fill('★').join('')}</span> <span style={{fontWeight: 'normal', color: '#334155'}}>({review.rating}/5)</span>
+                                            <span style={{color: '#0056b3', fontWeight: 'bold'}}>{Array(review.rating).fill('★').join('')}</span> <span style={{fontWeight: 'normal', color: '#334155'}}>({review.rating}/5)</span>
                                         </span>
                                     </div>
                                 </div>

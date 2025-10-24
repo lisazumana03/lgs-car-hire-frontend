@@ -16,10 +16,10 @@ function PaymentsManagement() {
     const fetchPayments = async () => {
         setLoading(true);
         setMessage('');
+        
+        
         try {
-            console.log('Fetching payments from backend...');
             const paymentsData = await adminApi.getAllPayments();
-            console.log('Received payments data:', paymentsData);
 
             if (paymentsData && Array.isArray(paymentsData)) {
                 setPayments(paymentsData);
@@ -28,7 +28,6 @@ function PaymentsManagement() {
                 throw new Error('Invalid data format received from server');
             }
         } catch (error) {
-            console.error('Error fetching payments:', error);
             setMessage(`Error: Unable to load payments data. ${error.message}`);
             setPayments([]);
             setDataSource('error');
@@ -41,7 +40,6 @@ function PaymentsManagement() {
         try {
             await adminApi.updatePaymentStatus(paymentId, newStatus);
             setMessage(`Payment status updated to ${newStatus}`);
-            // Refresh the data
             fetchPayments();
         } catch (error) {
             setMessage('Error updating payment status: ' + error.message);
