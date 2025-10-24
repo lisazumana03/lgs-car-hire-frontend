@@ -25,10 +25,24 @@ const PaymentForm = () => {
 
     const fetchBookings = async () => {
         try {
+            console.log('Fetching bookings...');
+            console.log('Token present:', !!localStorage.getItem('token'));
+            console.log('User present:', !!localStorage.getItem('user'));
+            
             const response = await getAllBookings();
-            setBookings(response.data || []);
+            console.log('Bookings response:', response);
+            console.log('Bookings data:', response.data);
+            
+            // Handle different response structures
+            const bookingsData = response.data || response || [];
+            console.log('Processed bookings data:', bookingsData);
+            
+            setBookings(Array.isArray(bookingsData) ? bookingsData : []);
         } catch (error) {
-            setMessage('Failed to load bookings');
+            console.error('Error fetching bookings:', error);
+            console.error('Error message:', error.message);
+            console.error('Error response:', error.response);
+            setMessage(`Failed to load bookings: ${error.message}`);
             setBookings([]);
         } finally {
             setLoading(false);
@@ -57,10 +71,10 @@ const PaymentForm = () => {
             try {
                 const token = localStorage.getItem('token');
                 console.log("Creating payment with token:", token ? "Present" : "Missing");
-
+                
                 const paymentRes = await fetch("http://localhost:3045/api/payment/create-payment", {
                     method: "POST",
-                    headers: {
+                    headers: { 
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
@@ -76,35 +90,65 @@ const PaymentForm = () => {
                 if (paymentRes.ok) {
                     const paymentData = await paymentRes.json();
                     console.log("Payment successful:", paymentData);
-
-                    // REDIRECT TO BOOKING DETAILS INSTEAD OF INVOICE CREATION
+                    const paymentId = paymentData.paymentID || paymentData.id;
+                    
+                    // Validate booking ID before navigation
+                    console.log('Navigating to booking details with ID:', bookingId);
+                    if (!bookingId) {
+                        console.error('No booking ID available for navigation');
+                        setMessage('Payment successful but unable to navigate to booking details.');
+                        return;
+                    }
+                    
+                    // Navigate directly to booking details after successful payment
                     navigate(`/booking-details/${bookingId}`, {
                         state: {
                             paymentSuccess: true,
-                            message: "Payment completed successfully!",
-                            paymentData: paymentData
+                            message: "Your payment has been processed successfully!",
+                            bookingId: bookingId, // Explicitly pass booking ID
+                            paymentData: {
+                                reference: paymentData.reference || response.reference,
+                                amount: paymentAmount,
+                                status: paymentData.status || 'COMPLETED',
+                                paymentID: paymentId
+                            }
                         }
                     });
                 } else {
                     const errorText = await paymentRes.text();
                     console.error("Payment API failed:", paymentRes.status, errorText);
-
-                    // Still redirect to booking details since Paystack payment went through
-                    navigate(`/booking-details/${bookingId}`, {
-                        state: {
-                            paymentSuccess: true,
-                            message: "Payment completed via Paystack. If invoice doesn't appear, contact support."
-                        }
-                    });
+                    
+                    if (paymentRes.status === 403) {
+                        console.error("403 Forbidden - Check backend permissions for /api/payment/create-payment");
+                        setMessage("Payment recorded by Paystack but backend permission error. Contact support.");
+                    }
+                    
+                    // Still navigate to booking details since Paystack payment went through
+                    if (bookingId) {
+                        navigate(`/booking-details/${bookingId}`, {
+                            state: { 
+                                paymentSuccess: true,
+                                message: "Payment completed via Paystack. Reference: " + response.reference,
+                                bookingId: bookingId
+                            }
+                        });
+                    } else {
+                        setMessage("Payment completed but unable to navigate to booking details.");
+                    }
                 }
             } catch (err) {
                 console.error("Payment processing error:", err);
-                navigate(`/booking-details/${bookingId}`, {
-                    state: {
-                        paymentSuccess: true,
-                        message: "Payment may have been processed. Please check your booking details."
-                    }
-                });
+                if (bookingId) {
+                    navigate(`/booking-details/${bookingId}`, {
+                        state: { 
+                            paymentSuccess: true,
+                            message: "Payment may have been processed. Please check with support if you have any questions.",
+                            bookingId: bookingId
+                        }
+                    });
+                } else {
+                    setMessage("Payment may have been processed. Please check your bookings.");
+                }
             }
         },
         onClose: () => {
@@ -125,7 +169,13 @@ const PaymentForm = () => {
         return (
             <div className="no-bookings">
                 <p>No bookings found. Please create a booking first.</p>
+                {message && (
+                    <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
+                        {message}
+                    </div>
+                )}
                 <button onClick={() => navigate('/bookings')}>Go to Bookings</button>
+                <button onClick={() => fetchBookings()} style={{ marginLeft: '10px' }}>Retry Loading</button>
             </div>
         );
     }

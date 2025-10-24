@@ -6,7 +6,7 @@ Shows detailed information about a specific booking with invoice integration
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { read, getAllBookings } from '../../../services/bookingService';
-import invoiceService from '../../../services/invoiceService';
+import * as invoiceService from '../../../services/invoiceService';
 import Footer from '../../Common/Footer';
 import './BookingDetails.css';
 
@@ -261,7 +261,7 @@ const BookingDetails = () => {
       // Create mock invoice as fallback
       if (paymentSuccess) {
         console.log('Creating fallback mock invoice');
-        const mockInvoice = createMockInvoice(booking, paymentData);
+        const mockInvoice = createMockInvoice(bookingData || booking, paymentData);
         setInvoices([mockInvoice]);
       }
     } finally {
@@ -271,6 +271,9 @@ const BookingDetails = () => {
 
   // Create mock invoice when real invoice data is not available
   const createMockInvoice = (bookingData, paymentData) => {
+    console.log('Creating mock invoice with booking data:', bookingData);
+    console.log('Payment data:', paymentData);
+    
     const bookingId = bookingData?.id || bookingData?.bookingID || id;
     const rentalPrice = bookingData?.car?.rentalPrice || 500;
     const startDate = bookingData?.startDate || new Date().toISOString();
@@ -281,16 +284,49 @@ const BookingDetails = () => {
     const taxAmount = subTotal * 0.15;
     const totalAmount = subTotal + taxAmount;
 
+    // Safely construct customer name - use booking user data or current user as fallback
+    const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+    let currentUser = null;
+    if (userStr) {
+      try {
+        currentUser = JSON.parse(userStr);
+      } catch (error) {
+        console.error('Error parsing current user:', error);
+      }
+    }
+
+    const firstName = bookingData?.user?.firstName || currentUser?.firstName || '';
+    const lastName = bookingData?.user?.lastName || currentUser?.lastName || '';
+    const customerName = `${firstName} ${lastName}`.trim() || 'Customer';
+
+    // Safely construct car model
+    const carBrand = bookingData?.car?.brand || '';
+    const carModel = bookingData?.car?.model || '';
+    const fullCarModel = `${carBrand} ${carModel}`.trim() || 'Vehicle';
+
+    // Safely construct pickup location address
+    const streetName = bookingData?.pickupLocation?.streetName || '';
+    const cityOrTown = bookingData?.pickupLocation?.cityOrTown || '';
+    const pickupAddress = `${streetName}${streetName && cityOrTown ? ', ' : ''}${cityOrTown}` || 'Address';
+
+    console.log('Constructed invoice data:', {
+      customerName,
+      customerEmail: bookingData?.user?.email,
+      fullCarModel,
+      pickupLocationName: bookingData?.pickupLocation?.locationName,
+      pickupAddress
+    });
+
     return {
       invoiceID: `${bookingId}`,
       bookingId: parseInt(bookingId),
       issueDate: new Date().toISOString(),
       Date: endDate,
-      customerName: bookingData?.user?.firstName + ' ' + bookingData?.user?.lastName || 'Customer',
-      customerEmail: bookingData?.user?.email || 'customer@example.com',
-      carModel: bookingData?.car?.brand + ' ' + bookingData?.car?.model || 'Vehicle',
+      customerName: customerName,
+      customerEmail: bookingData?.user?.email || currentUser?.email || 'customer@example.com',
+      carModel: fullCarModel,
       pickupLocationName: bookingData?.pickupLocation?.locationName || 'Pickup Location',
-      pickupLocationAddress: bookingData?.pickupLocation?.streetName + ', ' + bookingData?.pickupLocation?.cityOrTown || 'Address',
+      pickupLocationAddress: pickupAddress,
       subTotal: subTotal,
       taxAmount: taxAmount,
       totalAmount: totalAmount,

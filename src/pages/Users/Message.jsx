@@ -107,10 +107,10 @@ export default function CreateNotification() { // Define the CreateNotification 
                             marginTop: '15px',
                             border: '1px solid #555'
                         }}>
-                            <p className="user-info" style={{ margin: 0, color: 'white' }}>
+                            <p className="user-info" style={{ margin: 0, color: 'black' }}>
                                 <strong>Logged in as:</strong> {currentUser.name || currentUser.email} 
                                 {currentUser.role && <span className="user-role"> ({currentUser.role})</span>}
-                                <span className="user-id" style={{ color: 'white', fontWeight: 'bold' }}> | User ID: {
+                                <span className="user-id" style={{ color: 'black', fontWeight: 'bold' }}> | User ID: {
                                 console.log("User object in message:", currentUser) ||
                                 console.log("User properties:", Object.keys(currentUser)) ||
                                     (currentUser.id || currentUser.userID || currentUser.userId || currentUser.ID || 'N/A')

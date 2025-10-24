@@ -1,142 +1,118 @@
-/**
- * Sanele Zondi (221602011)
- * invoiceService.js
- */
-
+/*
+Lisakhanya Zumana (230864821)
+Date: 14/08/2025
+Invoice Service for managing invoice operations
+*/
 import apiClient from "../scripts/apiConfig";
 
-const API_URL = "http://localhost:3045/api";
+const API_URL = "http://localhost:3045/api/invoice";
 
-const invoiceService = {
-  create: async (invoiceData) => {
-    try {
-      const response = await apiClient.post(
-        `${API_URL}/invoice/create`,
-        invoiceData
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Invoice creation failed"
-      );
-    }
-  },
-
-  read: async (invoiceId) => {
-    try {
-      const response = await apiClient.get(
-        `${API_URL}/invoice/read/${invoiceId}`
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch invoice"
-      );
-    }
-  },
-
-  update: async (invoiceData) => {
-    try {
-      const response = await apiClient.put(
-        `${API_URL}/invoice/update`,
-        invoiceData
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to update invoice"
-      );
-    }
-  },
-
-  delete: async (invoiceId) => {
-    try {
-      const response = await apiClient.delete(
-        `${API_URL}/invoice/delete/${invoiceId}`
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to delete invoice"
-      );
-    }
-  },
-
-  getUserInvoices: async (userId) => {
-    try {
-      console.log("InvoiceService: Getting invoices for user ID:", userId);
-      console.log(
-        "InvoiceService: API URL:",
-        `${API_URL}/invoice/user/${userId}`
-      );
-
-      const response = await apiClient.get(`${API_URL}/invoice/user/${userId}`);
-      console.log("InvoiceService: Response received:", response);
-      console.log("InvoiceService: Response data:", response.data);
-
-      return response.data;
-    } catch (error) {
-      console.error("InvoiceService: Error fetching user invoices:", error);
-      console.error("InvoiceService: Error response:", error.response);
-      console.error("InvoiceService: Error status:", error.response?.status);
-      console.error("InvoiceService: Error data:", error.response?.data);
-
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch user invoices"
-      );
-    }
-  },
-
-  getAllInvoices: async () => {
-    try {
-      console.log("InvoiceService: Getting all invoices...");
-      console.log("InvoiceService: API URL:", `${API_URL}/invoice/all`);
-
-      const response = await apiClient.get(`${API_URL}/invoice/all`);
-      console.log("InvoiceService: All invoices response:", response);
-      console.log("InvoiceService: All invoices data:", response.data);
-
-      return response.data;
-    } catch (error) {
-      console.error("InvoiceService: Error fetching all invoices:", error);
-      console.error("InvoiceService: Error response:", error.response);
-      console.error("InvoiceService: Error status:", error.response?.status);
-      console.error("InvoiceService: Error data:", error.response?.data);
-
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch invoices"
-      );
-    }
-  },
-
-  getInvoicesByPayment: async (paymentId) => {
-    try {
-      const response = await apiClient.get(
-        `${API_URL}/invoice/payment/${paymentId}`
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch invoices by payment"
-      );
-    }
-  },
-
-  downloadInvoice: async (invoiceId) => {
-    try {
-      const response = await apiClient.get(
-        `${API_URL}/invoice/download/${invoiceId}`,
-        {
-          responseType: "blob",
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to download invoice"
-      );
-    }
-  },
+// Helper function to check if token is expired
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return Date.now() >= payload.exp * 1000;
+  } catch (error) {
+    console.error("Error checking token expiration:", error);
+    return true;
+  }
 };
 
-export default invoiceService;
+// Helper function to get JWT token
+const getAuthToken = () => {
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+  if (token && isTokenExpired(token)) {
+    console.warn("JWT token has expired");
+    localStorage.removeItem("token");
+    localStorage.removeItem("tokenType");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+    return null;
+  }
+  return token;
+};
+
+// Get all invoices
+export const getAllInvoices = () => {
+  console.log("Fetching all invoices");
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(
+      new Error("Authentication required. Please log in again.")
+    );
+  }
+  return apiClient.get(`${API_URL}/all`);
+};
+
+// Get invoice by ID
+export const getInvoiceById = (id) => {
+  console.log("Fetching invoice with ID:", id);
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(
+      new Error("Authentication required. Please log in again.")
+    );
+  }
+  return apiClient.get(`${API_URL}/read/${id}`);
+};
+
+// Create a new invoice
+export const createInvoice = (invoiceData) => {
+  console.log("Creating invoice:", invoiceData);
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(
+      new Error("Authentication required. Please log in again.")
+    );
+  }
+  return apiClient.post(`${API_URL}/create`, invoiceData);
+};
+
+// Update an existing invoice
+export const updateInvoice = (invoiceData) => {
+  console.log("Updating invoice:", invoiceData);
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(
+      new Error("Authentication required. Please log in again.")
+    );
+  }
+  return apiClient.put(`${API_URL}/update`, invoiceData);
+};
+
+// Delete an invoice
+export const deleteInvoice = (id) => {
+  console.log("Deleting invoice with ID:", id);
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(
+      new Error("Authentication required. Please log in again.")
+    );
+  }
+  return apiClient.delete(`${API_URL}/delete/${id}`);
+};
+
+// Get invoices for a specific user
+export const getUserInvoices = (userId) => {
+  console.log("Fetching invoices for user ID:", userId);
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(
+      new Error("Authentication required. Please log in again.")
+    );
+  }
+  return apiClient.get(`${API_URL}/user/${userId}`);
+};
+
+// Get invoices for a specific booking
+export const getBookingInvoices = (bookingId) => {
+  console.log("Fetching invoices for booking ID:", bookingId);
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(
+      new Error("Authentication required. Please log in again.")
+    );
+  }
+  return apiClient.get(`${API_URL}/booking/${bookingId}`);
+};
